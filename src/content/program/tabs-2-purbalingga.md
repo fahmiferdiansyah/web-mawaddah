@@ -4,7 +4,7 @@ menu: "TABS 2 Putra Purbalingga"
 pilar: "pendidikan"
 ikon: "cap"
 urutan: 2
-status: "Berjalan"
+status: "PSB Dibuka"
 ringkasan: "Pesantren berasrama untuk santri putra di Purbalingga, berfokus pada tahfidz Al-Qur’an, ilmu diniyah, dan adab."
 lokasi: "Purbalingga, Jawa Tengah"
 penerima: "Santri putra"

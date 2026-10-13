@@ -4,7 +4,7 @@ menu: "TABS 1 Putra Banjarnegara"
 pilar: "pendidikan"
 ikon: "cap"
 urutan: 1
-status: "Berjalan"
+status: "PSB Dibuka"
 ringkasan: "Pesantren berasrama untuk santri putra di Banjarnegara — pesantren pertama Yayasan Mawaddah Indonesia, berfokus pada tahfidz dan adab."
 lokasi: "Banjarnegara, Jawa Tengah"
 penerima: "Santri putra"

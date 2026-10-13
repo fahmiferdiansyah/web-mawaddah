@@ -4,7 +4,7 @@ menu: "TABS 3 Putri Purbalingga"
 pilar: "pendidikan"
 ikon: "cap"
 urutan: 3
-status: "Berjalan"
+status: "PSB Dibuka"
 ringkasan: "Pesantren berasrama khusus santri putri di Purbalingga, membina generasi muslimah penghafal Al-Qur’an."
 lokasi: "Purbalingga, Jawa Tengah"
 penerima: "Santri putri"

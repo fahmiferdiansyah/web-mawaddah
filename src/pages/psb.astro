@@ -73,12 +73,14 @@ const alur = [
     </div>
   </section>
 
+  {berjalan.length > 0 && (
   <section class="section bg-sand" aria-labelledby="tabs-title">
     <div class="container">
       <SectionHead eyebrow="Pesantren yang berjalan" id="tabs-title" title="Keluarga besar *Taisiru Ar-Rahman.*" />
       <div class="grid">{berjalan.map((p, i) => <ProgramCard entry={p} i={i} />)}</div>
     </div>
   </section>
+  )}
 </Base>
 
 <style>
