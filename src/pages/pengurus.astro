@@ -1,0 +1,125 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+
+type Person = { nama: string; peran: string };
+const inisial = (n: string) =>
+  n.replace(/^(Ust\.|H\.)\s+/, '').replace(/,.*$/, '').split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+
+const pembina: Person[] = [
+  { nama: 'Ust. Mas’ud Abu Abdillah', peran: 'Ketua Pembina' },
+  { nama: 'Ust. Abu Usamah Toni Hidayat', peran: 'Anggota Pembina' },
+];
+const pengawas: Person[] = [
+  { nama: 'Ust. Yusuf Utsman Baisa', peran: 'Ketua Pengawas' },
+  { nama: 'Muadz Masyadi, S.H.', peran: 'Anggota Pengawas' },
+  { nama: 'Ust. Hasby Bashiruddin Nasrullah', peran: 'Anggota Pengawas' },
+];
+const ketua: Person = { nama: 'H. Afipuddien, M.M.', peran: 'Ketua Yayasan' };
+const harian: Person[] = [
+  { nama: 'Fahmi Ferdiansyah', peran: 'Sekretaris' },
+  { nama: 'Abdullah', peran: 'Bendahara' },
+  { nama: 'Ammar Said', peran: 'Anggota' },
+];
+const bidang = [
+  { nama: 'Departemen Pendidikan', icon: 'cap', orang: [{ nama: 'Ust. Saim Abu Nailah', peran: 'Kepala Departemen' }] },
+  {
+    nama: 'Departemen Dakwah Media · Wesal TV', icon: 'tv', orang: [
+      { nama: 'Bagus Suhardi', peran: 'Koordinator Wesal TV' },
+      { nama: 'Chaidir Iswandi', peran: 'Konten Kreator' },
+      { nama: 'Tri Faisal Islami', peran: 'Operator MCR' },
+    ],
+  },
+] as const;
+---
+<Base title="Pengurus" description="Struktur organisasi Yayasan Mawaddah Indonesia: dewan pembina, dewan pengawas, pengurus harian, dan departemen.">
+  <PageHero eyebrow="Struktur organisasi" title="Orang-orang di balik *amanah ini.*"
+    lead="Pembina, pengawas, dan pengurus yang menjaga agar setiap kebaikan tersalurkan dengan amanah."
+    crumbs={[{ href: '/profil/', label: 'Tentang Kami' }]} />
+
+  <section class="section">
+    <div class="container chart">
+      <!-- Pembina & Pengawas -->
+      <div class="tier two">
+        <div class="board" data-reveal>
+          <p class="board-title"><Icon name="star8" /> Dewan Pembina</p>
+          <ul>{pembina.map((p) => <li class:list={['person', { 'is-lead': p.peran.startsWith('Ketua') }]}><span class="av serif" aria-hidden="true">{inisial(p.nama)}</span><span><strong>{p.nama}</strong><span class="small muted">{p.peran}</span></span></li>)}</ul>
+        </div>
+        <div class="board" data-reveal style="--i:1">
+          <p class="board-title"><Icon name="shield" /> Dewan Pengawas</p>
+          <ul>{pengawas.map((p) => <li class:list={['person', { 'is-lead': p.peran.startsWith('Ketua') }]}><span class="av serif" aria-hidden="true">{inisial(p.nama)}</span><span><strong>{p.nama}</strong><span class="small muted">{p.peran}</span></span></li>)}</ul>
+        </div>
+      </div>
+
+      <span class="connector" aria-hidden="true"></span>
+
+      <!-- Ketua -->
+      <div class="tier">
+        <div class="chair on-plum textured" data-reveal>
+          <span class="av big serif" aria-hidden="true">{inisial(ketua.nama)}</span>
+          <p class="eyebrow plain">{ketua.peran}</p>
+          <p class="chair-name display">{ketua.nama}</p>
+        </div>
+      </div>
+
+      <span class="connector" aria-hidden="true"></span>
+
+      <!-- Pengurus harian -->
+      <div class="board wide" data-reveal>
+        <p class="board-title"><Icon name="users" /> Pengurus Harian</p>
+        <ul class="row3">{harian.map((p) => <li class="person"><span class="av serif" aria-hidden="true">{inisial(p.nama)}</span><span><strong>{p.nama}</strong><span class="small muted">{p.peran}</span></span></li>)}</ul>
+      </div>
+
+      <span class="connector" aria-hidden="true"></span>
+
+      <!-- Bidang -->
+      <div class="tier two">
+        {bidang.map((b, i) => (
+          <div class="board" data-reveal style={`--i:${i}`}>
+            <p class="board-title"><Icon name={b.icon} /> {b.nama}</p>
+            <ul>{b.orang.map((p) => <li class:list={['person', { 'is-lead': p.peran.startsWith('Ketua') || p.peran.startsWith('Koordinator') }]}><span class="av serif" aria-hidden="true">{inisial(p.nama)}</span><span><strong>{p.nama}</strong><span class="small muted">{p.peran}</span></span></li>)}</ul>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .chart { display: grid; justify-items: center; }
+  .tier { display: grid; gap: var(--s-4); width: 100%; justify-items: center; }
+  .tier.two { gap: var(--s-4); }
+  @media (min-width: 900px) { .tier.two { grid-template-columns: 1fr 1fr; align-items: start; } }
+  .connector { display: block; width: 1px; height: clamp(2rem, 1.5rem + 2vw, 3.5rem); background: linear-gradient(var(--rose), rgb(211 164 40 / 0.2)); }
+
+  .board { width: 100%; padding: var(--s-5); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); }
+  .board.wide { max-width: 56rem; }
+  .board-title {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding-bottom: var(--s-3); margin-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line);
+    font-size: 0.78rem; font-weight: 650; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rose);
+  }
+  .board ul { list-style: none; padding: 0; display: grid; gap: 0.25rem; }
+  .row3 { grid-template-columns: 1fr; }
+  @media (min-width: 720px) { .row3 { grid-template-columns: repeat(3, 1fr); } }
+
+  .person { display: flex; align-items: center; gap: 0.85rem; padding: 0.6rem; border-radius: var(--r-md); transition: background-color var(--d-2); }
+  .person:hover { background: var(--paper); }
+  .person > span:last-child { display: grid; line-height: 1.35; }
+  .person strong { font-weight: 600; }
+  .av {
+    flex: none; display: grid; place-items: center;
+    width: 3rem; height: 3rem;
+    clip-path: var(--star);
+    background: var(--girih-rose), linear-gradient(160deg, #f6e7b8, #ecd9a3);
+    background-size: 24px, cover;
+    color: var(--rose-deep); font-size: 0.95rem;
+  }
+  .person.is-lead .av { background: var(--grad-rose); color: #fff; }
+
+  .chair { display: grid; justify-items: center; gap: var(--s-2); text-align: center; padding: var(--s-6) var(--s-8); border-radius: var(--r-lg); overflow: hidden; }
+  .av.big { width: 5rem; height: 5rem; font-size: 1.4rem; background: #e6bd4a; color: var(--plum); margin-bottom: var(--s-2); }
+  .chair-name { font-size: var(--step-3); color: var(--on-plum); }
+</style>

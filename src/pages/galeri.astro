@@ -1,0 +1,143 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+
+/** [PLACEHOLDER] Ganti dengan foto asli: tambahkan `image: import(...)` per item atau gunakan import.meta.glob. */
+const items = [
+  { cap: 'Penyaluran wakaf mushaf Al-Qur’an', tone: 'rose', emblem: 'book', ratio: '4 / 5' },
+  { cap: 'Studio Wesal TV di Graha Mawaddah', tone: 'plum', emblem: 'tv', ratio: '4 / 3' },
+  { cap: 'Santri TABS 1 Banjarnegara', tone: 'blush', emblem: 'cap', ratio: '1 / 1' },
+  { cap: 'Sumur wakaf untuk warga', tone: 'sand', emblem: 'drop', ratio: '4 / 3' },
+  { cap: 'Pembangunan masjid', tone: 'rose', emblem: 'mosque', ratio: '3 / 4' },
+  { cap: 'Iftar jama’i bersama santri', tone: 'blush', emblem: 'bowl', ratio: '4 / 3' },
+  { cap: 'Santriwati TABS 3 Purbalingga', tone: 'plum', emblem: 'cap', ratio: '1 / 1' },
+  { cap: 'Rumah Qur’an', tone: 'sand', emblem: 'book', ratio: '4 / 5' },
+  { cap: 'Tanggap bencana', tone: 'rose', emblem: 'shield', ratio: '4 / 3' },
+  { cap: 'Penyaluran daging qurban', tone: 'blush', emblem: 'heart', ratio: '3 / 4' },
+  { cap: 'Gedung Graha Mawaddah', tone: 'plum', emblem: 'home', ratio: '4 / 3' },
+  { cap: 'Santri TABS 2 Purbalingga', tone: 'sand', emblem: 'cap', ratio: '1 / 1' },
+] as const;
+---
+<Base title="Galeri" description="Dokumentasi kegiatan dakwah, pendidikan, dan sosial Yayasan Mawaddah Indonesia.">
+  <PageHero eyebrow="Galeri" title="Potret *kebaikan* yang Anda hadirkan."
+    lead="Setiap gambar adalah jejak amanah — wajah-wajah yang tersentuh oleh kebaikan para donatur dan relawan." />
+
+  <section class="section-tight">
+    <div class="container">
+      <ul class="masonry">
+        {items.map((it, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <div class="tile">
+              <Media alt={it.cap} tone={it.tone} emblem={it.emblem} ratio={it.ratio} label={it.cap} sizes="(min-width: 960px) 30vw, (min-width: 640px) 45vw, 92vw" />
+              <span class="cap small">{it.cap}</span>
+              <span class="zoom" aria-hidden="true"><Icon name="expand" /></span>
+              <button type="button" class="tile-btn" data-open={i} aria-label={`Perbesar: ${it.cap}`}></button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Tampilan foto">
+    <div class="lb-stage" data-stage></div>
+    <p class="lb-cap" data-cap></p>
+    <div class="lb-ctrl">
+      <button type="button" data-prev aria-label="Foto sebelumnya"><Icon name="arrow-left" /></button>
+      <span class="num small" data-count></span>
+      <button type="button" data-next aria-label="Foto berikutnya"><Icon name="arrow-right" /></button>
+    </div>
+    <button type="button" class="lb-close" data-close aria-label="Tutup"><Icon name="x" /></button>
+  </dialog>
+</Base>
+
+<script>
+  const dlg = document.getElementById('lightbox') as HTMLDialogElement;
+  const tiles = [...document.querySelectorAll<HTMLButtonElement>('[data-open]')];
+  const stage = dlg.querySelector<HTMLElement>('[data-stage]')!;
+  const cap = dlg.querySelector<HTMLElement>('[data-cap]')!;
+  const count = dlg.querySelector<HTMLElement>('[data-count]')!;
+  let idx = 0;
+
+  function show(i: number) {
+    idx = (i + tiles.length) % tiles.length;
+    const tile = tiles[idx];
+    const box = tile.closest('.tile')!;
+    const fig = box.querySelector('.media');
+    stage.replaceChildren(fig ? fig.cloneNode(true) : document.createElement('div'));
+    cap.textContent = box.querySelector('.cap')?.textContent ?? '';
+    count.textContent = `${idx + 1} / ${tiles.length}`;
+    stage.animate([{ opacity: 0, transform: 'scale(.97)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.22,1,.36,1)' });
+  }
+  tiles.forEach((t, i) => t.addEventListener('click', () => { show(i); dlg.showModal(); }));
+  dlg.querySelector('[data-prev]')!.addEventListener('click', () => show(idx - 1));
+  dlg.querySelector('[data-next]')!.addEventListener('click', () => show(idx + 1));
+  dlg.querySelector('[data-close]')!.addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  dlg.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(idx - 1);
+    if (e.key === 'ArrowRight') show(idx + 1);
+  });
+  dlg.addEventListener('close', () => tiles[idx]?.focus());
+</script>
+
+<style>
+  .masonry { list-style: none; padding: 0; columns: 1; column-gap: var(--s-5); }
+  .masonry li { break-inside: avoid; margin-bottom: var(--s-5); }
+  @media (min-width: 640px) { .masonry { columns: 2; } }
+  @media (min-width: 960px) { .masonry { columns: 3; } }
+  .tile { position: relative; border-radius: var(--r-lg); }
+  .tile-btn { position: absolute; inset: 0; z-index: 2; border-radius: var(--r-lg); cursor: zoom-in; }
+  .tile :global(.ph) { transition: transform 1200ms var(--ease-out); }
+  .cap {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 2.5rem 1.1rem 1rem;
+    color: #fff; font-weight: 520;
+    background: linear-gradient(transparent, rgb(110 18 63 / 0.75));
+    border-radius: 0 0 var(--r-lg) var(--r-lg);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity var(--d-3) var(--ease-out), transform var(--d-3) var(--ease-out);
+  }
+  .zoom {
+    position: absolute; top: 0.9rem; right: 0.9rem;
+    display: grid; place-items: center;
+    width: 2.6rem; height: 2.6rem; border-radius: 50%;
+    background: rgb(255 255 255 / 0.92); color: var(--ink);
+    opacity: 0; transform: scale(0.7);
+    transition: opacity var(--d-2), transform 520ms var(--ease-spring);
+  }
+  @media (hover: hover) {
+    .tile:hover :global(.ph) { transform: scale(1.05); }
+    .tile:hover .cap, .tile:hover .zoom { opacity: 1; transform: none; }
+  }
+  @media (hover: none) { .cap { opacity: 1; transform: none; } }
+  .tile:focus-within .cap, .tile:focus-within .zoom { opacity: 1; transform: none; }
+
+  .lightbox {
+    width: min(92vw, 64rem); max-height: 92dvh;
+    margin: auto;
+    padding: 0; border: 0; border-radius: var(--r-lg);
+    background: var(--plum); color: var(--on-plum);
+    overflow: hidden;
+  }
+  .lightbox[open] { display: grid; animation: lb-in 520ms var(--ease-out); }
+  .lightbox::backdrop { background: rgb(38 8 24 / 0.82); backdrop-filter: blur(6px); }
+  @keyframes lb-in { from { opacity: 0; transform: translateY(16px) scale(0.98); } }
+  .lb-stage { position: relative; width: 100%; height: min(70dvh, calc(min(92vw, 64rem) * 0.625)); }
+  .lb-stage :global(.media) { position: absolute; inset: 0; aspect-ratio: auto !important; }
+  .lb-stage :global(.media-clip) { border-radius: 0; }
+  .lb-stage :global(.media-inner) { clip-path: none !important; transform: none !important; }
+  .lb-stage :global(.ph-label) { display: none; }
+  .lb-cap { padding: var(--s-4) var(--s-5) 0; font-family: var(--font-display); font-size: var(--step-1); }
+  .lb-ctrl { display: flex; align-items: center; gap: var(--s-4); padding: var(--s-3) var(--s-5) var(--s-5); color: var(--on-plum-soft); }
+  .lb-ctrl button, .lb-close {
+    display: grid; place-items: center;
+    width: 2.9rem; height: 2.9rem; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-plum); color: var(--on-plum);
+    transition: background-color var(--d-2), color var(--d-2);
+  }
+  .lb-ctrl button:hover, .lb-close:hover { background: var(--on-plum); color: var(--plum); }
+  .lb-close { position: absolute; top: 0.9rem; right: 0.9rem; background: rgb(110 18 63 / 0.6); }
+</style>

@@ -1,0 +1,91 @@
+---
+import '../styles/global.css';
+import geistUrl from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+const { title, description = site.description, image = '/og-image.jpg', type = 'website' } = Astro.props;
+const fullTitle = title ? `${title} — ${site.name}` : `${site.name} · Dakwah, Pendidikan & Sosial`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(image, Astro.site);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NGO',
+  name: site.name,
+  alternateName: site.short,
+  url: Astro.site?.toString(),
+  logo: new URL('/icon-512.png', Astro.site).toString(),
+  description: site.description,
+  foundingDate: String(site.founded),
+  email: site.email,
+  telephone: site.phone,
+  address: { '@type': 'PostalAddress', streetAddress: 'Jl. Swadaya 1 No. 59, Pondok Ranggon, Cipayung', addressLocality: 'Jakarta Timur', addressRegion: 'DKI Jakarta', addressCountry: 'ID' },
+  sameAs: site.social.map((s) => s.href),
+};
+---
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#faf5f8" />
+    <meta name="color-scheme" content="light" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href={geistUrl} as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="id_ID" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Langsung ke konten</a>
+
+    <!-- Bentuk lengkung mihrab, dipakai ulang oleh komponen Media -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <clipPath id="arch-clip" clipPathUnits="objectBoundingBox">
+        <path d="M0,1 L0,0.4 C0,0.2 0.22,0.072 0.5,0 C0.78,0.072 1,0.2 1,0.4 L1,1 Z" />
+      </clipPath>
+    </svg>
+
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>
+
+<style>
+  main:focus { outline: none; }
+</style>

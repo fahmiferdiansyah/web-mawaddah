@@ -1,0 +1,68 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Media from './Media.astro';
+import Progress from './Progress.astro';
+import Icon from './Icon.astro';
+import { pilar } from '../data/site';
+import { pilarVisual } from '../data/visual';
+
+interface Props { entry: CollectionEntry<'program'>; i?: number; compact?: boolean }
+const { entry, i = 0, compact = false } = Astro.props;
+const d = entry.data;
+const v = pilarVisual[d.pilar];
+const href = `/${entry.id}/`;
+---
+<article class:list={['pcard', { compact }]} data-reveal style={`--i:${i}`} data-pilar={d.pilar}>
+  <div class="pcard-media">
+    <Media image={d.foto} alt={d.fotoAlt || d.title} tone={v.tone} emblem={d.ikon} label={d.title} ratio={compact ? '4 / 3' : '16 / 11'} sizes="(min-width: 960px) 30vw, (min-width: 640px) 45vw, 92vw" />
+    {d.status && <span class:list={['status', { open: d.status === 'PSB Dibuka' }]}>{d.status}</span>}
+  </div>
+  <div class="pcard-body">
+    <p class="tag"><Icon name={d.ikon} /> {pilar[d.pilar].nama}</p>
+    <h3><a href={href}>{d.menu}</a></h3>
+    <p class="muted desc">{d.ringkasan}</p>
+    {d.target && d.terkumpul !== undefined && <Progress target={d.target} terkumpul={d.terkumpul} compact />}
+    {(d.lokasi || d.jadwal) && <p class="meta small"><Icon name={d.lokasi ? 'map-pin' : 'calendar'} /> {d.lokasi ?? d.jadwal}</p>}
+    <span class="more" aria-hidden="true">Selengkapnya <Icon name="arrow-right" /></span>
+  </div>
+</article>
+
+<style>
+  .pcard {
+    position: relative;
+    display: grid; grid-template-rows: auto 1fr;
+    background: #fff;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+    transition: transform 520ms var(--ease-out), box-shadow 520ms var(--ease-out);
+  }
+  .pcard-media { position: relative; }
+  .pcard-media :global(.media-clip) { border-radius: 0; }
+  .status {
+    position: absolute; top: 0.85rem; left: 0.85rem;
+    font-size: 0.72rem; font-weight: 650; letter-spacing: 0.04em;
+    padding: 0.3rem 0.7rem; border-radius: var(--r-pill);
+    background: rgb(255 255 255 / 0.92); color: var(--ink);
+  }
+  .status.open { background: var(--rose); color: #fff; }
+  .pcard-body { display: grid; gap: var(--s-2); align-content: start; padding: var(--s-5); }
+  .tag :global(.icon) { width: 1em; height: 1em; }
+  h3 { font-size: 1.2rem; line-height: 1.3; }
+  h3 a::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: var(--r-lg); }
+  .desc { font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .compact .desc { -webkit-line-clamp: 2; }
+  .meta { display: inline-flex; align-items: center; gap: 0.45em; color: var(--ink-soft); }
+  .meta :global(.icon) { color: var(--rose); }
+  .more { display: inline-flex; align-items: center; gap: 0.45em; margin-top: var(--s-2); font-weight: 600; font-size: 0.9rem; color: var(--rose); }
+  .more :global(.icon) { transition: transform 420ms var(--ease-out); }
+  .pcard :global(.ph), .pcard :global(img) { transition: transform 1200ms var(--ease-out); }
+  @media (hover: hover) {
+    .pcard:hover { transform: translateY(-6px); box-shadow: var(--shadow-2); }
+    .pcard:hover h3 a { color: var(--rose); }
+    .pcard:hover .more :global(.icon) { transform: translateX(5px); }
+    .pcard:hover :global(.ph), .pcard:hover :global(img) { transform: scale(1.05); }
+  }
+  .pcard:focus-within { outline: 2px solid var(--rose); outline-offset: 3px; }
+  .pcard h3 a:focus-visible { outline: none; }
+</style>

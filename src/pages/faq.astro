@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site, waLink } from '../data/site';
+
+const groups = [
+  {
+    judul: 'Donasi', icon: 'heart', items: [
+      { q: 'Bagaimana cara berdonasi?', a: 'Isi niat donasi di halaman Donasi, transfer ke rekening resmi atau scan QRIS, lalu konfirmasi melalui WhatsApp admin. Pesan konfirmasi akan terisi otomatis.' },
+      { q: 'Apakah donasi saya dilaporkan?', a: 'Ya. Setiap donasi yang dikonfirmasi dicatat, dan kabar penyaluran program kami bagikan melalui halaman Kabar serta WhatsApp.' },
+      { q: 'Bisakah saya mendapatkan bukti penerimaan?', a: 'Bisa. Setelah konfirmasi, admin akan mengirimkan bukti penerimaan donasi melalui WhatsApp.' },
+      { q: 'Bolehkah berdonasi atas nama orang lain atau almarhum?', a: 'Tentu. Tuliskan nama yang dimaksud pada kolom “Atas nama” saat mengisi niat donasi.' },
+    ],
+  },
+  {
+    judul: 'Zakat & Wakaf', icon: 'book', items: [
+      { q: 'Ke rekening mana saya membayar zakat?', a: 'Mohon hubungi admin melalui WhatsApp sebelum menunaikan zakat agar kami arahkan ke rekening dan pencatatan yang tepat.' },
+      { q: 'Apakah dana zakat dipisahkan?', a: 'Ya. Dana zakat dicatat terpisah dari infaq dan wakaf, dan hanya disalurkan kepada delapan golongan (asnaf) yang berhak.' },
+      { q: 'Ke mana mushaf wakaf disalurkan?', a: 'Ke masjid, musala, pesantren, rumah Qur’an, majelis taklim, dan daerah terdampak bencana di seluruh Indonesia. Hingga kini 189.940 mushaf telah tersalurkan.' },
+      { q: 'Apa beda wakaf pesantren dengan infaq biasa?', a: 'Wakaf pesantren digunakan untuk aset yang manfaatnya terus berjalan, seperti asrama, ruang kelas, dan masjid pesantren. Infaq dapat digunakan untuk kebutuhan operasional program.' },
+    ],
+  },
+  {
+    judul: 'Pesantren & PSB', icon: 'cap', items: [
+      { q: 'Pesantren mana yang sedang membuka pendaftaran?', a: 'Taisiru Ar-Rahman Boarding School 4 Cilacap (putra) dan Taisiru Ar-Rahman Boarding School 5 Cianjur (putra), serta Sekolah Tadrib Ad Du’at Mawaddah (STAM) di Graha Mawaddah, Jakarta Timur.' },
+      { q: 'Bagaimana cara mendaftar dan berapa biayanya?', a: `Silakan hubungi admin PSB melalui WhatsApp ${site.phone}. Admin akan mengirimkan brosur, persyaratan, dan rincian biaya.` },
+    ],
+  },
+  {
+    judul: 'Lainnya', icon: 'tv', items: [
+      { q: 'Di mana saya bisa menonton Wesal TV?', a: 'Informasi kanal siaran Wesal TV dapat ditanyakan melalui admin. Tautan resmi juga tersedia di media sosial yayasan.' },
+      { q: 'Bolehkah berkunjung ke Graha Mawaddah?', a: `Tentu. Kantor pusat kami berada di ${site.address}. Mohon hubungi admin terlebih dahulu untuk mengatur jadwal kunjungan.` },
+    ],
+  },
+] as const;
+---
+<Base title="Tanya Jawab" description="Pertanyaan yang sering diajukan seputar donasi, zakat, wakaf, PSB, dan kegiatan Yayasan Mawaddah Indonesia.">
+  <PageHero eyebrow="Tanya jawab" title="Yang sering *ditanyakan.*"
+    lead="Belum menemukan jawabannya? Admin kami siap membantu melalui WhatsApp."
+    crumbs={[{ href: '/profil/', label: 'Tentang Kami' }]} />
+
+  <section class="section-tight">
+    <div class="container layout">
+      <nav class="toc" aria-label="Kategori pertanyaan">
+        <ul>
+          {groups.map((g, i) => <li><a href={`#faq-${i}`}><Icon name={g.icon} /> {g.judul}</a></li>)}
+        </ul>
+        <a class="btn btn-sm" href={waLink('Assalamu’alaikum, saya ingin bertanya.')} target="_blank" rel="noopener"><Icon name="chat" /> Tanya admin</a>
+      </nav>
+      <div class="groups">
+        {groups.map((g, i) => (
+          <section id={`faq-${i}`} aria-labelledby={`faq-h-${i}`}>
+            <h2 id={`faq-h-${i}`} class="g-title display" data-reveal>{g.judul}</h2>
+            <div class="faq">
+              {g.items.map((f, j) => (
+                <details data-reveal style={`--i:${j}`}>
+                  <summary><span>{f.q}</span><span class="pm" aria-hidden="true"></span></summary>
+                  <div class="ans"><p class="muted">{f.a}</p></div>
+                </details>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 960px) { .layout { grid-template-columns: 15rem 1fr; gap: var(--s-9); } .toc { position: sticky; top: 7rem; } }
+  .toc { display: grid; gap: var(--s-4); justify-items: start; }
+  .toc ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  @media (min-width: 960px) { .toc ul { display: grid; gap: 0.15rem; width: 100%; } }
+  .toc a:not(.btn) { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.85rem; border-radius: var(--r-md); font-weight: 560; transition: background-color var(--d-2), color var(--d-2); }
+  .toc a:not(.btn):hover { background: var(--paper-2); color: var(--rose); }
+  .toc a :global(.icon) { color: var(--rose); }
+  .groups { display: grid; gap: var(--s-8); }
+  .groups section { scroll-margin-top: 7rem; }
+  .g-title { font-size: var(--step-3); margin-bottom: var(--s-4); }
+  .faq { border-top: 1px solid var(--line-strong); }
+  details { border-bottom: 1px solid var(--line-strong); }
+  summary { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); padding-block: var(--s-5); cursor: pointer; list-style: none; font-family: var(--font-serif); font-weight: 600; font-size: var(--step-1); line-height: 1.35; }
+  summary::-webkit-details-marker { display: none; }
+  @media (hover: hover) { summary:hover { color: var(--rose); } }
+  .pm { position: relative; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line-strong); transition: background-color var(--d-2), transform 520ms var(--ease-out); }
+  .pm::before, .pm::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px; background: currentColor; translate: -50% -50%; transition: transform 420ms var(--ease-out); }
+  .pm::after { transform: rotate(90deg); }
+  details[open] .pm { background: var(--rose); color: var(--paper); box-shadow: none; transform: rotate(180deg); }
+  details[open] .pm::after { transform: rotate(0); }
+  .ans { padding-bottom: var(--s-5); max-width: 62ch; }
+  details[open] .ans { animation: ans-in 520ms var(--ease-out); }
+  @keyframes ans-in { from { opacity: 0; transform: translateY(-6px); } }
+</style>

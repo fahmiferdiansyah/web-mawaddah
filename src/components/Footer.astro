@@ -1,0 +1,108 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo-lockup.webp';
+import Icon from './Icon.astro';
+import { site, pilar, tentangMenu, bantuanMenu, waLink } from '../data/site';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer on-plum textured">
+  <div class="container">
+    <div class="closing">
+      <p class="statement display" data-reveal>
+        Setiap kebaikan kecil, bila dirajut bersama, menjadi <em>mawaddah</em> bagi sesama.
+      </p>
+      <div class="cluster" data-reveal style="--i:1">
+        <a href="/donasi/" class="btn btn-light">Salurkan donasi <Icon name="arrow-right" /></a>
+        <a href={waLink('Assalamu’alaikum, saya ingin mengonfirmasi donasi.')} class="btn btn-ghost-light" target="_blank" rel="noopener"><Icon name="chat" /> Konfirmasi donasi</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col brand-col">
+        <a href="/" class="seal" aria-label={`${site.name} — Beranda`}>
+          <Image src={logo} alt="" widths={[220, 440]} sizes="220px" loading="lazy" />
+        </a>
+        <p class="small muted">{site.tagline}</p>
+        <p class="small muted legal-line"><Icon name="shield" /> <a href="/profil/#legalitas">{site.legal}</a></p>
+        <ul class="social">
+          {site.social.map((s) => (
+            <li><a href={s.href} target="_blank" rel="noopener" aria-label={s.label}><Icon name={s.icon} /></a></li>
+          ))}
+        </ul>
+      </div>
+
+      <nav class="col" aria-label="Tentang kami">
+        <h2 class="col-title">Tentang Kami</h2>
+        <ul>{tentangMenu.map((n) => <li><a href={n.href}>{n.label}</a></li>)}</ul>
+      </nav>
+
+      <nav class="col" aria-label="Program">
+        <h2 class="col-title">Program</h2>
+        <ul>
+          {Object.values(pilar).map((p) => <li><a href={p.href}>Program {p.nama}</a></li>)}
+          <li><a href="/wakaf-quran/">Wakaf Mushaf Al-Qur’an</a></li>
+          <li><a href="/wesal-tv/">Wesal TV</a></li>
+          <li><a href="/psb/">PSB TABS &amp; STAM</a></li>
+          <li><a href="/haji-umrah/">Haji &amp; Umrah (Almaz Tour)</a></li>
+        </ul>
+      </nav>
+
+      <nav class="col" aria-label="Bantuan">
+        <h2 class="col-title">Bantuan</h2>
+        <ul>{bantuanMenu.map((n) => <li><a href={n.href}>{n.label}</a></li>)}</ul>
+      </nav>
+
+      <div class="col contact-col">
+        <h2 class="col-title">Kantor Pusat</h2>
+        <address>
+          <p class="row"><Icon name="map-pin" /> <a href={site.mapsUrl} target="_blank" rel="noopener">{site.building}<br />{site.address}</a></p>
+          <p class="row"><Icon name="chat" /> <a href={waLink('Assalamu’alaikum, saya ingin bertanya.')} target="_blank" rel="noopener">{site.phone} (WhatsApp admin)</a></p>
+          <p class="row"><Icon name="mail" /> <a href={`mailto:${site.email}`}>{site.email}</a></p>
+        </address>
+      </div>
+    </div>
+
+    <div class="bottom small">
+      <p>© {year} {site.name}. Berkhidmat sejak {site.founded}.</p>
+      <p class="arab-sign"><span class="arab" lang="ar">جزاكم الله خيرا</span> — terima kasih atas setiap kebaikan Anda.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding-top: var(--section); overflow: hidden; }
+  .closing { display: grid; gap: var(--s-6); padding-bottom: calc(var(--section) * 0.8); border-bottom: 1px solid var(--line-plum); }
+  .statement { font-size: var(--step-4); line-height: 1.15; max-width: 22ch; color: var(--on-plum); }
+  .statement em { color: #e6bd4a; }
+  @media (min-width: 960px) { .closing { grid-template-columns: 1fr auto; align-items: end; } }
+  .grid { display: grid; gap: var(--s-7) var(--s-6); padding-block: var(--s-8); grid-template-columns: 1fr 1fr; }
+  .brand-col, .contact-col { grid-column: 1 / -1; }
+  @media (min-width: 1024px) {
+    .grid { grid-template-columns: 1.4fr 0.9fr 0.9fr 0.8fr 1.4fr; }
+    .brand-col, .contact-col { grid-column: auto; }
+  }
+  .col { display: grid; align-content: start; gap: var(--s-4); }
+  .col-title { font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #e6bd4a; }
+  .col ul { list-style: none; padding: 0; display: grid; gap: 0.1rem; }
+  .col ul a { display: inline-block; padding-block: 0.3rem; color: var(--on-plum-soft); transition: color var(--d-2), transform var(--d-2) var(--ease-out); }
+  @media (hover: hover) { .col ul a:hover { color: var(--on-plum); transform: translateX(4px); } }
+  .seal { display: block; width: min(13.5rem, 100%); padding: 1rem 1.25rem; border-radius: var(--r-lg); background: var(--paper); transition: transform 520ms var(--ease-spring); }
+  @media (hover: hover) { .seal:hover { transform: rotate(-1.5deg) scale(1.02); } }
+  address { font-style: normal; display: grid; gap: 0.8rem; }
+  .row { display: grid; grid-template-columns: 1.25rem 1fr; gap: 0.75rem; align-items: start; color: var(--on-plum-soft); }
+  .row :global(.icon) { margin-top: 0.25em; color: #e6bd4a; }
+  .row a:hover { color: var(--on-plum); }
+  .legal-line { display: flex; gap: 0.5rem; align-items: flex-start; }
+  .legal-line :global(.icon) { color: #e6bd4a; margin-top: 0.2em; }
+  .legal-line a:hover { color: var(--on-plum); }
+  .social { display: flex !important; gap: var(--s-2) !important; }
+  .social a {
+    display: grid !important; place-items: center;
+    width: 2.75rem; height: 2.75rem; border-radius: 50%; padding: 0 !important;
+    box-shadow: inset 0 0 0 1px var(--line-plum); color: var(--on-plum) !important;
+    transition: background-color var(--d-2), color var(--d-2), transform var(--d-2) var(--ease-spring) !important;
+  }
+  @media (hover: hover) { .social a:hover { background: var(--on-plum); color: var(--plum) !important; transform: translateY(-3px) !important; } }
+  .bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3); padding-block: var(--s-5) var(--s-6); border-top: 1px solid var(--line-plum); color: var(--on-plum-soft); }
+  .arab-sign .arab { font-size: 1.15rem; color: var(--on-plum); }
+</style>

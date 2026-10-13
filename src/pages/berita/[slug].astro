@@ -1,0 +1,87 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Media from '../../components/Media.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import SplitText from '../../components/SplitText.astro';
+import Icon from '../../components/Icon.astro';
+import { tanggal } from '../../data/site';
+import { kategoriVisual } from '../../data/visual';
+
+export async function getStaticPaths() {
+  const all = (await getCollection('berita')).sort((a, b) => +b.data.tanggal - +a.data.tanggal);
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry, all } }));
+}
+interface Props { entry: CollectionEntry<'berita'>; all: CollectionEntry<'berita'>[] }
+const { entry, all } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const v = kategoriVisual[d.kategori];
+const more = all.filter((n) => n.id !== entry.id).slice(0, 3);
+const shareUrl = new URL(`/berita/${entry.id}/`, Astro.site).toString();
+const words = entry.body?.split(/\s+/).length ?? 0;
+const minutes = Math.max(1, Math.round(words / 200));
+---
+<Base title={d.title} description={d.ringkasan} type="article">
+  <article>
+    <header class="ahead container-narrow">
+      <nav aria-label="Breadcrumb" class="crumbs small" data-reveal>
+        <a href="/berita/"><Icon name="arrow-left" /> Semua kabar</a>
+      </nav>
+      <p class="meta small" data-reveal>
+        <span class="tag">{d.kategori}</span>
+        <span aria-hidden="true">·</span>
+        <time datetime={d.tanggal.toISOString()}>{tanggal(d.tanggal)}</time>
+        <span aria-hidden="true">·</span>
+        <span>{minutes} menit baca</span>
+      </p>
+      <SplitText as="h1" text={d.title} class="atitle" />
+      <p class="lead" data-reveal style="--i:3">{d.ringkasan}</p>
+    </header>
+
+    <div class="container cover">
+      <Media image={d.foto} alt={d.fotoAlt || d.title} tone={v.tone} emblem={v.emblem} ratio="16 / 8" label={d.title} eager sizes="(min-width: 1200px) 1200px, 92vw" />
+    </div>
+
+    <div class="container-narrow abody">
+      <div class="prose" data-reveal><Content /></div>
+      <footer class="afoot">
+        <p class="small muted">Ditulis oleh <strong>{d.penulis}</strong></p>
+        <a class="btn btn-ghost btn-sm" href={`https://wa.me/?text=${encodeURIComponent(`${d.title} ${shareUrl}`)}`} target="_blank" rel="noopener">
+          <Icon name="chat" /> Bagikan
+        </a>
+      </footer>
+    </div>
+  </article>
+
+  {more.length > 0 && (
+    <section class="section bg-sand" aria-labelledby="more-title">
+      <div class="container">
+        <h2 id="more-title" class="display more-title" data-reveal>Kabar <em>lainnya</em></h2>
+        <div class="grid">{more.map((n, i) => <NewsCard entry={n} i={i} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .ahead { padding-top: clamp(3rem, 2rem + 4vw, 5rem); display: grid; gap: var(--s-5); }
+  .ahead :global(.atitle) { font-size: var(--step-4); max-width: 20ch; }
+  .crumbs a { display: inline-flex; align-items: center; gap: 0.5em; padding-block: 0.5rem; color: var(--ink-soft); transition: color var(--d-2); }
+  .crumbs a:hover { color: var(--rose); }
+  .crumbs :global(.icon) { transition: transform 420ms var(--ease-out); }
+  .crumbs a:hover :global(.icon) { transform: translateX(-4px); }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.5em; align-items: center; color: var(--ink-soft); }
+  .lead { max-width: 52ch; }
+  .cover { margin-block: var(--s-8); }
+  .abody { padding-bottom: var(--section); }
+  .afoot {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s-4);
+    margin-top: var(--s-8); padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+  .more-title { font-size: var(--step-4); margin-bottom: var(--s-7); }
+  .grid { display: grid; gap: var(--s-7) var(--s-6); }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+</style>

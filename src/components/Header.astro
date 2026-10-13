@@ -1,0 +1,314 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import logo from '../assets/logo-horizontal.webp';
+import Icon from './Icon.astro';
+import { site, pilar, tentangMenu, waLink, type PilarKey } from '../data/site';
+
+const path = Astro.url.pathname;
+const programs = (await getCollection('program')).sort((a, b) => a.data.urutan - b.data.urutan);
+const groups = (Object.keys(pilar) as PilarKey[]).map((k) => ({
+  key: k,
+  ...pilar[k],
+  items: programs.filter((p) => p.data.pilar === k),
+}));
+const programPaths = ['/program/', '/psb/', ...Object.values(pilar).map((p) => p.href), ...programs.map((p) => `/${p.id}/`)];
+const tentangPaths = tentangMenu.map((t) => t.href);
+const cur = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+const inProgram = programPaths.some((p) => path.startsWith(p)) && path !== '/psb/';
+const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', '/berita/'].some((p) => path.startsWith(p));
+---
+<div class="topbar on-plum">
+  <div class="container tb-inner small">
+    <ul class="tb-info">
+      <li class="hide-sm"><Icon name="map-pin" /> {site.addressShort}</li>
+      <li><a href={`tel:+${site.whatsapp}`}><Icon name="phone" /> {site.phone}</a></li>
+      <li class="hide-sm"><a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a></li>
+    </ul>
+    <ul class="tb-links">
+      <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB TABS &amp; STAM dibuka</a></li>
+      <li class="hide-sm"><a href="/haji-umrah/"><Icon name="star8" /> Haji &amp; Umrah</a></li>
+      <li class="hide-sm"><a href="/rekening/"><Icon name="shield" /> Rekening Resmi</a></li>
+    </ul>
+  </div>
+</div>
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a href="/" class="brand" aria-label={`${site.name} — Beranda`}>
+      <Image src={logo} alt="" widths={[240, 480]} sizes="240px" loading="eager" class="brand-img" />
+    </a>
+
+    <nav class="nav" aria-label="Navigasi utama">
+      <ul class="nav-list">
+        <li><a href="/" class="nav-link" aria-current={cur('/') ? 'page' : undefined}>Beranda</a></li>
+
+        <li class="has-sub" data-sub>
+          <button type="button" class:list={['nav-link', 'nav-trigger', { active: inTentang }]} aria-expanded="false" aria-controls="sub-tentang">
+            Tentang Kami <Icon name="chevron-down" />
+          </button>
+          <div class="sub sub-tentang" id="sub-tentang">
+            <ul class="sub-list two">
+              {tentangMenu.map((t) => (
+                <li>
+                  <a href={t.href} aria-current={cur(t.href) ? 'page' : undefined}>
+                    <span class="sl-label">{t.label}</span>
+                    <span class="sl-desc">{t.desc}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div class="sub-aside on-plum">
+              <Icon name="star8" class="aside-star" />
+              <p class="serif aside-title">Graha Mawaddah</p>
+              <p class="small">{site.address}</p>
+              <a href="/profil/" class="link small">Kenali kami <Icon name="arrow-right" /></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="has-sub mega" data-sub>
+          <button type="button" class:list={['nav-link', 'nav-trigger', { active: inProgram }]} aria-expanded="false" aria-controls="sub-program">
+            Program <Icon name="chevron-down" />
+          </button>
+          <div class="sub sub-program" id="sub-program">
+            {groups.map((g) => (
+              <div class="mcol">
+                <a href={g.href} class="mcol-head">
+                  <span class="arab" lang="ar">{g.arab}</span>
+                  <span>{g.nama}</span>
+                  <Icon name="arrow-right" />
+                </a>
+                <ul>
+                  {g.items.map((p) => (
+                    <li>
+                      <a href={`/${p.id}/`} aria-current={cur(`/${p.id}/`) ? 'page' : undefined}>
+                        <Icon name={p.data.ikon} />
+                        <span>{p.data.menu}</span>
+                        {p.data.status === 'PSB Dibuka' && <span class="badge">PSB</span>}
+                      </a>
+                    </li>
+                  ))}
+                  {g.key === 'sosial' && <li><a href="/sosial/"><Icon name="arrow-right" /><span>Program sosial lainnya</span></a></li>}
+                  {g.key === 'pendidikan' && <li><a href="/psb/"><Icon name="file" /><span>Penerimaan Santri Baru</span><span class="badge">Baru</span></a></li>}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </li>
+
+        <li><a href="/haji-umrah/" class="nav-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a></li>
+        <li><a href="/psb/" class="nav-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB <span class="pill-new">Dibuka</span></a></li>
+        <li><a href="/berita/" class="nav-link" aria-current={cur('/berita/') ? 'page' : undefined}>Kabar</a></li>
+        <li><a href="/kontak/" class="nav-link" aria-current={cur('/kontak/') ? 'page' : undefined}>Kontak</a></li>
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a href="/donasi/" class="btn btn-sm donate">
+        <Icon name="heart" /> <span>Donasi</span>
+      </a>
+      <button class="menu-btn" type="button" aria-controls="menu-sheet" aria-expanded="false" aria-label="Buka menu" data-menu-open>
+        <Icon name="menu" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<dialog id="menu-sheet" class="menu-sheet on-plum textured" aria-label="Menu navigasi">
+  <div class="sheet-top container">
+    <span class="eyebrow">Menu</span>
+    <button type="button" class="close-btn" data-menu-close aria-label="Tutup menu"><Icon name="x" /></button>
+  </div>
+  <nav class="container sheet-nav" aria-label="Navigasi seluler">
+    <a href="/" class="s-link" aria-current={cur('/') ? 'page' : undefined}>Beranda</a>
+    <details open={inTentang}>
+      <summary class="s-link">Tentang Kami <Icon name="chevron-down" /></summary>
+      <ul>{tentangMenu.map((t) => <li><a href={t.href} aria-current={cur(t.href) ? 'page' : undefined}>{t.label}</a></li>)}</ul>
+    </details>
+    {groups.map((g) => (
+      <details open={path.startsWith(g.href)}>
+        <summary class="s-link">Program {g.nama} <Icon name="chevron-down" /></summary>
+        <ul>
+          <li><a href={g.href}>Semua program {g.nama.toLowerCase()}</a></li>
+          {g.items.map((p) => <li><a href={`/${p.id}/`} aria-current={cur(`/${p.id}/`) ? 'page' : undefined}>{p.data.menu}</a></li>)}
+        </ul>
+      </details>
+    ))}
+    <a href="/haji-umrah/" class="s-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a>
+    <a href="/psb/" class="s-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB TABS &amp; STAM <span class="pill-new">Dibuka</span></a>
+    <a href="/berita/" class="s-link" aria-current={cur('/berita/') ? 'page' : undefined}>Kabar</a>
+    <a href="/kontak/" class="s-link" aria-current={cur('/kontak/') ? 'page' : undefined}>Kontak</a>
+  </nav>
+  <div class="container sheet-foot">
+    <a class="btn btn-light" href="/donasi/"><Icon name="heart" /> Donasi sekarang</a>
+    <a class="btn btn-ghost-light" href={waLink('Assalamu’alaikum, saya ingin bertanya tentang Yayasan Mawaddah Indonesia.')} rel="noopener" target="_blank">
+      <Icon name="chat" /> WhatsApp admin
+    </a>
+  </div>
+</dialog>
+
+<style>
+  /* — Topbar — */
+  .topbar { font-size: 0.82rem; }
+  .tb-inner { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 2.5rem; }
+  .tb-info, .tb-links { display: flex; align-items: center; gap: var(--s-5); list-style: none; padding: 0; }
+  .topbar li, .topbar a { display: inline-flex; align-items: center; gap: 0.45em; color: var(--on-plum-soft); }
+  .topbar a { padding-block: 0.4rem; transition: color var(--d-2); }
+  .topbar a:hover { color: var(--on-plum); }
+  .topbar :global(.icon) { width: 1em; height: 1em; color: #e6bd4a; }
+  .tb-psb { color: var(--on-plum) !important; font-weight: 560; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #e6bd4a; box-shadow: 0 0 0 0 rgb(230 189 74 / 0.7); animation: pulse 2s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 7px rgb(230 189 74 / 0); } 100% { box-shadow: 0 0 0 0 rgb(230 189 74 / 0); } }
+  @media (max-width: 899px) { .hide-sm { display: none !important; } }
+
+  /* — Header — */
+  .site-header {
+    position: sticky; top: 0; z-index: var(--z-header);
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid var(--line);
+    transition: transform 520ms var(--ease-out), box-shadow var(--d-2);
+  }
+  .site-header[data-scrolled] { box-shadow: 0 10px 30px -18px rgb(110 18 63 / 0.35); }
+  .site-header[data-hidden] { transform: translateY(-105%); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); min-height: 4.75rem; }
+  .brand { display: block; flex: none; padding-block: 0.35rem; }
+  .brand-img { height: 3.1rem; width: auto; max-width: none; }
+
+  .nav { display: none; }
+  .nav-list { display: flex; align-items: center; gap: clamp(0.1rem, 0.6vw, 0.6rem); list-style: none; padding: 0; }
+  .nav-link {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 0.35em;
+    min-height: 2.75rem; padding: 0.5rem 0.7rem;
+    font-size: 0.9rem; font-weight: 600; letter-spacing: 0.01em;
+    color: var(--ink);
+    transition: color var(--d-2);
+  }
+  .nav-link { border-radius: var(--r-pill); padding-inline: 1rem; transition: color var(--d-2), background-color var(--d-2); }
+  .nav-link:hover { background: rgb(211 164 40 / 0.16); }
+  .nav-link[aria-current='page'], .nav-link.active { background: var(--gold); color: var(--plum); }
+  .nav-trigger :global(.icon) { width: 0.95em; height: 0.95em; transition: transform 420ms var(--ease-out); }
+  .pill-new {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+    padding: 0.15rem 0.5rem; border-radius: var(--r-pill);
+    background: var(--gold); color: var(--plum);
+  }
+
+  /* — Dropdown — */
+  .has-sub { position: relative; }
+  .sub {
+    position: absolute; top: calc(100% + 0.6rem); left: 50%;
+    display: grid; gap: var(--s-4);
+    padding: var(--s-4);
+    border-radius: var(--r-lg);
+    background: #fff;
+    box-shadow: 0 2px 6px rgb(110 18 63 / 0.06), 0 28px 60px -16px rgb(110 18 63 / 0.28);
+    border: 1px solid var(--line);
+    opacity: 0; visibility: hidden;
+    transform: translate(-50%, 10px);
+    transition: opacity 260ms var(--ease-out), transform 420ms var(--ease-out), visibility 0s linear 260ms;
+  }
+  .sub::before { content: ''; position: absolute; left: 0; right: 0; top: -0.8rem; height: 0.8rem; }
+  .has-sub:hover > .sub, .has-sub:global(.open) > .sub, :global(html:not(.js)) .has-sub:focus-within > .sub {
+    opacity: 1; visibility: visible; transform: translate(-50%, 0);
+    transition-delay: 0s;
+  }
+  .has-sub:hover .nav-trigger :global(.icon), .has-sub:global(.open) .nav-trigger :global(.icon) { transform: rotate(180deg); }
+
+  .sub-tentang { width: 40rem; grid-template-columns: 1fr 13rem; }
+  .sub-list { list-style: none; padding: 0; display: grid; gap: 0.15rem; }
+  .sub-list.two { grid-template-columns: 1fr 1fr; }
+  .sub-list a { display: grid; gap: 0.1rem; padding: 0.7rem 0.85rem; border-radius: var(--r-md); transition: background-color var(--d-2); }
+  .sub-list a:hover, .sub-list a[aria-current='page'] { background: var(--paper-2); }
+  .sl-label { font-weight: 600; font-size: 0.92rem; }
+  .sl-desc { font-size: 0.8rem; color: var(--ink-soft); line-height: 1.4; }
+  .sub-aside { position: relative; overflow: hidden; display: grid; align-content: end; gap: 0.4rem; padding: var(--s-5); border-radius: var(--r-md); color: var(--on-plum-soft); }
+  .sub-aside :global(.aside-star) { position: absolute; top: -1.5rem; right: -1.5rem; width: 7rem; height: 7rem; color: #e6bd4a; opacity: 0.35; stroke-width: 0.8; }
+  .aside-title { color: var(--on-plum); font-size: 1.1rem; }
+
+  .mega { position: static; }
+  .sub-program {
+    left: 50%; width: min(64rem, calc(100vw - 2 * var(--gutter)));
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-2);
+    padding: var(--s-5);
+    top: calc(100% - 0.4rem);
+  }
+  .mcol { padding: var(--s-2); }
+  .mcol-head {
+    display: flex; align-items: baseline; gap: 0.6rem;
+    padding: 0.4rem 0.6rem 0.8rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 1px solid var(--line);
+    font-family: var(--font-display); font-size: 1.35rem;
+    transition: color var(--d-2);
+  }
+  .mcol-head .arab { font-size: 1.15rem; color: var(--rose); }
+  .mcol-head :global(.icon) { margin-left: auto; width: 1rem; height: 1rem; align-self: center; transition: transform 420ms var(--ease-out); }
+  .mcol-head:hover { color: var(--rose); }
+  .mcol-head:hover :global(.icon) { transform: translateX(4px); }
+  .mcol ul { list-style: none; padding: 0; display: grid; }
+  .mcol li a {
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.55rem 0.6rem; border-radius: var(--r-sm);
+    font-size: 0.9rem; font-weight: 500;
+    transition: background-color var(--d-2), color var(--d-2), transform var(--d-2) var(--ease-out);
+  }
+  .mcol li a :global(.icon) { width: 1.05rem; height: 1.05rem; color: var(--rose); flex: none; }
+  .mcol li a:hover, .mcol li a[aria-current='page'] { background: var(--paper-2); color: var(--rose); }
+  .badge { margin-left: auto; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; padding: 0.12rem 0.45rem; border-radius: var(--r-pill); background: rgb(211 164 40 / 0.1); color: var(--rose); }
+
+  .actions { display: flex; align-items: center; gap: var(--s-2); }
+  .donate :global(.icon) { width: 1em; height: 1em; }
+  @media (hover: hover) { .donate:hover :global(.icon) { animation: beat 900ms var(--ease-out); } }
+  @keyframes beat { 30% { transform: scale(1.25); } 60% { transform: scale(0.95); } }
+  .menu-btn {
+    display: grid; place-items: center;
+    width: 2.9rem; height: 2.9rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .menu-btn :global(.icon) { width: 1.3rem; height: 1.3rem; }
+  @media (max-width: 459px) { .brand-img { height: 2.5rem; } .donate { padding-inline: 0.95rem; } }
+  @media (min-width: 1100px) {
+    .nav { display: block; }
+    .menu-btn { display: none; }
+  }
+
+  /* — Lembar menu seluler — */
+  .menu-sheet {
+    position: fixed; inset: 0;
+    width: 100%; height: 100dvh; max-width: none; max-height: none;
+    margin: 0; padding: 0; border: 0;
+    display: none; flex-direction: column;
+    overflow-y: auto; overscroll-behavior: contain;
+  }
+  .menu-sheet[open] { display: flex; animation: sheet-in 480ms var(--ease-out) both; }
+  .menu-sheet::backdrop { background: rgb(110 18 63 / 0.5); }
+  @keyframes sheet-in { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  .sheet-top { display: flex; align-items: center; justify-content: space-between; padding-block: 1rem; border-bottom: 1px solid var(--line-plum); }
+  .close-btn { display: grid; place-items: center; width: 2.9rem; height: 2.9rem; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line-plum); color: var(--on-plum); }
+  .sheet-nav { flex: 1; padding-block: var(--s-3); }
+  .s-link {
+    display: flex; align-items: center; justify-content: space-between; gap: var(--s-3);
+    padding-block: 0.95rem;
+    border-bottom: 1px solid var(--line-plum);
+    font-family: var(--font-display); font-size: 1.6rem; line-height: 1.2;
+    cursor: pointer; list-style: none;
+    animation: link-in 600ms var(--ease-out) both;
+  }
+  .s-link::-webkit-details-marker { display: none; }
+  .s-link[aria-current='page'] { color: #e6bd4a; }
+  .s-link :global(.icon) { width: 1.2rem; height: 1.2rem; color: var(--on-plum-soft); transition: transform 420ms var(--ease-out); }
+  details[open] > .s-link :global(.icon) { transform: rotate(180deg); }
+  details ul { list-style: none; padding: 0.5rem 0 1rem 0.25rem; display: grid; border-bottom: 1px solid var(--line-plum); }
+  details ul a { display: block; padding: 0.55rem 0; color: var(--on-plum-soft); }
+  details ul a:hover, details ul a[aria-current='page'] { color: #e6bd4a; }
+  details[open] ul { animation: link-in 420ms var(--ease-out); }
+  .s-link .pill-new { font-family: var(--font-body); }
+  @keyframes link-in { from { opacity: 0; transform: translateY(12px); } }
+  .sheet-foot { padding-block: var(--s-5) var(--s-6); display: flex; flex-wrap: wrap; gap: var(--s-3); }
+</style>

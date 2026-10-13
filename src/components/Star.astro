@@ -1,0 +1,20 @@
+---
+/** Bintang delapan (rub el hizb) bergaris — motif dekoratif yang berputar sangat pelan. */
+interface Props { class?: string; spin?: boolean }
+const { class: cls, spin = true } = Astro.props;
+---
+<svg class:list={['star', { spin }, cls]} viewBox="0 0 200 200" aria-hidden="true" fill="none" stroke="currentColor">
+  <g stroke-width="0.6" vector-effect="non-scaling-stroke">
+    <rect x="41.4" y="41.4" width="117.2" height="117.2" />
+    <rect x="41.4" y="41.4" width="117.2" height="117.2" transform="rotate(45 100 100)" />
+    <circle cx="100" cy="100" r="58" />
+    <circle cx="100" cy="100" r="96" stroke-dasharray="1.5 5" />
+    <rect x="62" y="62" width="76" height="76" transform="rotate(22.5 100 100)" />
+    <rect x="62" y="62" width="76" height="76" transform="rotate(67.5 100 100)" />
+  </g>
+</svg>
+<style>
+  .star { width: 100%; height: auto; overflow: visible; }
+  .spin { animation: star-spin 180s linear infinite; transform-origin: 50% 50%; }
+  @keyframes star-spin { to { transform: rotate(360deg); } }
+</style>

@@ -1,0 +1,139 @@
+---
+/**
+ * Bingkai gambar khas Mawaddah (persegi, lengkung mihrab, atau bulat).
+ * Tanpa `image`, tampil karya placeholder bertekstur girih — label "Foto: …"
+ * hanya muncul saat `npm run dev` agar mudah dilacak.
+ * Foto asli: taruh di src/assets/foto lalu kirim lewat prop `image`.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  image?: ImageMetadata;
+  alt: string;
+  shape?: 'arch' | 'rect' | 'round' | 'star';
+  tone?: 'rose' | 'sand' | 'plum' | 'blush';
+  ratio?: string;
+  emblem?: IconName;
+  label?: string;
+  outline?: boolean;
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+  delay?: number;
+}
+const {
+  image, alt, shape = 'rect', tone = 'rose', ratio = shape === 'arch' ? '4 / 5' : shape === 'star' ? '1 / 1' : '4 / 3',
+  emblem, label, outline = false, eager = false, sizes = '(min-width: 960px) 40vw, 92vw',
+  class: cls, delay = 0,
+} = Astro.props;
+const dev = import.meta.env.DEV;
+---
+<figure class:list={['media', `media-${shape}`, `tone-${tone}`, cls]} style={`aspect-ratio:${ratio};--md:${delay}ms`} data-media>
+  <div class="media-clip">
+    <div class="media-inner">
+      {image ? (
+        <Image
+          src={image}
+          alt={alt}
+          widths={[480, 800, 1200, 1600]}
+          sizes={sizes}
+          loading={eager ? 'eager' : 'lazy'}
+          fetchpriority={eager ? 'high' : 'auto'}
+          decoding="async"
+        />
+      ) : (
+        <div class="ph" role="img" aria-label={alt}>
+          <span class="ph-glow" aria-hidden="true"></span>
+          {emblem && <span class="ph-emblem" aria-hidden="true"><Icon name={emblem} /></span>}
+          {dev && label && <span class="ph-label" aria-hidden="true">Foto: {label}</span>}
+        </div>
+      )}
+    </div>
+  </div>
+  {outline && shape === 'arch' && (
+    <svg class="arch-line" viewBox="0 0 100 125" preserveAspectRatio="none" aria-hidden="true">
+      <path pathLength="1" d="M1 124V50C1 25 22 9 50 1c28 8 49 24 49 49v74" />
+    </svg>
+  )}
+  <slot />
+</figure>
+
+<style>
+  .media { position: relative; margin: 0; }
+  .media-clip {
+    position: absolute; inset: 0;
+    overflow: hidden;
+    border-radius: var(--r-lg);
+    background: var(--paper-2);
+    isolation: isolate;
+  }
+  .media-arch .media-clip { clip-path: url(#arch-clip); border-radius: 0; }
+  .media-round .media-clip { border-radius: 50%; }
+  .media-star .media-clip { clip-path: var(--star); border-radius: 0; }
+  .media-inner { position: absolute; inset: 0; }
+  .media-inner :global(img) { width: 100%; height: 100%; object-fit: cover; }
+
+  .ph {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background-size: 56px, cover;
+  }
+  .tone-rose .ph { background-image: var(--girih-light), linear-gradient(160deg, #d3a428 0%, #8f1a50 45%, #3d1630 100%); }
+  .tone-plum .ph { background-image: var(--girih-light), linear-gradient(170deg, #8f1d55 0%, #6e123f 70%); }
+  .tone-sand .ph { background-image: var(--girih-rose), linear-gradient(170deg, #f8eaf1 0%, #eed3e2 100%); }
+  .tone-blush .ph { background-image: var(--girih-rose), linear-gradient(165deg, #f6e7b8 0%, #ecd9a3 100%); }
+  .ph-glow {
+    position: absolute; inset: -20%;
+    background: radial-gradient(circle at 30% 18%, rgb(255 255 255 / 0.3), transparent 45%);
+    mix-blend-mode: soft-light;
+  }
+  .ph-emblem {
+    position: relative;
+    display: grid; place-items: center;
+    width: clamp(3.5rem, 22%, 6rem); aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.4);
+    color: rgb(255 255 255 / 0.9);
+  }
+  .ph-emblem :global(svg) { width: 42%; height: 42%; stroke-width: 1.2; }
+  .tone-sand .ph-emblem, .tone-blush .ph-emblem { color: var(--rose); border-color: rgb(211 164 40 / 0.3); }
+  .ph-label {
+    position: absolute; left: 0.75rem; bottom: 0.75rem;
+    font: 500 0.7rem/1.2 var(--font-body);
+    letter-spacing: 0.04em;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--r-pill);
+    background: rgb(0 0 0 / 0.5);
+    color: #fff;
+  }
+  .media-arch .ph-label { left: 50%; transform: translateX(-50%); white-space: nowrap; }
+
+  .arch-line {
+    position: absolute;
+    inset: -12px;
+    width: calc(100% + 24px); height: calc(100% + 24px);
+    fill: none; stroke: var(--rose); stroke-width: 0.32;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  /* Gerak: tirai terbuka dari bawah, gambar sedikit menyusut ke posisi */
+  :global(html.js) .media .media-inner {
+    clip-path: inset(100% 0 0 0);
+    transform: scale(1.14);
+    transition: clip-path 1400ms var(--ease-in-out), transform 2000ms var(--ease-out);
+    transition-delay: var(--md, 0ms);
+  }
+  :global(html.js) .media.is-in .media-inner { clip-path: inset(0 0 0 0); transform: none; }
+  :global(html.js) .arch-line path {
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    transition: stroke-dashoffset 2400ms var(--ease-in-out) calc(var(--md, 0ms) + 300ms);
+  }
+  :global(html.js) .media.is-in .arch-line path { stroke-dashoffset: 0; }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .media .media-inner { clip-path: none; transform: none; }
+    :global(html.js) .arch-line path { stroke-dashoffset: 0; }
+  }
+</style>

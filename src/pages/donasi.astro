@@ -1,0 +1,334 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { rekening, site } from '../data/site';
+
+const programs = (await getCollection('program')).sort((a, b) => a.data.urutan - b.data.urutan);
+const jenis = ['Infaq & Sedekah', 'Wakaf Mushaf', 'Wakaf Pesantren', 'Zakat'];
+const nominal = [50000, 100000, 250000, 500000, 1000000];
+const short = (n: number) => (n >= 1000000 ? `${n / 1000000} jt` : `${n / 1000} rb`);
+
+const faq = [
+  { q: 'Apakah donasi saya dilaporkan?', a: 'Ya. Setiap donasi dicatat dan dilaporkan dalam laporan program berkala. Donatur yang mengonfirmasi via WhatsApp juga akan menerima kabar penyaluran.' },
+  { q: 'Bagaimana jika saya ingin membayar zakat?', a: 'Pilih jenis dana "Zakat" lalu hubungi admin via WhatsApp sebelum transfer agar diarahkan ke rekening yang tepat. Dana zakat dipisahkan dan hanya disalurkan kepada delapan golongan (asnaf) yang berhak.' },
+  { q: 'Bisakah saya mendapatkan bukti penerimaan?', a: 'Bisa. Setelah konfirmasi, tim kami akan mengirimkan bukti penerimaan donasi (kuitansi digital) melalui WhatsApp atau email.' },
+  { q: 'Bolehkah berdonasi atas nama orang lain atau almarhum?', a: 'Tentu. Tuliskan nama yang dimaksud pada kolom "Atas nama" — kami akan mendoakan dan mencatatnya sesuai permintaan Anda.' },
+];
+---
+<Base title="Donasi" description="Salurkan infaq, sedekah, zakat, dan wakaf Anda melalui Yayasan Mawaddah Indonesia — transfer bank atau QRIS, konfirmasi mudah via WhatsApp.">
+  <PageHero eyebrow="Donasi" title="Titipkan kebaikan, *kami sampaikan.*"
+    lead="Tiga langkah sederhana. Tanpa biaya tambahan — seluruh donasi Anda tersalurkan sesuai peruntukan." />
+
+  <section class="section-tight">
+    <div class="container">
+      <ol class="steps">
+        <li data-reveal><span class="sn display">1</span><div><strong>Isi niat donasi</strong><span class="muted small">Pilih jenis dana, program, dan nominal.</span></div></li>
+        <li data-reveal style="--i:1"><span class="sn display">2</span><div><strong>Transfer atau scan QRIS</strong><span class="muted small">Ke rekening resmi atas nama yayasan.</span></div></li>
+        <li data-reveal style="--i:2"><span class="sn display">3</span><div><strong>Konfirmasi via WhatsApp</strong><span class="muted small">Pesan terisi otomatis, tinggal kirim.</span></div></li>
+      </ol>
+
+      <div class="layout">
+        <!-- ===== Formulir niat ===== -->
+        <form class="card form" id="donasi-form" novalidate data-reveal>
+          <h2 class="form-title display">Niat donasi Anda</h2>
+
+          <fieldset>
+            <legend class="label">Jenis dana</legend>
+            <div class="pills">
+              {jenis.map((j, i) => (
+                <label class="pill"><input type="radio" name="jenis" value={j} checked={i === 0} /><span>{j}</span></label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="program">Program</label>
+            <div class="select-wrap">
+              <select id="program" name="program" class="input">
+                <option value="">Program umum (paling mendesak)</option>
+                {programs.map((p) => <option value={p.id}>{p.data.title}</option>)}
+              </select>
+              <Icon name="chevron-down" />
+            </div>
+          </div>
+
+          <fieldset>
+            <legend class="label">Nominal <span class="req" aria-hidden="true">*</span></legend>
+            <div class="pills amounts">
+              {nominal.map((n, i) => (
+                <label class="pill"><input type="radio" name="preset" value={n} checked={i === 1} /><span class="num">{short(n)}</span></label>
+              ))}
+            </div>
+            <div class="field custom">
+              <label for="nominal" class="sr-only">Nominal lainnya</label>
+              <div class="prefix-wrap">
+                <span class="prefix" aria-hidden="true">Rp</span>
+                <input id="nominal" name="nominal" class="input num" inputmode="numeric" autocomplete="off" placeholder="Nominal lainnya" aria-describedby="nominal-hint nominal-err" />
+              </div>
+              <p id="nominal-hint" class="hint">Minimal Rp10.000. Ketik angka saja.</p>
+              <p id="nominal-err" class="error-text" role="alert" hidden></p>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="nama">Atas nama <span class="muted small">(opsional)</span></label>
+            <input id="nama" name="nama" class="input" autocomplete="name" placeholder="Hamba Allah" />
+          </div>
+
+          <div class="field">
+            <label for="doa">Doa atau pesan <span class="muted small">(opsional)</span></label>
+            <textarea id="doa" name="doa" class="input" rows="3" placeholder="Semoga menjadi amal jariyah untuk keluarga kami…"></textarea>
+          </div>
+
+          <div class="summary" aria-live="polite">
+            <span class="muted small">Total donasi</span>
+            <output class="total display num" id="total" for="nominal">Rp100.000</output>
+          </div>
+
+          <button type="submit" class="btn full">
+            <Icon name="chat" /> Konfirmasi via WhatsApp
+          </button>
+          <p class="small muted center">Transfer dahulu ke rekening di samping, lalu kirim bukti transfer di WhatsApp.</p>
+        </form>
+
+        <!-- ===== Rekening & QRIS ===== -->
+        <div class="pay">
+          <h2 class="pay-title display" data-reveal>Rekening resmi</h2>
+          <ul class="banks">
+            {rekening.map((r, i) => (
+              <li class="bank card" data-reveal style={`--i:${i}`}>
+                <div class="bank-top">
+                  <span class="bank-code">{r.kode}</span>
+                  <span class="tag tag-pill">{r.peruntukan}</span>
+                </div>
+                <p class="acc num">{r.nomor.replace(/(\d{4})(?=\d)/g, '$1 ')}</p>
+                <p class="small muted">{r.bank} · a.n. {r.atasNama}</p>
+                <button type="button" class="copy" data-copy={r.nomor} aria-label={`Salin nomor rekening ${r.bank} ${r.nomor}`}>
+                  <span class="copy-icons" aria-hidden="true"><Icon name="copy" /><Icon name="check" /></span>
+                  <span data-copy-label>Salin</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div class="qris card on-plum" data-reveal>
+            <div class="qr-box" aria-hidden="true">
+              <Icon name="qr" />
+            </div>
+            <div class="stack" style="--stack: var(--s-2)">
+              <p class="eyebrow plain">QRIS</p>
+              <p><strong>Scan dari semua e-wallet & m-banking.</strong></p>
+              <p class="small muted">Kode QRIS resmi yayasan akan ditampilkan di sini. {/* [PLACEHOLDER] ganti dengan gambar QRIS asli */}</p>
+            </div>
+          </div>
+
+          <p class="small muted safety"><Icon name="shield" /> Waspada penipuan. Kami hanya menggunakan rekening atas nama <strong>{site.name}</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-sand" aria-labelledby="faq-title">
+    <div class="container faq-grid">
+      <div>
+        <p class="eyebrow" data-reveal>Pertanyaan umum</p>
+        <h2 id="faq-title" class="display faq-h" data-reveal>Yang sering <em>ditanyakan.</em></h2>
+      </div>
+      <div class="faq">
+        {faq.map((f, i) => (
+          <details data-reveal style={`--i:${i}`}>
+            <summary><span>{f.q}</span><span class="pm" aria-hidden="true"></span></summary>
+            <div class="ans"><p class="muted">{f.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { waLink, rupiah } from '../data/site';
+
+  const form = document.getElementById('donasi-form') as HTMLFormElement;
+  const custom = form.querySelector<HTMLInputElement>('#nominal')!;
+  const err = form.querySelector<HTMLElement>('#nominal-err')!;
+  const total = form.querySelector<HTMLOutputElement>('#total')!;
+  const select = form.querySelector<HTMLSelectElement>('#program')!;
+
+  // Program terpilih dari tautan ?program=
+  const pre = new URLSearchParams(location.search).get('program');
+  if (pre && [...select.options].some((o) => o.value === pre)) select.value = pre;
+
+  const amount = () => {
+    const c = Number(custom.value.replace(/\D/g, ''));
+    if (c) return c;
+    const p = form.querySelector<HTMLInputElement>('input[name="preset"]:checked');
+    return p ? Number(p.value) : 0;
+  };
+  const refresh = () => {
+    const a = amount();
+    total.textContent = a ? rupiah(a) : 'Rp0';
+    total.classList.remove('bump');
+    void total.offsetWidth;
+    total.classList.add('bump');
+  };
+  const showError = (msg: string) => {
+    err.textContent = msg;
+    err.hidden = !msg;
+    custom.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  };
+
+  form.querySelectorAll<HTMLInputElement>('input[name="preset"]').forEach((r) =>
+    r.addEventListener('change', () => { custom.value = ''; showError(''); refresh(); }),
+  );
+  custom.addEventListener('input', () => {
+    const digits = custom.value.replace(/\D/g, '');
+    custom.value = digits ? new Intl.NumberFormat('id-ID').format(Number(digits)) : '';
+    form.querySelectorAll<HTMLInputElement>('input[name="preset"]').forEach((r) => (r.checked = !digits && r.defaultChecked));
+    refresh();
+  });
+  custom.addEventListener('blur', () => {
+    const a = amount();
+    showError(custom.value && a < 10000 ? 'Nominal minimal Rp10.000. Silakan ubah nominal Anda.' : '');
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const a = amount();
+    if (a < 10000) {
+      showError('Nominal minimal Rp10.000. Pilih nominal atau ketik nominal lainnya.');
+      custom.focus();
+      return;
+    }
+    showError('');
+    const data = new FormData(form);
+    const programText = select.selectedOptions[0]?.text ?? 'Program umum';
+    const lines = [
+      'Assalamu’alaikum, saya ingin konfirmasi donasi:',
+      '',
+      `• Jenis dana: ${data.get('jenis')}`,
+      `• Program: ${programText}`,
+      `• Nominal: ${rupiah(a)}`,
+      `• Atas nama: ${(data.get('nama') as string)?.trim() || 'Hamba Allah'}`,
+    ];
+    const doa = (data.get('doa') as string)?.trim();
+    if (doa) lines.push(`• Doa/pesan: ${doa}`);
+    lines.push('', 'Bukti transfer saya lampirkan setelah pesan ini. Jazakumullahu khairan.');
+    window.open(waLink(lines.join('\n')), '_blank', 'noopener');
+  });
+  refresh();
+</script>
+
+<style>
+  .steps { list-style: none; padding: 0; display: grid; gap: var(--s-4); margin-bottom: var(--s-8); counter-reset: s; }
+  .steps li { display: flex; gap: var(--s-4); align-items: center; padding: var(--s-4) 0; border-bottom: 1px solid var(--line); }
+  .steps li > div { display: grid; }
+  .sn {
+    flex: none; display: grid; place-items: center;
+    width: 3rem; height: 3rem; border-radius: 50%;
+    border: 1px solid var(--rose); color: var(--rose);
+    font-size: 1.25rem; font-family: var(--font-serif); font-weight: 600;
+  }
+  @media (min-width: 960px) { .steps { grid-template-columns: repeat(3, 1fr); gap: var(--s-6); } }
+
+  .layout { display: grid; gap: var(--s-8); align-items: start; }
+  @media (min-width: 1024px) { .layout { grid-template-columns: 1.1fr 1fr; gap: var(--s-8); } }
+
+  .card { background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
+  .form { display: grid; gap: var(--s-6); padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .form-title, .pay-title { font-size: var(--step-2); }
+  fieldset { border: 0; padding: 0; display: grid; gap: var(--s-3); min-width: 0; }
+  .label { font-size: 0.9rem; font-weight: 560; padding: 0; }
+  .pills { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .pill { position: relative; cursor: pointer; }
+  .pill input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+  .pill span {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 2.9rem; min-width: 4.5rem; padding: 0.55rem 1.1rem;
+    border-radius: var(--r-pill);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-weight: 520; font-size: 0.95rem;
+    transition: background-color var(--d-2) var(--ease-out), color var(--d-2), box-shadow var(--d-2), transform var(--d-1);
+  }
+  @media (hover: hover) { .pill:hover span { box-shadow: inset 0 0 0 1px var(--ink); } }
+  .pill input:checked + span { background: var(--rose); color: var(--paper); box-shadow: none; }
+  .pill input:focus-visible + span { outline: 2px solid var(--rose); outline-offset: 3px; }
+  .pill:active span { transform: scale(0.96); }
+  .amounts .pill { flex: 1 1 4.5rem; }
+  .amounts .pill span { width: 100%; }
+  .custom { margin-top: var(--s-2); }
+  .prefix-wrap { position: relative; }
+  .prefix { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--ink-soft); font-weight: 520; pointer-events: none; }
+  .prefix-wrap .input { padding-left: 2.75rem; }
+  .select-wrap { position: relative; }
+  .select-wrap select { appearance: none; padding-right: 2.75rem; cursor: pointer; }
+  .select-wrap :global(.icon) { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ink-soft); }
+
+  .summary { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-4); padding-top: var(--s-5); border-top: 1px dashed var(--line-strong); }
+  .total { font-size: var(--step-3); color: var(--rose); font-weight: 400; }
+  .total:global(.bump) { animation: bump 420ms var(--ease-spring); }
+  @keyframes bump { 40% { transform: translateY(-3px); } }
+  .full { width: 100%; }
+  .center { text-align: center; }
+
+  .pay { display: grid; gap: var(--s-4); }
+  .banks { list-style: none; padding: 0; display: grid; gap: var(--s-3); }
+  .bank { position: relative; display: grid; gap: 0.35rem; padding: var(--s-5); transition: transform 520ms var(--ease-spring), box-shadow var(--d-2); }
+  @media (hover: hover) { .bank:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); } }
+  .bank-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-3); margin-bottom: var(--s-2); }
+  .bank-code { font-weight: 700; letter-spacing: 0.02em; }
+  .acc { font-size: clamp(1.35rem, 1.1rem + 1vw, 1.7rem); font-weight: 500; letter-spacing: 0.04em; }
+  .copy {
+    position: absolute; right: var(--s-4); bottom: var(--s-4);
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    min-height: 2.75rem; padding-inline: 1rem;
+    border-radius: var(--r-pill);
+    background: var(--paper-2);
+    font-size: 0.875rem; font-weight: 560;
+    transition: background-color var(--d-2), color var(--d-2);
+  }
+  @media (hover: hover) { .copy:hover { background: var(--ink); color: var(--paper); } }
+  .copy-icons { position: relative; width: 1.1em; height: 1.1em; }
+  .copy-icons :global(.icon) { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 420ms var(--ease-spring), opacity var(--d-2); }
+  .copy-icons :global(.icon-check) { opacity: 0; transform: scale(0.4); }
+  .copy:global(.is-copied) { background: var(--rose); color: var(--paper); }
+  .copy:global(.is-copied) .copy-icons :global(.icon-copy) { opacity: 0; transform: scale(0.4); }
+  .copy:global(.is-copied) .copy-icons :global(.icon-check) { opacity: 1; transform: none; }
+  @media (max-width: 420px) {
+    .copy { position: static; justify-self: start; margin-top: var(--s-2); }
+  }
+
+  .qris { display: flex; gap: var(--s-5); align-items: center; padding: var(--s-5); background: var(--plum); }
+  .qr-box {
+    flex: none; display: grid; place-items: center;
+    width: 6.5rem; aspect-ratio: 1; border-radius: var(--r-md);
+    background: var(--paper); color: var(--plum);
+  }
+  .qr-box :global(.icon) { width: 55%; height: 55%; stroke-width: 1.2; }
+  .safety { display: flex; gap: 0.6rem; align-items: flex-start; }
+  .safety :global(.icon) { color: var(--rose); margin-top: 0.2em; }
+
+  .faq-grid { display: grid; gap: var(--s-7); }
+  .faq-h { font-size: var(--step-4); max-width: 12ch; margin-top: var(--s-4); }
+  @media (min-width: 960px) { .faq-grid { grid-template-columns: 1fr 1.4fr; gap: var(--s-9); } }
+  .faq { border-top: 1px solid var(--line-strong); }
+  details { border-bottom: 1px solid var(--line-strong); }
+  summary {
+    display: flex; justify-content: space-between; align-items: center; gap: var(--s-4);
+    padding-block: var(--s-5);
+    cursor: pointer; list-style: none;
+    font-family: var(--font-serif); font-weight: 600; font-size: var(--step-1); line-height: 1.3;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .pm { position: relative; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line-strong); transition: background-color var(--d-2), transform 520ms var(--ease-out); }
+  .pm::before, .pm::after { content: ''; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px; background: currentColor; translate: -50% -50%; transition: transform 420ms var(--ease-out); }
+  .pm::after { transform: rotate(90deg); }
+  details[open] .pm { background: var(--rose); color: var(--paper); box-shadow: none; transform: rotate(180deg); }
+  details[open] .pm::after { transform: rotate(0); }
+  @media (hover: hover) { summary:hover { color: var(--rose); } }
+  .ans { padding-bottom: var(--s-5); max-width: 60ch; }
+  details[open] .ans { animation: ans-in 520ms var(--ease-out); }
+  @keyframes ans-in { from { opacity: 0; transform: translateY(-6px); } }
+</style>

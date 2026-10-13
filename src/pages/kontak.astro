@@ -1,0 +1,163 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Star from '../components/Star.astro';
+import { site, waLink } from '../data/site';
+---
+<Base title="Kontak" description="Hubungi sekretariat Yayasan Mawaddah Indonesia — alamat, WhatsApp, email, dan jam layanan.">
+  <PageHero eyebrow="Kontak" title="Pintu kami *selalu terbuka.*"
+    lead="Untuk pertanyaan program, kemitraan, relawan, atau sekadar silaturahmi — kami senang mendengar dari Anda." />
+
+  <section class="section-tight">
+    <div class="container layout">
+      <div class="info">
+        <ul class="channels">
+          <li data-reveal>
+            <a href={waLink('Assalamu’alaikum, saya ingin bertanya.')} target="_blank" rel="noopener" class="ch">
+              <span class="ch-ic"><Icon name="chat" /></span>
+              <span class="ch-tx"><span class="k">WhatsApp</span><strong>{site.phone}</strong><span class="muted small">Respons tercepat</span></span>
+              <Icon name="arrow-up-right" class="ch-go" />
+            </a>
+          </li>
+          <li data-reveal style="--i:1">
+            <a href={`mailto:${site.email}`} class="ch">
+              <span class="ch-ic"><Icon name="mail" /></span>
+              <span class="ch-tx"><span class="k">Email</span><strong>{site.email}</strong><span class="muted small">Untuk kemitraan & dokumen</span></span>
+              <Icon name="arrow-up-right" class="ch-go" />
+            </a>
+          </li>
+          <li data-reveal style="--i:2">
+            <a href={site.mapsUrl} target="_blank" rel="noopener" class="ch">
+              <span class="ch-ic"><Icon name="map-pin" /></span>
+              <span class="ch-tx"><span class="k">Sekretariat</span><strong>{site.address}</strong></span>
+              <Icon name="arrow-up-right" class="ch-go" />
+            </a>
+          </li>
+          <li data-reveal style="--i:3">
+            <div class="ch">
+              <span class="ch-ic"><Icon name="clock" /></span>
+              <span class="ch-tx"><span class="k">Jam layanan</span><strong>{site.hours}</strong></span>
+            </div>
+          </li>
+        </ul>
+
+        <a class="map on-plum" href={site.mapsUrl} target="_blank" rel="noopener" data-reveal aria-label="Buka lokasi sekretariat di Google Maps">
+          <span class="map-star" aria-hidden="true"><Star /></span>
+          <span class="pin" aria-hidden="true"><Icon name="map-pin" /></span>
+          <span class="map-tx">Buka di Google Maps <Icon name="arrow-up-right" /></span>
+        </a>
+      </div>
+
+      <form class="card form" id="kontak-form" novalidate data-reveal>
+        <h2 class="display form-title">Kirim pesan</h2>
+        <p class="muted small">Pesan Anda akan dibuka di WhatsApp agar kami dapat membalas lebih cepat.</p>
+
+        <div class="field">
+          <label for="k-nama">Nama <span class="req" aria-hidden="true">*</span></label>
+          <input id="k-nama" name="nama" class="input" autocomplete="name" required aria-describedby="k-nama-err" />
+          <p id="k-nama-err" class="error-text" hidden></p>
+        </div>
+        <div class="field">
+          <label for="k-topik">Keperluan</label>
+          <div class="select-wrap">
+            <select id="k-topik" name="topik" class="input">
+              <option>Pertanyaan umum</option>
+              <option>Program & donasi</option>
+              <option>Menjadi relawan</option>
+              <option>Kemitraan / CSR</option>
+              <option>Media & liputan</option>
+            </select>
+            <Icon name="chevron-down" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="k-pesan">Pesan <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="k-pesan" name="pesan" class="input" rows="5" required aria-describedby="k-pesan-err"></textarea>
+          <p id="k-pesan-err" class="error-text" hidden></p>
+        </div>
+        <button type="submit" class="btn full"><Icon name="chat" /> Kirim via WhatsApp</button>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { waLink } from '../data/site';
+  const form = document.getElementById('kontak-form') as HTMLFormElement;
+  const rules: [string, string][] = [
+    ['k-nama', 'Mohon isi nama Anda agar kami bisa menyapa dengan tepat.'],
+    ['k-pesan', 'Mohon tuliskan pesan Anda (minimal 10 karakter).'],
+  ];
+  const check = (id: string, msg: string) => {
+    const el = document.getElementById(id) as HTMLInputElement;
+    const err = document.getElementById(`${id}-err`)!;
+    const ok = id === 'k-pesan' ? el.value.trim().length >= 10 : el.value.trim().length > 0;
+    el.setAttribute('aria-invalid', String(!ok));
+    err.textContent = ok ? '' : msg;
+    err.hidden = ok;
+    return ok;
+  };
+  rules.forEach(([id, msg]) => document.getElementById(id)!.addEventListener('blur', (e) => {
+    if ((e.target as HTMLInputElement).value) check(id, msg);
+  }));
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const results = rules.map(([id, msg]) => check(id, msg));
+    const firstBad = rules.find((_, i) => !results[i]);
+    if (firstBad) { (document.getElementById(firstBad[0]) as HTMLElement).focus(); return; }
+    const d = new FormData(form);
+    const text = `Assalamu’alaikum, saya ${d.get('nama')}.\nKeperluan: ${d.get('topik')}\n\n${d.get('pesan')}`;
+    window.open(waLink(text), '_blank', 'noopener');
+  });
+</script>
+
+<style>
+  .layout { display: grid; gap: var(--s-8); align-items: start; padding-top: var(--s-5); }
+  @media (min-width: 1024px) { .layout { grid-template-columns: 1fr 1fr; gap: var(--s-9); } }
+  .info { display: grid; gap: var(--s-6); }
+  .channels { list-style: none; padding: 0; border-top: 1px solid var(--line); }
+  .channels li { border-bottom: 1px solid var(--line); }
+  .ch { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-4); align-items: center; padding-block: var(--s-5); }
+  .ch-ic {
+    display: grid; place-items: center;
+    width: 3rem; height: 3rem; border-radius: 50%;
+    background: rgb(211 164 40 / 0.08); color: var(--rose);
+    transition: background-color var(--d-2), color var(--d-2), transform 520ms var(--ease-spring);
+  }
+  .ch-tx { display: grid; gap: 0.1rem; }
+  .k { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  .ch strong { font-weight: 540; }
+  .ch :global(.ch-go) { color: var(--ink-soft); transition: transform 420ms var(--ease-out), color var(--d-2); }
+  @media (hover: hover) {
+    a.ch:hover .ch-ic { background: var(--rose); color: var(--paper); transform: rotate(-8deg); }
+    a.ch:hover :global(.ch-go) { transform: translate(3px, -3px); color: var(--rose); }
+  }
+
+  .map {
+    position: relative; overflow: hidden;
+    display: grid; place-items: center;
+    min-height: 15rem; border-radius: var(--r-lg);
+    background-image: var(--girih-light), linear-gradient(170deg, #8f1d55, #6e123f);
+    background-size: 56px, cover;
+  }
+  .map-star { position: absolute; width: 22rem; color: #e6bd4a; opacity: 0.25; }
+  .pin {
+    position: relative; display: grid; place-items: center;
+    width: 4rem; height: 4rem; border-radius: 50%;
+    background: var(--rose); color: #fff;
+    box-shadow: 0 0 0 0 rgb(211 164 40 / 0.6);
+    animation: ping 2.4s var(--ease-out) infinite;
+  }
+  .pin :global(.icon) { width: 1.6rem; height: 1.6rem; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 22px rgb(211 164 40 / 0); } 100% { box-shadow: 0 0 0 0 rgb(211 164 40 / 0); } }
+  .map-tx { position: absolute; bottom: 1rem; left: 1.1rem; display: inline-flex; gap: 0.4em; align-items: center; font-weight: 540; }
+
+  .card { background: #fff; border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
+  .form { display: grid; gap: var(--s-5); padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); }
+  .form-title { font-size: var(--step-2); }
+  .select-wrap { position: relative; }
+  .select-wrap select { appearance: none; padding-right: 2.75rem; cursor: pointer; }
+  .select-wrap :global(.icon) { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ink-soft); }
+  .full { width: 100%; }
+</style>

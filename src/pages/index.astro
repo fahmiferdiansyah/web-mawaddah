@@ -1,0 +1,414 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import SplitText from '../components/SplitText.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import Verse from '../components/Verse.astro';
+import ProgramCard from '../components/ProgramCard.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { site, capaian, almaz, waLink, waLinkTo } from '../data/site';
+
+const pick = ['wakaf-quran', 'wesal-tv', 'wakaf-pesantren', 'masjid', 'air-bersih', 'rumah-quran'];
+const featured = (await Promise.all(pick.map((id) => getEntry('program', id)))).filter((p) => !!p);
+const news = (await getCollection('berita')).sort((a, b) => +b.data.tanggal - +a.data.tanggal).slice(0, 3);
+
+// Foto hero opsional: taruh src/assets/foto/hero.jpg (atau .webp/.png) — otomatis dipakai sebagai latar.
+const heroFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/foto/hero.{jpg,jpeg,png,webp}', { eager: true });
+const heroPhoto = Object.values(heroFiles)[0]?.default;
+// Video hero opsional: public/video/hero.mp4 (loop, tanpa suara). Foto hero dipakai sebagai cadangan.
+const heroVideo = '/video/hero.mp4';
+
+// Foto gedung (bingkai lengkung 4:5): src/assets/foto/gedung.{jpg,jpeg,png,webp}
+const psbFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/foto/psb.{jpg,jpeg,png,webp}', { eager: true });
+const psbPhoto = Object.values(psbFiles)[0]?.default;
+const gedungFiles = import.meta.glob<{ default: ImageMetadata }>('../assets/foto/gedung.{jpg,jpeg,png,webp}', { eager: true });
+const gedungPhoto = Object.values(gedungFiles)[0]?.default;
+
+const tentangPoin = [
+  'Wesal TV — televisi keluarga islami',
+  'Wakaf mushaf Al-Qur’an ke seluruh Indonesia',
+  'Pesantren Taisiru Ar-Rahman Boarding School',
+  'Masjid, sumur, dan tanggap bencana',
+  'Haji & umrah bersama Almaz Tour',
+];
+---
+<Base>
+  <!-- ============ HERO ============ -->
+  <section class="hero on-brown">
+    {heroVideo && <video class="hero-photo hero-video" src={heroVideo} autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>}
+    {!heroVideo && heroPhoto && <Image src={heroPhoto} alt="" class="hero-photo" widths={[800, 1400, 2000]} sizes="100vw" loading="eager" fetchpriority="high" />}
+    <div class="hero-shade" aria-hidden="true"></div>
+
+    <div class="container hero-grid">
+      <div class="hero-inner">
+        <p class="eyebrow" data-reveal>{site.name} · sejak {site.founded}</p>
+        <SplitText as="h1" text="Menebar Dakwah. *Merajut Mawaddah.*" delay={100} />
+        <p class="lead" data-reveal style="--i:5">
+          Wadah dakwah, pendidikan, dan sosial dari Graha Mawaddah — melalui Wesal TV, wakaf mushaf Al-Qur’an,
+          masjid dan sumur, pesantren, hingga layanan haji dan umrah.
+        </p>
+        <div class="cluster cta" data-reveal style="--i:6">
+          <a href="/donasi/" class="btn" data-magnetic>Donasi Sekarang <Icon name="arrow-right" /></a>
+          <a href="/profil/" class="btn btn-ghost-light">Pelajari Lebih Lanjut</a>
+        </div>
+        <ul class="hero-tags" data-reveal style="--i:7">
+          <li>Wesal TV</li><li>Wakaf Al-Qur’an</li><li>Pesantren TABS</li><li>Almaz Tour</li>
+        </ul>
+      </div>
+
+      <aside class="prayer" data-prayer aria-label="Jadwal shalat hari ini" data-reveal style="--i:4">
+        <header class="p-head">
+          <p class="p-kicker">Jadwal Shalat · <span data-p-city>Kota Jakarta</span></p>
+          <p class="p-date"><span data-p-date>&nbsp;</span><strong data-p-hijri></strong></p>
+        </header>
+        <div class="p-next">
+          <span class="p-next-label">Menuju <b data-p-next-name>—</b></span>
+          <span class="p-count" data-p-count>--:--:--</span>
+        </div>
+        <dl class="p-times">
+          <div data-k="subuh"><dt>Subuh</dt><dd>—</dd></div>
+          <div data-k="dzuhur"><dt>Dzuhur</dt><dd>—</dd></div>
+          <div data-k="ashar"><dt>Ashar</dt><dd>—</dd></div>
+          <div data-k="maghrib"><dt>Maghrib</dt><dd>—</dd></div>
+          <div data-k="isya"><dt>Isya</dt><dd>—</dd></div>
+        </dl>
+        <p class="p-src" data-p-src>Sumber: data Bimas Islam, Kementerian Agama RI</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ ANGKA ============ -->
+  <section class="stats" aria-labelledby="capaian-title">
+    <div class="container">
+      <h2 id="capaian-title" class="sr-only">Capaian yayasan</h2>
+      <dl>
+        {capaian.map((s, i) => (
+          <div class="stat" data-reveal style={`--i:${i}`}>
+            <dd>
+              <span class="count" data-count={s.angka} data-suffix={s.suffix}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</span>
+            </dd>
+            <dt>{s.label}</dt>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- ============ TENTANG ============ -->
+  <section class="section about" aria-labelledby="tentang-title">
+    <div class="container about-grid">
+      <Media shape="arch" tone="sand" emblem="home" outline image={gedungPhoto} alt="Gedung Graha Mawaddah, kantor pusat yayasan" label="Gedung Graha Mawaddah" class="about-media" sizes="(min-width: 960px) 34vw, 80vw" />
+      <div class="about-copy">
+        <p class="eyebrow" data-reveal>Sekilas tentang kami</p>
+        <SplitText as="h2" id="tentang-title" class="bar-gold" text="Mengenal *Yayasan Mawaddah Indonesia*" />
+        <p class="muted" data-reveal style="--i:2">
+          Berdiri sejak {site.founded}, Yayasan Mawaddah Indonesia menjadi wadah bagi kegiatan dakwah, sosial, dan pendidikan.
+          Dari gedung Graha Mawaddah, kami menghadirkan Wesal TV, menyalurkan mushaf Al-Qur’an ke seluruh negeri, membangun
+          masjid dan sumur, serta membina generasi Qur’ani di pesantren dan rumah Qur’an.
+        </p>
+        <ul class="checks" data-reveal style="--i:3">
+          {tentangPoin.map((t) => <li><span class="ck" aria-hidden="true"><Icon name="check" /></span>{t}</li>)}
+        </ul>
+        <a href="/profil/" class="btn" data-reveal style="--i:4">Baca Lebih Lanjut <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAM ============ -->
+  <section class="section programs" aria-labelledby="program-title">
+    <div class="container">
+      <div class="center-head">
+        <p class="eyebrow" data-reveal>Program kami</p>
+        <SplitText as="h2" id="program-title" class="bar-gold" text="Salurkan *Kebaikan Anda*" />
+        <p class="muted" data-reveal style="--i:2">Pilih program yang paling menyentuh hati — setiap amanah kami salurkan sesuai peruntukannya.</p>
+      </div>
+      <div class="pgrid">
+        {featured.map((p, i) => <ProgramCard entry={p} i={i} compact />)}
+      </div>
+      <div class="center" data-reveal>
+        <a href="/program/" class="btn btn-ghost">Lihat semua program <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HAJI & UMRAH ============ -->
+  <section class="section haji on-brown textured" aria-labelledby="haji-title">
+    <div class="container haji-grid">
+      <div class="haji-copy">
+        <p class="eyebrow" data-reveal>Haji &amp; Umrah</p>
+        <SplitText as="h2" id="haji-title" class="bar-gold" text="Berangkat ke Tanah Suci *bersama Almaz Tour*" />
+        <p class="muted" data-reveal style="--i:2">
+          Yayasan Mawaddah terafiliasi dengan <strong>{almaz.company}</strong> ({almaz.brand}) — biro perjalanan umrah dan haji
+          berizin PPIU No. {almaz.ppiu} dengan akreditasi {almaz.akreditasi} dari Kementerian Agama RI. Ibadah dibimbing sesuai sunnah.
+        </p>
+        <div class="cluster" data-reveal style="--i:3">
+          <a href="/haji-umrah/" class="btn">Lihat layanan <Icon name="arrow-right" /></a>
+          <a href={waLinkTo(almaz.whatsapp[0].wa, 'Assalamu’alaikum, saya ingin bertanya tentang paket umrah/haji Almaz Tour.')} class="btn btn-ghost-light" target="_blank" rel="noopener"><Icon name="chat" /> Tanya paket via WhatsApp</a>
+        </div>
+      </div>
+      <ul class="haji-list">
+        {almaz.layanan.slice(0, 4).map((l, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <span class="hl-ic"><Icon name={l.icon} /></span>
+            <span><strong>{l.title}</strong><span class="small muted">{l.text}</span></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PSB ============ -->
+  <section class="psb" aria-labelledby="psb-title">
+    <div class="psb-media">
+      <Media tone="rose" emblem="cap" ratio="auto" image={psbPhoto} alt="Santri Taisiru Ar-Rahman Boarding School" label="Santri TABS" class="psb-img" sizes="(min-width: 960px) 50vw, 100vw" />
+    </div>
+    <div class="psb-copy">
+      <p class="eyebrow" data-reveal>Penerimaan Santri Baru</p>
+      <SplitText as="h2" id="psb-title" class="bar-gold" text="TABS & STAM *kini dibuka*" />
+      <p class="muted" data-reveal style="--i:2">
+        Pendaftaran dibuka untuk Taisiru Ar-Rahman Boarding School dan STAM, program kaderisasi da’i setingkat D2
+        dengan 1 tahun materi dan 1 tahun praktek vokasi. Bergabunglah bersama TABS 1 Banjarnegara, TABS 2 Purbalingga,
+        dan TABS 3 Purbalingga Putri dalam membina generasi Qur’ani.
+      </p>
+      <ul class="loc" data-reveal style="--i:3">
+        <li><Icon name="map-pin" /> TABS 4 Putra — Cilacap, Jawa Tengah</li>
+        <li><Icon name="map-pin" /> TABS 5 Putra — Cianjur, Jawa Barat</li>
+        <li><Icon name="map-pin" /> STAM — Graha Mawaddah, Jakarta Timur</li>
+      </ul>
+      <div class="cluster" data-reveal style="--i:4">
+        <a class="btn" href={waLink('Assalamu’alaikum, saya ingin mendaftar PSB Taisiru Ar-Rahman Boarding School (TABS 4 Cilacap / TABS 5 Cianjur / STAM).')} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+        <a class="btn btn-ghost" href="/psb/">Info PSB <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AYAT ============ -->
+  <section class="section-tight verse-band">
+    <div class="container"><Verse /></div>
+  </section>
+
+  <!-- ============ KABAR ============ -->
+  <section class="section news" aria-labelledby="kabar-title">
+    <div class="container">
+      <SectionHead eyebrow="Wawasan & kabar" id="kabar-title" title="Kabar *Terbaru*" align="split">
+        <a href="/berita/" class="link">Semua kabar <Icon name="arrow-right" /></a>
+      </SectionHead>
+      <div class="ngrid">
+        {news.map((n, i) => <NewsCard entry={n} i={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA DONASI ============ -->
+  <section class="cta-band on-brown textured" aria-labelledby="cta-title">
+    <div class="container cta-in">
+      <h2 id="cta-title" data-reveal>Mulai Investasi Akhirat <em>Anda Hari Ini</em></h2>
+      <p class="muted" data-reveal style="--i:1">Tidak perlu menunggu kaya untuk bersedekah. Mulailah dari yang sedikit namun istiqamah — Allah Maha Melihat setiap butir kebaikan.</p>
+      <div class="cluster center-cluster" data-reveal style="--i:2">
+        <a href="/donasi/" class="btn">Ayo Berdonasi <Icon name="heart" /></a>
+        <a href="/rekening/" class="btn btn-ghost-light">Rekening Resmi</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  // Hormati preferensi "kurangi gerakan": video hero berhenti di bingkai pertama.
+  const heroVid = document.querySelector<HTMLVideoElement>('.hero-video');
+  if (heroVid && matchMedia('(prefers-reduced-motion: reduce)').matches) { heroVid.removeAttribute('autoplay'); heroVid.pause(); }
+</script>
+
+<script>
+  // Jadwal shalat Kota Jakarta — data Bimas Islam (Kemenag RI), diteruskan lewat api.myquran.com (id kota 1301).
+  const box = document.querySelector<HTMLElement>('[data-prayer]');
+  if (box) {
+    const API = 'https://api.myquran.com/v2/sholat/jadwal/1301/';
+    const $ = (sel: string) => box.querySelector<HTMLElement>(sel)!;
+    const WIB = 'Asia/Jakarta';
+    const ymd = (d: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: WIB }).format(d);
+    const order: [string, string][] = [['subuh', 'Subuh'], ['dzuhur', 'Dzuhur'], ['ashar', 'Ashar'], ['maghrib', 'Maghrib'], ['isya', 'Isya']];
+    const wajib = ['subuh', 'dzuhur', 'ashar', 'maghrib', 'isya'];
+
+    const load = async (date: string): Promise<Record<string, string>> => {
+      const key = 'mw-bimas-' + date;
+      try { const c = localStorage.getItem(key); if (c) return JSON.parse(c); } catch {}
+      const r = await fetch(API + date);
+      if (!r.ok) throw new Error('http');
+      const j = await r.json();
+      if (!j.status) throw new Error('data');
+      try { localStorage.setItem(key, JSON.stringify(j.data.jadwal)); } catch {}
+      return j.data.jadwal;
+    };
+    const at = (date: string, hm: string) => new Date(`${date}T${hm}:00+07:00`);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    // Tanggal Hijriah mengikuti kalender Kemenag RI (adj=0 sesuai penetapan 1 Rabiul Akhir 1448 H = 13 Sep 2026).
+    const hijri = async (date: string) => {
+      const key = 'mw-hijri-' + date;
+      try { const c = localStorage.getItem(key); if (c) return c; } catch {}
+      const r = await fetch('https://api.myquran.com/v2/cal/hijr/' + date + '?adj=0');
+      const j = await r.json();
+      const t: string = j.data.date[1];
+      try { localStorage.setItem(key, t); } catch {}
+      return t;
+    };
+
+    const start = async () => {
+      const now = new Date();
+      const today = ymd(now);
+      const j = await load(today);
+      $('[data-p-date]').textContent = new Intl.DateTimeFormat('id-ID', { timeZone: WIB, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+      hijri(today).then((t) => { $('[data-p-hijri]').textContent = t; }).catch(() => {});
+      order.forEach(([k]) => { const dd = box.querySelector<HTMLElement>(`[data-k="${k}"] dd`); if (dd) dd.textContent = j[k].replace(':', '.'); });
+
+      let target: Date | null = null, name = '';
+      let tomorrow: Record<string, string> | null = null;
+      const tick = async () => {
+        const n = new Date();
+        if (!target || target <= n) {
+          target = null;
+          for (const k of wajib) { const t = at(today, j[k]); if (t > n) { target = t; name = k; break; } }
+          if (!target) {
+            const tmr = ymd(new Date(n.getTime() + 864e5));
+            if (!tomorrow) { try { tomorrow = await load(tmr); } catch { tomorrow = null; } }
+            if (tomorrow) { target = at(tmr, tomorrow.subuh); name = 'subuh'; }
+          }
+        }
+        box.querySelectorAll<HTMLElement>('[data-k]').forEach((el) => el.classList.toggle('is-next', el.dataset.k === name));
+        $('[data-p-next-name]').textContent = order.find(([k]) => k === name)?.[1] ?? '—';
+        if (target) {
+          const s = Math.max(0, Math.floor((+target - +n) / 1000));
+          $('[data-p-count]').textContent = `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+        }
+      };
+      await tick();
+      setInterval(tick, 1000);
+    };
+    start().catch(() => {
+      $('[data-p-count]').textContent = '—';
+      $('[data-p-src]').innerHTML = 'Jadwal belum dapat dimuat. Lihat <a href="https://bimasislam.kemenag.go.id/jadwalshalat" target="_blank" rel="noopener">Bimas Islam Kemenag</a>.';
+    });
+  }
+</script>
+
+<style>
+  /* ---------- Hero (dua kolom: pesan di kiri, kartu jadwal shalat berbentuk lengkung di kanan) ---------- */
+  .hero { position: relative; overflow: hidden; isolation: isolate; min-height: min(46rem, 88svh); display: grid; align-content: center; }
+  .hero .hero-video { object-fit: cover; }
+  .hero :global(.hero-photo) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; }
+  .hero-shade { position: absolute; inset: 0; z-index: -1; background:
+    radial-gradient(ellipse 60% 70% at 85% 45%, rgb(110 18 63 / 0.45), transparent 70%),
+    linear-gradient(100deg, rgb(38 8 24 / 0.92) 8%, rgb(38 8 24 / 0.7) 60%, rgb(38 8 24 / 0.6)); }
+  .hero::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: var(--girih-light); background-size: 56px; opacity: 0.5; mask-image: radial-gradient(ellipse 60% 90% at 85% 50%, #000, transparent 75%); pointer-events: none; }
+  .hero-grid { display: grid; gap: var(--s-8); align-items: center; padding-block: clamp(3.5rem, 2.5rem + 5vw, 7rem); }
+  .hero-inner { display: grid; justify-items: start; text-align: left; gap: var(--s-5); }
+  .hero-inner :global(h1) { color: #fff; font-size: clamp(2.5rem, 1.5rem + 4.4vw, 4.75rem); max-width: 12ch; }
+  .hero-inner :global(h1 em) { color: #e6bd4a; }
+  .hero-inner .lead { color: var(--on-plum-soft); max-width: 46ch; }
+  .cta { margin-top: var(--s-2); }
+  .hero .eyebrow { background: rgb(230 189 74 / 0.16); color: #f2dc9a; }
+  .hero-tags { list-style: none; padding: 0; margin: var(--s-3) 0 0; display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; padding-top: var(--s-4); border-top: 1px solid var(--line-plum); }
+  .hero-tags li { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-plum-soft); }
+  .hero-tags li + li::before { content: '✦'; color: #e6bd4a; margin-right: 1.4rem; font-size: 0.6rem; vertical-align: 0.1em; }
+
+  .prayer { justify-self: center; width: min(100%, 24rem); display: grid; gap: var(--s-4); padding: clamp(3rem, 2.5rem + 3vw, 4.5rem) var(--s-6) var(--s-6); text-align: center;
+    border-radius: 12rem 12rem var(--r-lg) var(--r-lg); background: rgb(255 255 255 / 0.07); border: 1px solid rgb(230 189 74 / 0.4);
+    backdrop-filter: blur(10px); box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.6), inset 0 0 0 6px rgb(38 8 24 / 0.25); }
+  .p-head { display: grid; gap: 0.25rem; }
+  .p-kicker { margin: 0; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: #f2dc9a; }
+  .p-date { margin: 0; display: grid; gap: 0.1rem; font-size: 0.82rem; color: var(--on-plum-soft); }
+  .p-date strong { color: #fff; font-weight: 600; }
+  .p-next { display: grid; gap: 0.15rem; padding-block: var(--s-3); border-block: 1px solid var(--line-plum); }
+  .p-next-label { font-size: 0.8rem; color: var(--on-plum-soft); }
+  .p-next-label b { color: #e6bd4a; font-weight: 650; }
+  .p-count { font-size: clamp(2rem, 1.6rem + 1.4vw, 2.6rem); font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .p-times { margin: 0; display: grid; gap: 0.15rem; }
+  .p-times > div { display: flex; justify-content: space-between; align-items: baseline; padding: 0.4rem 0.8rem; border-radius: 0.5rem; }
+  .p-times dt { font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-plum-soft); }
+  .p-times dd { margin: 0; font-weight: 650; color: #fff; font-variant-numeric: tabular-nums; }
+  .p-times .is-next { background: rgb(230 189 74 / 0.18); outline: 1px solid rgb(230 189 74 / 0.5); }
+  .p-times .is-next dt, .p-times .is-next dd { color: #f2dc9a; }
+  .p-src { margin: 0; font-size: 0.68rem; color: var(--on-plum-soft); opacity: 0.8; }
+  .p-src :global(a) { color: #f2dc9a; text-decoration: underline; }
+  @media (min-width: 960px) {
+    .hero-grid { grid-template-columns: 1.15fr 0.85fr; gap: var(--s-9); }
+    .prayer { justify-self: end; }
+  }
+
+  /* ---------- Angka ---------- */
+  .stats { background: #8f1d55; color: var(--on-plum); }
+  .stats dl { display: grid; grid-template-columns: 1fr 1fr; margin: 0; }
+  .stat { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.35rem; padding: var(--s-6) var(--s-3); }
+  .stat dd { margin: 0; }
+  .stat .count { font-size: clamp(2rem, 1.4rem + 2.6vw, 3.4rem); font-weight: 700; line-height: 1; color: #e6bd4a; }
+  .stat dt { font-size: 0.82rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-plum-soft); }
+  @media (min-width: 960px) { .stats dl { grid-template-columns: repeat(4, 1fr); } .stat { padding-block: var(--s-7); } }
+
+  /* ---------- Tentang ---------- */
+  .about-grid { display: grid; gap: var(--s-7); align-items: center; }
+  .about-grid :global(.about-media) { width: min(100%, 26rem); justify-self: center; }
+  .about-copy { display: grid; gap: var(--s-4); justify-items: start; }
+  .about-copy :global(h2) { max-width: 18ch; }
+  .checks { list-style: none; padding: 0; display: grid; gap: 0.6rem; }
+  .checks li { display: flex; align-items: center; gap: 0.7rem; font-weight: 550; }
+  .ck { flex: none; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--gold); color: var(--plum); }
+  .ck :global(.icon) { width: 0.9rem; height: 0.9rem; stroke-width: 2.4; }
+  @media (min-width: 960px) { .about-grid { grid-template-columns: 0.9fr 1.1fr; gap: var(--s-9); } }
+
+  /* ---------- Program ---------- */
+  .programs { background: #f7eef3; position: relative; }
+  .center-head { display: grid; gap: var(--s-3); justify-items: center; text-align: center; margin-bottom: var(--s-8); }
+  .center-head :global(h2) { max-width: 20ch; }
+  .center-head :global(h2)::after { margin-inline: auto; }
+  .center-head p:last-child { max-width: 52ch; }
+  .pgrid { display: grid; gap: var(--s-5); }
+  @media (min-width: 640px) { .pgrid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .pgrid { grid-template-columns: repeat(3, 1fr); } }
+  .center { display: flex; justify-content: center; margin-top: var(--s-7); }
+
+  /* ---------- Haji & Umrah ---------- */
+  .haji-grid { display: grid; gap: var(--s-7); align-items: center; }
+  .haji-copy { display: grid; gap: var(--s-4); justify-items: start; }
+  .haji-copy :global(h2) { max-width: 16ch; }
+  .haji-copy .muted { max-width: 52ch; }
+  .haji-copy strong { color: #fff; }
+  .haji-list { list-style: none; padding: 0; display: grid; gap: var(--s-3); }
+  .haji-list li { display: flex; gap: var(--s-4); align-items: center; padding: var(--s-4) var(--s-5); border-radius: var(--r-md); background: rgb(255 255 255 / 0.06); border: 1px solid var(--line-plum); }
+  .haji-list li > span:last-child { display: grid; gap: 0.15rem; }
+  .haji-list strong { color: #fff; }
+  .hl-ic { flex: none; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--gold); color: var(--plum); }
+  @media (min-width: 960px) { .haji-grid { grid-template-columns: 1.1fr 1fr; gap: var(--s-9); } }
+
+  /* ---------- PSB ---------- */
+  .psb { display: grid; background: var(--grad-soft); }
+  .psb-media { position: relative; min-height: 18rem; }
+  .psb-media :global(.psb-img) { position: absolute !important; inset: 0; aspect-ratio: auto !important; }
+  .psb-media :global(.media-clip) { border-radius: 0; }
+  .psb-copy { display: grid; gap: var(--s-4); justify-items: start; align-content: center; padding: clamp(2.5rem, 2rem + 4vw, 6rem) var(--gutter); }
+  .psb-copy :global(h2) { max-width: 16ch; }
+  .psb-copy .muted { max-width: 50ch; }
+  .loc { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+  .loc li { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 560; }
+  .loc :global(.icon) { color: var(--rose); }
+  @media (min-width: 960px) {
+    .psb { grid-template-columns: 1fr 1fr; min-height: 34rem; }
+    .psb-copy { padding-right: max(var(--gutter), calc((100vw - var(--max)) / 2)); }
+  }
+
+  /* ---------- Ayat & Kabar ---------- */
+  .verse-band { border-bottom: 1px solid var(--line); }
+  .ngrid { display: grid; gap: var(--s-7) var(--s-6); }
+  @media (min-width: 640px) { .ngrid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .ngrid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* ---------- CTA ---------- */
+  .cta-band { padding-block: clamp(4rem, 3rem + 5vw, 7rem); text-align: center; }
+  .cta-in { display: grid; justify-items: center; gap: var(--s-4); }
+  .cta-in h2 { font-size: var(--step-4); max-width: 20ch; }
+  .cta-in .muted { max-width: 56ch; }
+  .center-cluster { justify-content: center; margin-top: var(--s-3); }
+
+  [data-magnetic] { transition: transform 420ms var(--ease-out), color var(--d-2), box-shadow var(--d-2); }
+</style>

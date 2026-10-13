@@ -1,0 +1,27 @@
+---
+import SplitText from './SplitText.astro';
+interface Props { eyebrow?: string; title: string; lead?: string; align?: 'start' | 'split'; as?: 'h1' | 'h2'; id?: string }
+const { eyebrow, title, lead, align = 'start', as = 'h2', id } = Astro.props;
+---
+<div class:list={['shead', `shead-${align}`]}>
+  <div class="shead-main">
+    {eyebrow && <p class="eyebrow" data-reveal>{eyebrow}</p>}
+    <SplitText as={as} text={title} id={id} />
+  </div>
+  {(lead || Astro.slots.has('default')) && (
+    <div class="shead-side" data-reveal style="--i:2">
+      {lead && <p class="lead">{lead}</p>}
+      <slot />
+    </div>
+  )}
+</div>
+
+<style>
+  .shead { display: grid; gap: var(--s-5); margin-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem); }
+  .shead-main { display: grid; gap: var(--s-4); }
+  .shead-main :global(h2), .shead-main :global(h1) { max-width: 16ch; }
+  .shead-side { display: grid; gap: var(--s-4); justify-items: start; }
+  @media (min-width: 960px) {
+    .shead-split { grid-template-columns: 1.4fr 1fr; align-items: end; gap: var(--s-8); }
+  }
+</style>

@@ -1,0 +1,234 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHead from '../components/SectionHead.astro';
+import Media from '../components/Media.astro';
+import Icon from '../components/Icon.astro';
+import Verse from '../components/Verse.astro';
+import { site, pilar, capaian, legalitas, visi, misi, nilai, tujuan, pilarPengembangan, motto, type PilarKey } from '../data/site';
+
+const pilarIcon = { sosial: 'heart', dakwah: 'tv', pendidikan: 'cap' } as const;
+const jejak = [
+  { k: String(site.founded), t: 'Yayasan berdiri', d: 'Yayasan Mawaddah Indonesia berdiri sebagai wadah kegiatan dakwah, sosial, dan pendidikan.' },
+  { k: 'Graha Mawaddah', t: 'Rumah bagi seluruh kegiatan', d: 'Kantor pusat di Pondok Ranggon, Cipayung, Jakarta Timur — sekaligus studio Wesal TV.' },
+  { k: 'Wesal TV', t: 'Dakwah media keluarga', d: 'Televisi keluarga islami menjadi kegiatan utama dakwah media yayasan.' },
+  { k: '189.940', t: 'Mushaf tersalurkan', d: 'Wakaf mushaf Al-Qur’an telah sampai ke masjid, pesantren, dan rumah Qur’an di seluruh Indonesia.' },
+  { k: 'TABS 1–3', t: 'Tiga pesantren berjalan', d: 'Taisiru Ar-Rahman Boarding School di Banjarnegara, Purbalingga, dan Purbalingga Putri.' },
+  { k: 'TABS 4–5', t: 'Membuka PSB', d: 'Dua pesantren baru di Cilacap dan Cianjur kini menerima santri baru.' },
+];
+---
+<Base title="Profil Yayasan" description={site.description}>
+  <PageHero eyebrow="Profil yayasan" title="Berangkat dari satu kata: *mawaddah.*"
+    lead="Kasih sayang yang tulus, yang Allah tanamkan di antara sesama. Itulah yang ingin kami rajut melalui dakwah, pendidikan, dan kepedulian sosial."
+    crumbs={[{ href: '/profil/', label: 'Tentang Kami' }]} />
+
+  <section class="section">
+    <div class="container story">
+      <Media shape="star" tone="sand" emblem="home" alt="Gedung Graha Mawaddah di Jakarta Timur" label="Gedung Graha Mawaddah" class="story-media" sizes="(min-width: 960px) 35vw, 80vw" />
+      <div class="stack story-copy">
+        <p class="eyebrow" data-reveal>Sejarah singkat</p>
+        <h2 class="display" data-reveal>Sejak {site.founded}, dari <em>Graha Mawaddah.</em></h2>
+        <div class="prose" data-reveal style="--i:2">
+          <p>Yayasan Mawaddah Indonesia berdiri sejak <strong>{site.founded}</strong> sebagai wadah bagi berbagai kegiatan dakwah, sosial, dan pendidikan. Yayasan berdiri di atas gedung <strong>Graha Mawaddah</strong>, yang memiliki kegiatan utama dakwah media melalui <a href="/wesal-tv/">Wesal TV</a>, sebuah televisi keluarga islami.</p>
+          <p>Hingga kini, yayasan telah menyalurkan <strong>189.940 mushaf Al-Qur’an</strong> ke seluruh Indonesia, membangun masjid-masjid dan sumur-sumur di daerah yang membutuhkan, serta mengelola pesantren <strong>Taisiru Ar-Rahman Boarding School</strong> dan rumah Qur’an.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight bg-sand">
+    <div class="container"><Verse compact /></div>
+  </section>
+
+  <section class="section" aria-labelledby="jejak-title">
+    <div class="container">
+      <SectionHead eyebrow="Jejak langkah" id="jejak-title" title="Yang telah *kita rajut bersama.*" align="split"
+        lead="Setiap capaian adalah buah kepercayaan para donatur, wakif, dan relawan." />
+      <ol class="jejak">
+        {jejak.map((j, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <span class="j-k serif">{j.k}</span>
+            <h3>{j.t}</h3>
+            <p class="muted">{j.d}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section on-plum textured" aria-labelledby="bidang-title">
+    <div class="container">
+      <SectionHead eyebrow="Bidang kegiatan" id="bidang-title" title="Tiga ruang *kebaikan.*" />
+      <ul class="bidang">
+        {(Object.keys(pilar) as PilarKey[]).map((k, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <a href={pilar[k].href}>
+              <span class="b-ic"><Icon name={pilarIcon[k]} /></span>
+              <span class="arab b-ar" lang="ar">{pilar[k].arab}</span>
+              <h3>{pilar[k].nama}</h3>
+              <p class="muted">{pilar[k].lead}</p>
+              <span class="link small">Lihat program <Icon name="arrow-right" /></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section id="visi-misi" class="section" aria-labelledby="visi-title">
+    <div class="container">
+      <SectionHead eyebrow="Visi & misi" id="visi-title" title="Arah yang *kami tuju.*" align="split"
+        lead="Landasan seluruh program dakwah, pendidikan, dan sosial Yayasan Mawaddah Indonesia." />
+      <div class="vm">
+        <blockquote class="visi on-plum textured" data-reveal>
+          <p class="eyebrow plain">Visi</p>
+          <p class="serif visi-text">“{visi}”</p>
+        </blockquote>
+        <div class="misi" data-reveal style="--i:1">
+          <p class="eyebrow">Misi</p>
+          <ol>
+            {misi.map((m) => <li>{m}</li>)}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="nilai" class="section bg-sand" aria-labelledby="nilai-title">
+    <div class="container">
+      <SectionHead eyebrow="Nilai-nilai yayasan" id="nilai-title" title="Enam nilai yang *kami pegang.*" />
+      <ul class="nilai">
+        {nilai.map((n, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <h3 class="serif">{n.nama}</h3>
+            <p class="muted">{n.makna}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section id="tujuan" class="section" aria-labelledby="tujuan-title">
+    <div class="container">
+      <SectionHead eyebrow="Tujuan strategis" id="tujuan-title" title="Lima sasaran *yang terukur.*" />
+      <ol class="tujuan">
+        {tujuan.map((t, i) => (
+          <li data-reveal style={`--i:${i % 2}`}><span class="t-n serif">{i + 1}</span><p>{t}</p></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section id="pilar" class="section on-plum textured" aria-labelledby="pp-title">
+    <div class="container">
+      <SectionHead eyebrow="Pilar pengembangan" id="pp-title" title="Lima pilar *program unggulan.*" />
+      <ul class="pp">
+        {pilarPengembangan.map((p, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <h3>{i + 1}. {p.nama}</h3>
+            <ul>{p.program.map((x) => <li>{x}</li>)}</ul>
+          </li>
+        ))}
+      </ul>
+      <p class="motto serif" data-reveal>{motto.join(' · ')}</p>
+    </div>
+  </section>
+
+  <section id="legalitas" class="section bg-sand" aria-labelledby="legal-title">
+    <div class="container legal">
+      <div class="stack" style="--stack: var(--s-4)">
+        <p class="eyebrow" data-reveal>Legalitas</p>
+        <h2 id="legal-title" class="display" data-reveal>Berbadan hukum <em>resmi.</em></h2>
+        <p class="muted" data-reveal style="--i:2">Yayasan Mawaddah Indonesia terdaftar dan disahkan oleh Kementerian Hukum dan HAM Republik Indonesia.</p>
+      </div>
+      <ol class="docs">
+        {legalitas.map((l, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <span class="d-ic"><Icon name={i % 2 ? 'shield' : 'file'} /></span>
+            <div><p class="small d-k">{l.label}</p><p class="serif d-v">{l.value}</p><p class="small muted">{l.note}</p></div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="angka-title">
+    <div class="container">
+      <h2 id="angka-title" class="sr-only">Capaian dalam angka</h2>
+      <dl class="angka">
+        {capaian.map((s, i) => (
+          <div data-reveal style={`--i:${i}`}>
+            <dt class="small muted">{s.label}</dt>
+            <dd class="serif num count" data-count={s.angka} data-suffix={s.suffix}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</dd>
+          </div>
+        ))}
+      </dl>
+      <div class="next" data-reveal>
+        <a href="/pengurus/" class="btn">Lihat struktur pengurus <Icon name="arrow-right" /></a>
+        <a href="/kontak/" class="btn btn-ghost">Kunjungi Graha Mawaddah</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .story { display: grid; gap: var(--s-8); align-items: center; }
+  .story :global(.story-media) { width: min(100%, 26rem); justify-self: center; }
+  .story-copy { --stack: var(--s-5); }
+  .story-copy h2 { font-size: var(--step-3); max-width: 18ch; }
+  @media (min-width: 960px) { .story { grid-template-columns: 0.9fr 1.1fr; gap: var(--s-9); } }
+
+  .jejak { list-style: none; padding: 0; display: grid; gap: var(--s-4); counter-reset: j; }
+  .jejak li { position: relative; display: grid; gap: var(--s-2); align-content: start; padding: var(--s-6) var(--s-5) var(--s-5); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); overflow: hidden; }
+  .jejak li::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--grad-rose); transform: scaleX(0.2); transform-origin: left; transition: transform 700ms var(--ease-out); }
+  @media (hover: hover) { .jejak li:hover::before { transform: scaleX(1); } }
+  .j-k { font-size: var(--step-2); color: var(--rose); line-height: 1.1; }
+  .jejak h3 { font-size: 1.1rem; }
+  @media (min-width: 640px) { .jejak { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .jejak { grid-template-columns: repeat(3, 1fr); } }
+
+  .bidang { list-style: none; padding: 0; display: grid; gap: var(--s-4); }
+  .bidang a { position: relative; display: grid; gap: var(--s-3); align-content: start; height: 100%; padding: var(--s-6); border-radius: var(--r-lg); border: 1px solid var(--line-plum); transition: background-color var(--d-3) var(--ease-out), transform 520ms var(--ease-out); }
+  @media (hover: hover) { .bidang a:hover { background: rgb(255 255 255 / 0.05); transform: translateY(-4px); } }
+  .b-ic { display: grid; place-items: center; width: 3.25rem; height: 3.25rem; border-radius: 50%; background: #e6bd4a; color: var(--plum); }
+  .b-ar { position: absolute; top: 1.25rem; right: 1.5rem; font-size: 2.2rem; color: #e6bd4a; opacity: 0.5; }
+  .bidang h3 { color: var(--on-plum); }
+  .bidang .link { justify-self: start; }
+  @media (min-width: 960px) { .bidang { grid-template-columns: repeat(3, 1fr); } }
+
+  .angka { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); padding-block: var(--s-6); border-block: 1px solid var(--line); }
+  .angka div { display: flex; flex-direction: column-reverse; gap: 0.25rem; }
+  .angka dd { font-size: clamp(2rem, 1.4rem + 2.4vw, 3.2rem); color: var(--rose); font-weight: 600; line-height: 1; }
+  @media (min-width: 960px) { .angka { grid-template-columns: repeat(4, 1fr); } }
+  .legal { display: grid; gap: var(--s-7); align-items: start; }
+  .legal h2 { font-size: var(--step-4); }
+  @media (min-width: 960px) { .legal { grid-template-columns: 0.8fr 1.2fr; gap: var(--s-9); } }
+  .docs { list-style: none; padding: 0; display: grid; gap: var(--s-3); }
+  .docs li { display: flex; gap: var(--s-4); align-items: flex-start; padding: var(--s-5); border-radius: var(--r-md); background: #fff; box-shadow: var(--shadow-1); }
+  .d-ic { flex: none; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; background: rgb(211 164 40 / 0.08); color: var(--rose); }
+  .d-k { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rose); font-size: 0.72rem; }
+  .d-v { font-size: 1.05rem; line-height: 1.4; margin-block: 0.15rem; }
+  .vm { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 960px) { .vm { grid-template-columns: 1fr 1.1fr; gap: var(--s-8); } }
+  .visi { margin: 0; padding: var(--s-7); border-radius: var(--r-lg); display: grid; gap: var(--s-3); overflow: hidden; }
+  .visi-text { font-size: var(--step-2); line-height: 1.35; }
+  .misi ol { padding-left: 1.4rem; display: grid; gap: var(--s-3); margin-top: var(--s-3); }
+  .misi li::marker { color: var(--rose); font-weight: 700; }
+  .nilai { list-style: none; padding: 0; display: grid; gap: var(--s-4); }
+  .nilai li { padding: var(--s-6); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); display: grid; gap: var(--s-2); align-content: start; }
+  .nilai h3 { font-size: 1.25rem; color: var(--rose); }
+  @media (min-width: 640px) { .nilai { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .nilai { grid-template-columns: repeat(3, 1fr); } }
+  .tujuan { list-style: none; padding: 0; display: grid; gap: var(--s-3); }
+  .tujuan li { display: flex; gap: var(--s-4); align-items: flex-start; padding: var(--s-5); border-radius: var(--r-md); border: 1px solid var(--line); }
+  .t-n { flex: none; display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--rose); color: #fff; font-weight: 600; }
+  @media (min-width: 960px) { .tujuan { grid-template-columns: repeat(2, 1fr); } }
+  .pp { list-style: none; padding: 0; display: grid; gap: var(--s-4); }
+  .pp > li { padding: var(--s-6); border-radius: var(--r-lg); border: 1px solid var(--line-plum); }
+  .pp h3 { color: var(--on-plum); margin-bottom: var(--s-3); font-size: 1.1rem; }
+  .pp ul { padding-left: 1.2rem; display: grid; gap: 0.25rem; }
+  @media (min-width: 640px) { .pp { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .pp { grid-template-columns: repeat(3, 1fr); } }
+  .motto { margin-top: var(--s-7); text-align: center; font-size: var(--step-2); font-style: italic; color: #e6bd4a; }
+  .next { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-7); }
+</style>

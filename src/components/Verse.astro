@@ -1,0 +1,48 @@
+---
+/** QS. Ar-Rum: 21 — asal-usul nama "Mawaddah". Terungkap dari kanan ke kiri, mengikuti arah tulisan Arab. */
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<figure class:list={['verse', { compact }]} data-inview>
+  <blockquote>
+    <p class="arab ayah" lang="ar">وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً</p>
+    <p class="terj">“…dan Dia menjadikan di antaramu rasa kasih dan sayang.”</p>
+  </blockquote>
+  <figcaption class="src">QS. Ar-Rum : 21</figcaption>
+</figure>
+
+<style>
+  .verse { display: grid; justify-items: center; text-align: center; gap: var(--s-4); }
+  blockquote { display: grid; gap: var(--s-3); }
+  .ayah {
+    font-size: clamp(2.2rem, 1.4rem + 4.2vw, 4.6rem);
+    line-height: 1.6;
+    color: var(--rose);
+  }
+  .compact .ayah { font-size: clamp(1.8rem, 1.3rem + 2.2vw, 2.8rem); }
+  .terj {
+    font-family: var(--font-serif);
+    font-size: var(--step-1);
+    color: var(--ink-soft);
+    max-width: 34ch;
+    margin-inline: auto;
+  }
+  .src {
+    font-size: 0.75rem; font-weight: 560;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-soft);
+    display: inline-flex; align-items: center; gap: 0.8rem;
+  }
+  .src::before, .src::after { content: ''; width: 2rem; height: 1px; background: var(--line-strong); }
+
+  :global(html.js) .verse .ayah {
+    clip-path: inset(-20% 0 -20% 100%);
+    transition: clip-path 2200ms var(--ease-in-out);
+  }
+  :global(html.js) .verse.is-in .ayah { clip-path: inset(-20% 0 -20% 0); }
+  :global(html.js) .verse .terj, :global(html.js) .verse .src {
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 900ms var(--ease-out) 1300ms, transform 900ms var(--ease-out) 1300ms;
+  }
+  :global(html.js) .verse.is-in .terj, :global(html.js) .verse.is-in .src { opacity: 1; transform: none; }
+</style>

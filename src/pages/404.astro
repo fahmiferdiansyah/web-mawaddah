@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Star from '../components/Star.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Halaman tidak ditemukan">
+  <section class="nf">
+    <div class="nf-star" aria-hidden="true"><Star /></div>
+    <div class="container-narrow inner">
+      <p class="eyebrow plain" data-reveal>Kesalahan 404</p>
+      <h1 data-reveal style="--i:1">Jalan ini <em>belum ada.</em></h1>
+      <p class="lead" data-reveal style="--i:2">Halaman yang Anda cari mungkin telah dipindahkan. Mari kembali ke jalan yang kita kenal.</p>
+      <div class="cluster" data-reveal style="--i:3">
+        <a href="/" class="btn"><Icon name="arrow-left" /> Kembali ke beranda</a>
+        <a href="/program/" class="btn btn-ghost">Lihat program</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { position: relative; overflow: hidden; min-height: 80svh; display: grid; place-items: center; padding-block: 5rem; text-align: center; }
+  .inner { display: grid; gap: var(--s-5); justify-items: center; }
+  .lead { margin-inline: auto; }
+  .cluster { justify-content: center; }
+  .nf-star { position: absolute; width: min(90vw, 40rem); color: var(--rose); opacity: 0.14; }
+</style>

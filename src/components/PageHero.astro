@@ -1,0 +1,50 @@
+---
+import SplitText from './SplitText.astro';
+import Star from './Star.astro';
+interface Props { eyebrow: string; title: string; lead?: string; crumbs?: { href: string; label: string }[] }
+const { eyebrow, title, lead, crumbs } = Astro.props;
+---
+<section class="phero">
+  <div class="star-wrap" aria-hidden="true"><Star /></div>
+  <div class="container inner">
+    {crumbs && (
+      <nav aria-label="Breadcrumb" class="crumbs small" data-reveal>
+        <ol>
+          <li><a href="/">Beranda</a></li>
+          {crumbs.map((c) => <li><a href={c.href}>{c.label}</a></li>)}
+        </ol>
+      </nav>
+    )}
+    <p class="eyebrow" data-reveal>{eyebrow}</p>
+    <SplitText as="h1" text={title} />
+    {lead && <p class="lead" data-reveal style="--i:3">{lead}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .phero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem);
+    background: var(--grad-dark);
+    color: var(--on-plum);
+  }
+  .inner { position: relative; display: grid; gap: var(--s-5); justify-items: start; }
+  h1, .phero :global(h1) { max-width: 18ch; }
+  .lead { max-width: 46ch; color: var(--on-plum-soft); }
+  .phero :global(h1) { color: #fff; }
+  .phero :global(h1 em) { color: #e6bd4a; }
+  .star-wrap {
+    position: absolute;
+    width: clamp(18rem, 42vw, 34rem);
+    right: -8vw; top: 3rem;
+    color: var(--gold);
+    opacity: 0.16;
+    pointer-events: none;
+  }
+  .crumbs ol { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; color: var(--on-plum-soft); }
+  .crumbs li + li::before { content: '/'; margin-right: 0.5rem; opacity: 0.5; }
+  .crumbs a { padding-block: 0.4rem; display: inline-block; }
+  .crumbs a:hover { color: #e6bd4a; }
+</style>

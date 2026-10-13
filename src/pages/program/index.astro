@@ -1,0 +1,109 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProgramCard from '../../components/ProgramCard.astro';
+import Icon from '../../components/Icon.astro';
+import { pilar } from '../../data/site';
+
+const programs = (await getCollection('program')).sort((a, b) => a.data.urutan - b.data.urutan);
+const filters = [{ key: 'semua', label: 'Semua' }, ...Object.entries(pilar).map(([key, p]) => ({ key, label: p.nama }))];
+---
+<Base title="Program" description="Program dakwah, pendidikan, dan sosial Yayasan Mawaddah Indonesia — dari beasiswa santri hingga tanggap bencana.">
+  <PageHero eyebrow="Program kami" title="Ladang kebaikan yang *bisa Anda tanami.*"
+    lead="Pilih program yang paling menyentuh hati Anda. Setiap program dilaporkan secara berkala kepada para donatur." />
+
+  <section class="section-tight">
+    <div class="container">
+      <div class="filters" role="group" aria-label="Saring program berdasarkan pilar" data-reveal>
+        {filters.map((f) => (
+          <button type="button" class="chip" data-filter={f.key} aria-pressed={f.key === 'semua' ? 'true' : 'false'}>
+            {f.label}
+            <span class="chip-count num">{f.key === 'semua' ? programs.length : programs.filter((p) => p.data.pilar === f.key).length}</span>
+          </button>
+        ))}
+      </div>
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+
+      <div class="grid" data-program-grid>
+        {programs.map((p, i) => <ProgramCard entry={p} i={i % 3} />)}
+      </div>
+
+      <aside class="general on-plum textured" data-reveal>
+        <div class="stack">
+          <p class="eyebrow">Donasi umum</p>
+          <h2 class="display">Biarkan kami salurkan ke yang <em>paling mendesak.</em></h2>
+          <p class="muted">Donasi tanpa peruntukan khusus akan dialokasikan ke program dengan kebutuhan paling mendesak bulan ini.</p>
+        </div>
+        <a class="btn btn-light" href="/donasi/">Donasi program umum <Icon name="arrow-right" /></a>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('[data-program-grid] [data-pilar]');
+  const status = document.querySelector('[data-filter-status]');
+
+  function apply(key: string, push = true) {
+    if (!['semua', 'dakwah', 'pendidikan', 'sosial'].includes(key)) key = 'semua';
+    chips.forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.filter === key)));
+    let shown = 0;
+    cards.forEach((card) => {
+      const match = key === 'semua' || card.dataset.pilar === key;
+      card.hidden = !match;
+      if (match) {
+        shown++;
+        card.classList.remove('is-in');
+        requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('is-in')));
+      }
+    });
+    if (status) status.textContent = `Menampilkan ${shown} program`;
+    if (push) {
+      const url = new URL(location.href);
+      if (key === 'semua') url.searchParams.delete('pilar'); else url.searchParams.set('pilar', key);
+      history.replaceState(null, '', url);
+    }
+  }
+  chips.forEach((c) => c.addEventListener('click', () => apply(c.dataset.filter!)));
+  const initial = new URLSearchParams(location.search).get('pilar');
+  if (initial) apply(initial, false);
+</script>
+
+<style>
+  .filters { display: flex; flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-8); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    min-height: 2.9rem; padding: 0.55rem 1.1rem;
+    border-radius: var(--r-pill);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-weight: 520; font-size: 0.95rem;
+    transition: background-color var(--d-2) var(--ease-out), color var(--d-2), box-shadow var(--d-2);
+  }
+  .chip-count {
+    display: grid; place-items: center;
+    min-width: 1.6rem; height: 1.6rem; padding-inline: 0.35rem;
+    border-radius: var(--r-pill);
+    background: rgb(43 35 40 / 0.07);
+    font-size: 0.78rem;
+    transition: background-color var(--d-2);
+  }
+  @media (hover: hover) { .chip:hover { box-shadow: inset 0 0 0 1px var(--ink); } }
+  .chip[aria-pressed='true'] { background: var(--ink); color: var(--paper); box-shadow: none; }
+  .chip[aria-pressed='true'] .chip-count { background: rgb(255 255 255 / 0.16); }
+
+  .grid { display: grid; gap: var(--s-8) var(--s-6); }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 960px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .general {
+    margin-top: var(--section);
+    display: grid; gap: var(--s-6); align-items: end;
+    padding: clamp(2rem, 1.5rem + 3vw, 4rem);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .general h2 { font-size: var(--step-3); max-width: 18ch; }
+  @media (min-width: 960px) { .general { grid-template-columns: 1fr auto; } }
+</style>

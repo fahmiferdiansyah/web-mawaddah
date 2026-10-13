@@ -1,0 +1,84 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { rekening, site, waLink } from '../data/site';
+---
+<Base title="Rekening Resmi" description="Daftar rekening resmi Yayasan Mawaddah Indonesia untuk infaq, sedekah, zakat, dan wakaf.">
+  <PageHero eyebrow="Rekening resmi" title="Salurkan hanya ke *rekening resmi.*"
+    lead={`Seluruh rekening atas nama ${site.name}. Setelah transfer, mohon konfirmasi melalui WhatsApp admin agar donasi Anda tercatat.`}
+    crumbs={[{ href: '/profil/', label: 'Tentang Kami' }]} />
+
+  <section class="section-tight">
+    <div class="container layout">
+      <ul class="banks">
+        {rekening.map((r, i) => (
+          <li class="bank" data-reveal style={`--i:${i}`}>
+            <div class="bank-top">
+              <span class="bank-code">{r.kode}</span>
+              <span class="tag tag-pill">{r.peruntukan}</span>
+            </div>
+            <p class="acc num">{r.nomor.replace(/(\d{4})(?=\d)/g, '$1 ')}</p>
+            <p class="small muted">{r.bank} · a.n. {r.atasNama}</p>
+            <button type="button" class="copy" data-copy={r.nomor} aria-label={`Salin nomor rekening ${r.bank} ${r.nomor}`}>
+              <span class="copy-icons" aria-hidden="true"><Icon name="copy" /><Icon name="check" /></span>
+              <span data-copy-label>Salin</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <aside class="side">
+        <div class="qris on-plum textured" data-reveal>
+          <div class="qr-box" aria-hidden="true"><Icon name="qr" /></div>
+          <p class="eyebrow plain">QRIS</p>
+          <p class="serif q-title">Scan dari semua e-wallet &amp; m-banking</p>
+          <p class="small muted">Kode QRIS resmi yayasan akan ditampilkan di sini.</p>
+        </div>
+        <div class="confirm" data-reveal style="--i:1">
+          <p class="serif c-title">Sudah transfer?</p>
+          <p class="small muted">Kirim bukti transfer agar donasi Anda tercatat dan kami kirimkan bukti penerimaan.</p>
+          <a class="btn full" href={waLink('Assalamu’alaikum, saya ingin konfirmasi donasi. Berikut bukti transfernya:')} target="_blank" rel="noopener"><Icon name="chat" /> Konfirmasi via WhatsApp</a>
+          <a class="link small" href="/donasi/">Isi niat donasi terlebih dahulu <Icon name="arrow-right" /></a>
+        </div>
+        <p class="safety small" data-reveal><Icon name="shield" /> <span><strong>Waspada penipuan.</strong> Yayasan tidak pernah meminta transfer ke rekening pribadi. Jika ragu, hubungi admin di {site.phone}.</span></p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .layout { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 1024px) { .layout { grid-template-columns: 1.3fr 1fr; gap: var(--s-8); } }
+  .banks { list-style: none; padding: 0; display: grid; gap: var(--s-4); }
+  .bank { position: relative; display: grid; gap: 0.35rem; padding: var(--s-6); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); transition: transform 520ms var(--ease-spring), box-shadow var(--d-2); }
+  @media (hover: hover) { .bank:hover { transform: translateY(-3px); box-shadow: var(--shadow-2); } }
+  .bank-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s-3); margin-bottom: var(--s-2); }
+  .bank-code { font-weight: 700; font-size: 1.05rem; }
+  .acc { font-family: var(--font-serif); font-weight: 600; font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); letter-spacing: 0.04em; }
+  .copy {
+    position: absolute; right: var(--s-5); bottom: var(--s-5);
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    min-height: 2.75rem; padding-inline: 1rem; border-radius: var(--r-pill);
+    background: var(--paper-2); font-size: 0.875rem; font-weight: 600;
+    transition: background-color var(--d-2), color var(--d-2);
+  }
+  @media (hover: hover) { .copy:hover { background: var(--ink); color: var(--paper); } }
+  .copy-icons { position: relative; width: 1.1em; height: 1.1em; }
+  .copy-icons :global(.icon) { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform 420ms var(--ease-spring), opacity var(--d-2); }
+  .copy-icons :global(.icon-check) { opacity: 0; transform: scale(0.4); }
+  .copy:global(.is-copied) { background: var(--rose); color: var(--paper); }
+  .copy:global(.is-copied) .copy-icons :global(.icon-copy) { opacity: 0; transform: scale(0.4); }
+  .copy:global(.is-copied) .copy-icons :global(.icon-check) { opacity: 1; transform: none; }
+  @media (max-width: 480px) { .copy { position: static; justify-self: start; margin-top: var(--s-2); } }
+
+  .side { display: grid; gap: var(--s-4); }
+  .qris { display: grid; justify-items: start; gap: var(--s-2); padding: var(--s-6); border-radius: var(--r-lg); overflow: hidden; }
+  .qr-box { display: grid; place-items: center; width: 7rem; aspect-ratio: 1; border-radius: var(--r-md); background: var(--paper); color: var(--plum); margin-bottom: var(--s-3); }
+  .qr-box :global(.icon) { width: 55%; height: 55%; stroke-width: 1.2; }
+  .q-title, .c-title { font-size: 1.2rem; color: inherit; }
+  .confirm { display: grid; gap: var(--s-3); justify-items: start; padding: var(--s-6); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); }
+  .full { width: 100%; }
+  .safety { display: flex; gap: 0.6rem; align-items: flex-start; color: var(--ink-soft); }
+  .safety :global(.icon) { color: var(--rose); flex: none; margin-top: 0.15em; }
+</style>

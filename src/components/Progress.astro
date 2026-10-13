@@ -1,0 +1,39 @@
+---
+import { rupiah } from '../data/site';
+interface Props { target: number; terkumpul: number; compact?: boolean; light?: boolean }
+const { target, terkumpul, compact = false, light = false } = Astro.props;
+const pct = Math.min(100, Math.round((terkumpul / target) * 100));
+---
+<div class:list={['progress', { compact, light }]} data-progress>
+  <div class="nums">
+    <p><span class="k">Terkumpul</span> <strong class="num">{rupiah(terkumpul)}</strong></p>
+    <p class="pct num" aria-hidden="true">{pct}%</p>
+  </div>
+  <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={pct} aria-label={`${pct}% dari target ${rupiah(target)}`}>
+    <span class="bar" style={`--p:${pct / 100}`}></span>
+  </div>
+  {!compact && <p class="target small">dari target <span class="num">{rupiah(target)}</span></p>}
+</div>
+
+<style>
+  .progress { display: grid; gap: 0.6rem; }
+  .nums { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .k { display: block; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+  strong { font-weight: 600; font-size: 1.05rem; }
+  .compact strong { font-size: 0.95rem; }
+  .pct { font-family: var(--font-serif); font-weight: 600; font-size: var(--step-2); color: var(--rose); line-height: 1; }
+  .compact .pct { font-size: 1.25rem; }
+  .track { height: 6px; border-radius: 99px; background: rgb(211 164 40 / 0.12); overflow: hidden; }
+  .bar {
+    display: block; height: 100%; border-radius: inherit;
+    background: linear-gradient(90deg, var(--rose-deep), var(--rose-glow));
+    transform-origin: 0 50%;
+    transform: scaleX(var(--p));
+  }
+  :global(html.js) .progress .bar { transform: scaleX(0); transition: transform 1800ms var(--ease-out) 200ms; }
+  :global(html.js) .progress.is-in .bar { transform: scaleX(var(--p)); }
+  .target { color: var(--ink-soft); }
+  .light .k, .light .target { color: var(--on-plum-soft); }
+  .light .pct { color: #e6bd4a; }
+  .light .track { background: rgb(253 243 248 / 0.14); }
+</style>
