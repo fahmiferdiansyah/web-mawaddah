@@ -38,7 +38,8 @@ export async function getStaticPaths() {
 const props = Astro.props as Props;
 const P = props.kind === 'program' ? props.entry.data : null;
 const Content = props.kind === 'program' ? (await render(props.entry)).Content : null;
-const isPsb = P?.status === 'PSB Dibuka';
+const daftarTeks = `Assalamu’alaikum, saya ingin mendaftar ${props.kind === 'program' && props.entry.id === 'stam' ? 'PMB' : 'PSB'} ${P?.title}.`;
+const isPsb = /^P[SM]B Dibuka$/.test(P?.status ?? '');
 const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro.site).toString() : '';
 ---
 {props.kind === 'kategori' ? (
@@ -54,8 +55,8 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
         {props.key === 'pendidikan' && (
           <aside class="callout on-plum textured" data-reveal>
             <div class="stack" style="--stack: var(--s-3)">
-              <p class="eyebrow">Penerimaan Santri Baru</p>
-              <h2 class="display">PSB TABS &amp; STAM <em>dibuka.</em></h2>
+              <p class="eyebrow">Penerimaan Santri &amp; Mahasiswa Baru</p>
+              <h2 class="display">PSB TABS &amp; PMB STAM <em>dibuka.</em></h2>
             </div>
             <a class="btn btn-light" href="/psb/">Info pendaftaran <Icon name="arrow-right" /></a>
           </aside>
@@ -101,8 +102,8 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
             )}
             {isPsb ? (
               <>
-                <a class="btn full" href={P.wa ? waLinkTo(P.wa, `Assalamu’alaikum, saya ingin mendaftar PSB ${P.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${P.title}.`)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
-                <a class="btn btn-ghost full" href="/psb/">Info PSB</a>
+                <a class="btn full" href={P.wa ? waLinkTo(P.wa, daftarTeks) : waLink(daftarTeks)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+                <a class="btn btn-ghost full" href="/psb/">{props.entry.id === 'stam' ? 'Info PMB' : 'Info PSB'}</a>
               </>
             ) : P.pilar === 'pendidikan' && !P.donasi ? null : (
               <a class="btn full" href={`/donasi/?program=${props.entry.id}`}>{P.pilar === 'pendidikan' ? 'Dukung pesantren ini' : 'Dukung program ini'} <Icon name="arrow-right" /></a>

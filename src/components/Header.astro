@@ -26,7 +26,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
       <li class="hide-sm"><a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a></li>
     </ul>
     <ul class="tb-links">
-      <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB TABS &amp; STAM dibuka</a></li>
+      <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB TABS &amp; PMB STAM dibuka</a></li>
       <li class="hide-sm"><a href="/haji-umrah/"><Icon name="star8" /> Haji &amp; Umrah</a></li>
       <li class="hide-sm"><a href="/rekening/"><Icon name="shield" /> Rekening Resmi</a></li>
     </ul>
@@ -85,12 +85,12 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
                       <a href={`/${p.id}/`} aria-current={cur(`/${p.id}/`) ? 'page' : undefined}>
                         <Icon name={p.data.ikon} />
                         <span>{p.data.menu}</span>
-                        {p.data.status === 'PSB Dibuka' && <span class="badge">PSB</span>}
+                        {/^P[SM]B Dibuka$/.test(p.data.status ?? '') && <span class="badge">{p.id === 'stam' ? 'PMB' : 'PSB'}</span>}
                       </a>
                     </li>
                   ))}
                   {g.key === 'sosial' && <li><a href="/sosial/"><Icon name="arrow-right" /><span>Program sosial lainnya</span></a></li>}
-                  {g.key === 'pendidikan' && <li><a href="/psb/"><Icon name="file" /><span>Penerimaan Santri Baru</span><span class="badge">Baru</span></a></li>}
+                  {g.key === 'pendidikan' && <li><a href="/psb/"><Icon name="file" /><span>Penerimaan Santri &amp; Mahasiswa Baru</span><span class="badge">Baru</span></a></li>}
                 </ul>
               </div>
             ))}
@@ -98,7 +98,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
         </li>
 
         <li><a href="/haji-umrah/" class="nav-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a></li>
-        <li><a href="/psb/" class="nav-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB <span class="pill-new">Dibuka</span></a></li>
+        <li><a href="/psb/" class="nav-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB &amp; PMB <span class="pill-new">Dibuka</span></a></li>
         <li><a href="/berita/" class="nav-link" aria-current={cur('/berita/') ? 'page' : undefined}>Kabar</a></li>
         <li><a href="/kontak/" class="nav-link" aria-current={cur('/kontak/') ? 'page' : undefined}>Kontak</a></li>
       </ul>
@@ -136,7 +136,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
       </details>
     ))}
     <a href="/haji-umrah/" class="s-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a>
-    <a href="/psb/" class="s-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB TABS &amp; STAM <span class="pill-new">Dibuka</span></a>
+    <a href="/psb/" class="s-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB &amp; PMB <span class="pill-new">Dibuka</span></a>
     <a href="/berita/" class="s-link" aria-current={cur('/berita/') ? 'page' : undefined}>Kabar</a>
     <a href="/kontak/" class="s-link" aria-current={cur('/kontak/') ? 'page' : undefined}>Kontak</a>
   </nav>

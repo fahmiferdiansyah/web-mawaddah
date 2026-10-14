@@ -15,7 +15,7 @@ const href = `/${entry.id}/`;
 <article class:list={['pcard', { compact }]} data-reveal style={`--i:${i}`} data-pilar={d.pilar}>
   <div class="pcard-media">
     <Media image={d.foto} alt={d.fotoAlt || d.title} tone={v.tone} emblem={d.ikon} label={d.title} ratio={compact ? '4 / 3' : '16 / 11'} sizes="(min-width: 960px) 30vw, (min-width: 640px) 45vw, 92vw" />
-    {d.status && <span class:list={['status', { open: d.status === 'PSB Dibuka' }]}>{d.status}</span>}
+    {d.status && <span class:list={['status', { open: /^P[SM]B Dibuka$/.test(d.status ?? '') }]}>{d.status}</span>}
   </div>
   <div class="pcard-body">
     <p class="tag"><Icon name={d.ikon} /> {pilar[d.pilar].nama}</p>

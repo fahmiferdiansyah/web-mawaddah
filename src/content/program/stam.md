@@ -5,7 +5,7 @@ pilar: "pendidikan"
 ikon: "cap"
 urutan: 6
 unggulan: true
-status: "PSB Dibuka"
+status: "PMB Dibuka"
 ringkasan: "Program kaderisasi da'i setingkat D2: 1 tahun materi dan 1 tahun praktek vokasi, dibekali ilmu syar'i dan kemampuan entrepreneurship."
 lokasi: "Graha Mawaddah, Jakarta Timur"
 penerima: "Calon da'i"
@@ -15,7 +15,7 @@ wa: "6285710463077"
 fotoAlt: "Calon da'i STAM di Graha Mawaddah"
 ---
 
-**Sekolah Tadrib Ad Du'at Mawaddah (STAM)** adalah program kaderisasi da'i setingkat D2 yang diselenggarakan Yayasan Mawaddah Indonesia di Graha Mawaddah. **Penerimaan Santri Baru (PSB) STAM kini dibuka.**
+**Sekolah Tadrib Ad Du'at Mawaddah (STAM)** adalah program kaderisasi da'i setingkat D2 yang diselenggarakan Yayasan Mawaddah Indonesia di Graha Mawaddah. **Penerimaan Mahasiswa Baru (PMB) STAM kini dibuka.**
 
 ## Masa pendidikan
 
@@ -30,4 +30,4 @@ STAM tidak hanya mengajarkan ilmu syar'i, tetapi juga membekali calon da'i denga
 
 STAM bertempat di Graha Mawaddah, Jl. Swadaya 1 No. 59, Pondok Ranggon, Cipayung, Jakarta Timur.
 
-Informasi pendaftaran ada di halaman [Penerimaan Santri Baru](/psb/), atau tanyakan langsung melalui WhatsApp admin.
+Informasi pendaftaran ada di halaman [PSB & PMB](/psb/), atau tanyakan langsung melalui WhatsApp admin.

@@ -17,7 +17,7 @@ const program = defineCollection({
       urutan: z.number().default(99),
       unggulan: z.boolean().default(false),
       ikon: z.enum(['book', 'moon', 'heart', 'cap', 'users', 'sprout', 'drop', 'mosque', 'tv', 'home', 'bowl', 'shield', 'hands']).default('heart'),
-      status: z.string().optional(), // mis. "PSB Dibuka"
+      status: z.string().optional(), // mis. "PSB Dibuka", "PMB Dibuka"
       lokasi: z.string().optional(),
       penerima: z.string().optional(),
       jadwal: z.string().optional(),

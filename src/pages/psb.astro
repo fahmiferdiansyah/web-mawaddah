@@ -9,8 +9,8 @@ import Icon from '../components/Icon.astro';
 import { site, waLink, waLinkTo } from '../data/site';
 
 const tabs = (await getCollection('program', (p) => p.data.pilar === 'pendidikan' && (p.id.startsWith('tabs-') || p.id === 'stam'))).sort((a, b) => a.data.urutan - b.data.urutan);
-const dibuka = tabs.filter((t) => t.data.status === 'PSB Dibuka');
-const berjalan = tabs.filter((t) => t.data.status !== 'PSB Dibuka');
+const dibuka = tabs.filter((t) => /^P[SM]B Dibuka$/.test(t.data.status ?? ''));
+const berjalan = tabs.filter((t) => !/^P[SM]B Dibuka$/.test(t.data.status ?? ''));
 
 // [PLACEHOLDER] Alur umum — sesuaikan dengan ketentuan panitia PSB
 const alur = [
@@ -21,11 +21,11 @@ const alur = [
 ];
 ---
 <Base title="Penerimaan Santri Baru" description="PSB TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur, dan STAM (Sekolah Tadrib Ad Du’at Mawaddah) telah dibuka. Daftar melalui WhatsApp admin Yayasan Mawaddah Indonesia.">
-  <PageHero eyebrow="Penerimaan Santri Baru" title="TABS dan STAM *membuka PSB.*"
-    lead="Pendaftaran kini dibuka untuk TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur, dan STAM — program kaderisasi da’i di Graha Mawaddah."
+  <PageHero eyebrow="PSB TABS & PMB STAM" title="TABS dan STAM *membuka pendaftaran.*"
+    lead="Pendaftaran kini dibuka untuk TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur (Penerimaan Santri Baru), serta STAM — program kaderisasi da’i setingkat D2 di Graha Mawaddah (Penerimaan Mahasiswa Baru)."
     crumbs={[{ href: '/pendidikan/', label: 'Pendidikan' }]}>
     <div class="cluster" data-reveal style="--i:4">
-      <a class="btn" href={waLink('Assalamu’alaikum, saya ingin mendaftar PSB TABS / STAM Yayasan Mawaddah.')} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+      <a class="btn" href={waLink('Assalamu’alaikum, saya ingin mendaftar PSB TABS / PMB STAM Yayasan Mawaddah.')} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
       <a class="btn btn-ghost" href="#alur">Lihat alur pendaftaran</a>
     </div>
   </PageHero>
@@ -36,12 +36,12 @@ const alur = [
         <article class="open-card" data-reveal style={`--i:${i}`}>
           <Media shape="arch" tone={i % 2 === 0 ? 'rose' : 'plum'} emblem="cap" ratio="4 / 5" alt={t.data.fotoAlt || t.data.title} image={t.data.foto} label={t.data.menu} class="oc-media" sizes="(min-width: 960px) 20vw, 40vw" />
           <div class="oc-body">
-            <span class="badge-open">PSB Dibuka</span>
+            <span class="badge-open">{t.data.status}</span>
             <h2 class="display oc-title">{t.data.menu}</h2>
             <p class="muted">{t.data.ringkasan}</p>
             <p class="oc-loc small"><Icon name="map-pin" /> {t.data.lokasi}</p>
             <div class="cluster">
-              <a class="btn btn-sm" href={(t.data.wa ? waLinkTo(t.data.wa, `Assalamu’alaikum, saya ingin mendaftar PSB ${t.data.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${t.data.title}.`))} target="_blank" rel="noopener">Daftar</a>
+              <a class="btn btn-sm" href={t.data.wa ? waLinkTo(t.data.wa, `Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`)} target="_blank" rel="noopener">Daftar</a>
               <a class="link small" href={`/${t.id}/`}>Profil pesantren <Icon name="arrow-right" /></a>
             </div>
           </div>
