@@ -6,7 +6,7 @@ import SectionHead from '../components/SectionHead.astro';
 import Media from '../components/Media.astro';
 import ProgramCard from '../components/ProgramCard.astro';
 import Icon from '../components/Icon.astro';
-import { site, waLink } from '../data/site';
+import { site, waLink, waLinkTo } from '../data/site';
 
 const tabs = (await getCollection('program', (p) => p.data.pilar === 'pendidikan' && (p.id.startsWith('tabs-') || p.id === 'stam'))).sort((a, b) => a.data.urutan - b.data.urutan);
 const dibuka = tabs.filter((t) => t.data.status === 'PSB Dibuka');
@@ -41,7 +41,7 @@ const alur = [
             <p class="muted">{t.data.ringkasan}</p>
             <p class="oc-loc small"><Icon name="map-pin" /> {t.data.lokasi}</p>
             <div class="cluster">
-              <a class="btn btn-sm" href={waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${t.data.title}.`)} target="_blank" rel="noopener">Daftar</a>
+              <a class="btn btn-sm" href={(t.data.wa ? waLinkTo(t.data.wa, `Assalamu’alaikum, saya ingin mendaftar PSB ${t.data.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${t.data.title}.`))} target="_blank" rel="noopener">Daftar</a>
               <a class="link small" href={`/${t.id}/`}>Profil pesantren <Icon name="arrow-right" /></a>
             </div>
           </div>

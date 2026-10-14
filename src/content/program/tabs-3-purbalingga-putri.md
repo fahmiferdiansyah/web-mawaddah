@@ -8,6 +8,8 @@ status: "PSB Dibuka"
 ringkasan: "Pesantren berasrama khusus santri putri di Purbalingga, membina generasi muslimah penghafal Al-Qur’an."
 lokasi: "Purbalingga, Jawa Tengah"
 penerima: "Santri putri"
+foto: "../../assets/foto/program/tabs-3.png"
+wa: "6281568270248"
 fotoAlt: "Santriwati TABS 3 Purbalingga"
 ---
 

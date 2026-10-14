@@ -10,6 +10,8 @@ ringkasan: "Program kaderisasi da'i setingkat D2: 1 tahun materi dan 1 tahun pra
 lokasi: "Graha Mawaddah, Jakarta Timur"
 penerima: "Calon da'i"
 donasi: false
+foto: "../../assets/foto/program/stam.png"
+wa: "6285710463077"
 fotoAlt: "Calon da'i STAM di Graha Mawaddah"
 ---
 

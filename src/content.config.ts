@@ -26,6 +26,7 @@ const program = defineCollection({
       donasi: z.boolean().default(true), // tampilkan tombol donasi
       foto: image().optional(),
       fotoAlt: z.string().default(''),
+      wa: z.string().optional(), // nomor WhatsApp admin PSB (format 62...)
     }),
 });
 

@@ -11,7 +11,7 @@ import Media from '../components/Media.astro';
 import Progress from '../components/Progress.astro';
 import ProgramCard from '../components/ProgramCard.astro';
 import Icon from '../components/Icon.astro';
-import { pilar, waLink, type PilarKey } from '../data/site';
+import { pilar, waLink, waLinkTo, type PilarKey } from '../data/site';
 import { pilarVisual } from '../data/visual';
 
 type Props =
@@ -101,7 +101,7 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
             )}
             {isPsb ? (
               <>
-                <a class="btn full" href={waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${P.title}.`)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+                <a class="btn full" href={P.wa ? waLinkTo(P.wa, `Assalamu’alaikum, saya ingin mendaftar PSB ${P.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar PSB ${P.title}.`)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
                 <a class="btn btn-ghost full" href="/psb/">Info PSB</a>
               </>
             ) : P.pilar === 'pendidikan' && !P.donasi ? null : (
