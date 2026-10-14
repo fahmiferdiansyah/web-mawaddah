@@ -136,7 +136,7 @@ export const motto = ['Berilmu', 'Beramal', 'Berdakwah', 'Berkhidmat untuk Umat'
 /** Capaian — angka asli dari yayasan */
 export const capaian = [
   { angka: 189940, suffix: '', label: 'Mushaf Al-Qur’an tersalurkan', note: 'ke seluruh Indonesia' },
-  { angka: 5, suffix: '', label: 'Taisiru Ar-Rahman Boarding School', note: '3 berjalan · 2 baru · semuanya membuka PSB' },
+  { angka: 5, suffix: '', label: 'Taisiru Ar-Rahman Boarding School', note: '3 berjalan · 2 baru · PSB dibuka di 4 pesantren' },
   { angka: new Date().getFullYear() - 2016, suffix: '+', label: 'Tahun berkhidmat', note: 'sejak 2016' },
   { angka: 1, suffix: '', label: 'Televisi keluarga islami', note: 'Wesal TV' },
 ] as const;

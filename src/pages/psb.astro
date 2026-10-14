@@ -14,14 +14,14 @@ const berjalan = tabs.filter((t) => !/^P[SM]B Dibuka$/.test(t.data.status ?? '')
 
 // [PLACEHOLDER] Alur umum — sesuaikan dengan ketentuan panitia PSB
 const alur = [
-  { t: 'Hubungi admin PSB', d: 'Tanyakan brosur, persyaratan, dan rincian biaya melalui WhatsApp.' },
+  { t: 'Hubungi admin PSB & PMB', d: 'Tanyakan brosur, persyaratan, dan rincian biaya melalui WhatsApp.' },
   { t: 'Isi formulir pendaftaran', d: 'Lengkapi data calon santri dan berkas yang diminta panitia.' },
   { t: 'Tes & wawancara', d: 'Calon santri mengikuti tes bacaan Al-Qur’an dan wawancara bersama orang tua.' },
   { t: 'Pengumuman & daftar ulang', d: 'Calon santri yang diterima melakukan daftar ulang dan bersiap masuk asrama.' },
 ];
 ---
-<Base title="Penerimaan Santri Baru" description="PSB TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur, dan STAM (Sekolah Tadrib Ad Du’at Mawaddah) telah dibuka. Daftar melalui WhatsApp admin Yayasan Mawaddah Indonesia.">
-  <PageHero eyebrow="PSB TABS & PMB STAM" title="TABS dan STAM *membuka pendaftaran.*"
+<Base title="PSB & PMB — Penerimaan Santri & Mahasiswa Baru" description="PSB TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur, dan STAM (Sekolah Tadrib Ad Du’at Mawaddah) telah dibuka. Daftar melalui WhatsApp admin Yayasan Mawaddah Indonesia.">
+  <PageHero eyebrow="PSB & PMB" title="PSB & PMB *telah dibuka.*"
     lead="Pendaftaran kini dibuka untuk TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur (Penerimaan Santri Baru), serta STAM — program kaderisasi da’i setingkat D2 di Graha Mawaddah (Penerimaan Mahasiswa Baru)."
     crumbs={[{ href: '/pendidikan/', label: 'Pendidikan' }]}>
     <div class="cluster" data-reveal style="--i:4">
@@ -65,7 +65,7 @@ const alur = [
       </ol>
       <aside class="help on-plum textured" data-reveal>
         <div>
-          <p class="eyebrow">Admin PSB</p>
+          <p class="eyebrow">Admin PSB &amp; PMB</p>
           <p class="display help-title">Ada pertanyaan? Hubungi <em>{site.phone}</em></p>
         </div>
         <a class="btn btn-light" href={waLink('Assalamu’alaikum, saya ingin bertanya tentang PSB Taisiru Ar-Rahman Boarding School.')} target="_blank" rel="noopener"><Icon name="chat" /> Chat admin</a>

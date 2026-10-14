@@ -26,7 +26,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
       <li class="hide-sm"><a href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a></li>
     </ul>
     <ul class="tb-links">
-      <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB TABS &amp; PMB STAM dibuka</a></li>
+      <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB &amp; PMB dibuka</a></li>
       <li class="hide-sm"><a href="/haji-umrah/"><Icon name="star8" /> Haji &amp; Umrah</a></li>
       <li class="hide-sm"><a href="/rekening/"><Icon name="shield" /> Rekening Resmi</a></li>
     </ul>
@@ -90,7 +90,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
                     </li>
                   ))}
                   {g.key === 'sosial' && <li><a href="/sosial/"><Icon name="arrow-right" /><span>Program sosial lainnya</span></a></li>}
-                  {g.key === 'pendidikan' && <li><a href="/psb/"><Icon name="file" /><span>Penerimaan Santri &amp; Mahasiswa Baru</span><span class="badge">Baru</span></a></li>}
+                  {g.key === 'pendidikan' && <li><a href="/psb/"><Icon name="file" /><span>PSB &amp; PMB</span><span class="badge">Baru</span></a></li>}
                 </ul>
               </div>
             ))}
