@@ -97,7 +97,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
           </div>
         </li>
 
-        <li><a href="/haji-umrah/" class="nav-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a></li>
+        <li class="nav-haji"><a href="/haji-umrah/" class="nav-link" aria-current={cur('/haji-umrah/') ? 'page' : undefined}>Haji &amp; Umrah</a></li>
         <li><a href="/psb/" class="nav-link" aria-current={cur('/psb/') ? 'page' : undefined}>PSB &amp; PMB <span class="pill-new">Dibuka</span></a></li>
         <li><a href="/berita/" class="nav-link" aria-current={cur('/berita/') ? 'page' : undefined}>Kabar</a></li>
         <li><a href="/kontak/" class="nav-link" aria-current={cur('/kontak/') ? 'page' : undefined}>Kontak</a></li>
@@ -178,6 +178,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
   .brand-img { height: 3.1rem; width: auto; max-width: none; }
 
   .nav { display: none; }
+  .nav-list { flex-wrap: nowrap; }
   .nav-list { display: flex; align-items: center; gap: clamp(0.1rem, 0.6vw, 0.6rem); list-style: none; padding: 0; }
   .nav-link {
     position: relative;
@@ -187,7 +188,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
     color: var(--ink);
     transition: color var(--d-2);
   }
-  .nav-link { border-radius: var(--r-pill); padding-inline: 1rem; transition: color var(--d-2), background-color var(--d-2); }
+  .nav-link { white-space: nowrap; border-radius: var(--r-pill); padding-inline: clamp(0.55rem, 0.9vw, 1rem); transition: color var(--d-2), background-color var(--d-2); }
   .nav-link:hover { background: rgb(211 164 40 / 0.16); }
   .nav-link[aria-current='page'], .nav-link.active { background: var(--gold); color: var(--plum); }
   .nav-trigger :global(.icon) { width: 0.95em; height: 0.95em; transition: transform 420ms var(--ease-out); }
@@ -277,6 +278,8 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
     .nav { display: block; }
     .menu-btn { display: none; }
   }
+  /* Haji & Umrah sudah ada di topbar; sembunyikan di nav utama (beserta pil "Dibuka", sudah ada di topbar) saat layar sempit agar satu baris */
+  @media (min-width: 1100px) and (max-width: 1439px) { .nav-haji { display: none; } .nav-list .pill-new { display: none; } }
 
   /* — Lembar menu seluler — */
   .menu-sheet {
