@@ -215,7 +215,7 @@ p { text-wrap: pretty; }
   color: var(--on-plum);
 }
 .on-plum h1, .on-plum h2, .on-plum h3, .on-plum h4, .on-plum .serif, .on-plum .display, .on-plum strong { color: var(--on-plum); }
-.on-plum h1 em, .on-plum h2 em, .on-plum h3 em { color: #e6bd4a; }
+.on-plum em { color: #e6bd4a; }
 .on-plum .muted, .on-plum .lead { color: var(--on-plum-soft); }
 .on-plum .eyebrow { color: #e6bd4a; background: rgb(230 189 74 / 0.16); }
 .textured { position: relative; isolation: isolate; }
