@@ -189,13 +189,13 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
     transition: color var(--d-2);
   }
   .nav-link { white-space: nowrap; border-radius: var(--r-pill); padding-inline: clamp(0.55rem, 0.9vw, 1rem); transition: color var(--d-2), background-color var(--d-2); }
-  .nav-link:hover { background: rgb(211 164 40 / 0.16); }
-  .nav-link[aria-current='page'], .nav-link.active { background: var(--gold); color: var(--plum); }
+  .nav-link:hover { background: rgb(211 164 40 / 0.28); }
+  .nav-link[aria-current='page'], .nav-link.active { background: #e6bd4a; color: #3a0920; }
   .nav-trigger :global(.icon) { width: 0.95em; height: 0.95em; transition: transform 420ms var(--ease-out); }
   .pill-new {
-    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
     padding: 0.15rem 0.5rem; border-radius: var(--r-pill);
-    background: var(--gold); color: var(--plum);
+    background: #e6bd4a; color: #3a0920; font-weight: 700;
   }
 
   /* — Dropdown — */
@@ -260,7 +260,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
   }
   .mcol li a :global(.icon) { width: 1.05rem; height: 1.05rem; color: var(--rose); flex: none; }
   .mcol li a:hover, .mcol li a[aria-current='page'] { background: var(--paper-2); color: var(--rose); }
-  .badge { margin-left: auto; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; padding: 0.12rem 0.45rem; border-radius: var(--r-pill); background: rgb(211 164 40 / 0.1); color: var(--rose); }
+  .badge { margin-left: auto; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; padding: 0.12rem 0.45rem; border-radius: var(--r-pill); background: rgb(211 164 40 / 0.22); color: var(--rose-deep); }
 
   .actions { display: flex; align-items: center; gap: var(--s-2); }
   .donate :global(.icon) { width: 1em; height: 1em; }
