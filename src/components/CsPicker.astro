@@ -24,13 +24,13 @@ const { class: cls = 'btn', label = 'Tanya paket via WhatsApp' } = Astro.props;
   });
 </script>
 <style>
-  .cs-pick { position: relative; display: inline-block; }
+  .cs-pick { display: inline-block; vertical-align: top; }
   .cs-pick summary { list-style: none; cursor: pointer; }
   .cs-pick summary::-webkit-details-marker { display: none; }
-  .cs-menu { position: absolute; z-index: 20; top: calc(100% + 0.5rem); left: 0; min-width: 18rem; max-width: 90vw; padding: 1rem; border-radius: 1rem; background: #fff; color: #2a1020; box-shadow: 0 12px 40px rgba(0,0,0,.28); }
+  .cs-menu { margin-top: .5rem; width: 19rem; max-width: 100%; padding: 1rem; border-radius: 1rem; background: #fff; color: #2a1020; box-shadow: 0 12px 40px rgba(0,0,0,.28); }
   .cs-title { margin: 0 0 .5rem; font-size: .85rem; font-weight: 600; opacity: .7; }
   .cs-menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
-  .cs-menu a { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .8rem; border-radius: .7rem; background: #faf3f6; color: inherit; text-decoration: none; }
+  .cs-menu a { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .1rem 1rem; padding: .65rem .8rem; border-radius: .7rem; background: #faf3f6; color: inherit; text-decoration: none; }
   .cs-menu a:hover, .cs-menu a:focus-visible { background: var(--gold, #e3b93f); }
   .cs-menu span { opacity: .75; font-variant-numeric: tabular-nums; }
 </style>
