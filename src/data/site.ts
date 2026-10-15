@@ -82,8 +82,6 @@ export const almaz = {
   whatsapp: [
     { name: 'CS Almaz - Ishaq', label: '0812-1000-9948', wa: '6281210009948' },
     { name: 'CS Almaz - Abdurrozaq', label: '0821-3000-838', wa: '628213000838' },
-    { name: 'CS Almaz', label: '0813-2332-3329', wa: '6281323323329' },
-    { name: 'CS Almaz', label: '0857-7111-1197', wa: '6285771111197' },
   ],
   officeJakarta: 'Jl. Swadaya 1 No. 59 B, Pondok Ranggon, Cipayung, Jakarta Timur',
   officePusat: 'Refah Residence Dramaga, Blok R4, Jl. Raya Babengket, Ciampea, Dramaga, Bogor',
