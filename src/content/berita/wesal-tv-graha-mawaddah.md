@@ -3,6 +3,7 @@ title: "Wesal TV: Dakwah Keluarga dari Graha Mawaddah"
 tanggal: "2026-07-01"
 kategori: "Dakwah"
 ringkasan: "Mengenal Wesal TV, televisi keluarga islami yang diproduksi dari Graha Mawaddah, Jakarta Timur."
+foto: "../../assets/foto/program/wesal-tv.png"
 fotoAlt: "Studio produksi Wesal TV"
 ---
 

@@ -4,6 +4,7 @@ import PageHero from '../components/PageHero.astro';
 import SectionHead from '../components/SectionHead.astro';
 import Media from '../components/Media.astro';
 import Icon from '../components/Icon.astro';
+import gedungFoto from '../assets/foto/program/stam.png';
 import Verse from '../components/Verse.astro';
 import { site, pilar, capaian, legalitas, visi, misi, nilai, tujuan, pilarPengembangan, motto, type PilarKey } from '../data/site';
 
@@ -24,7 +25,7 @@ const jejak = [
 
   <section class="section">
     <div class="container story">
-      <Media shape="star" tone="sand" emblem="home" alt="Gedung Graha Mawaddah di Jakarta Timur" label="Gedung Graha Mawaddah" class="story-media" sizes="(min-width: 960px) 35vw, 80vw" />
+      <Media shape="star" tone="sand" emblem="home" image={gedungFoto} alt="Gedung Graha Mawaddah di Jakarta Timur" label="Gedung Graha Mawaddah" class="story-media" sizes="(min-width: 960px) 35vw, 80vw" />
       <div class="stack story-copy">
         <p class="eyebrow" data-reveal>Sejarah singkat</p>
         <h2 class="display" data-reveal>Sejak {site.founded}, dari <em>Graha Mawaddah.</em></h2>

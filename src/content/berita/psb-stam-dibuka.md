@@ -3,6 +3,7 @@ title: "PMB STAM (Sekolah Tadrib Ad Du'at Mawaddah) Dibuka"
 tanggal: "2026-10-04"
 kategori: "Pendidikan"
 ringkasan: "Yayasan Mawaddah Indonesia membuka PMB STAM, program kaderisasi da'i setingkat D2 dengan bekal ilmu syar'i dan entrepreneurship, bertempat di Graha Mawaddah."
+foto: "../../assets/foto/program/stam.png"
 fotoAlt: "Calon da'i STAM di Graha Mawaddah"
 ---
 

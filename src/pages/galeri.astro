@@ -3,21 +3,26 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Media from '../components/Media.astro';
 import Icon from '../components/Icon.astro';
+import wakafQuran from '../assets/foto/program/wakaf-quran.png';
+import wesalTv from '../assets/foto/program/wesal-tv.png';
+import tabs1 from '../assets/foto/program/tabs-1.png';
+import tabs2 from '../assets/foto/program/tabs-2.png';
+import tabs3 from '../assets/foto/program/tabs-3.png';
+import airBersih from '../assets/foto/program/air-bersih.png';
+import masjid from '../assets/foto/program/masjid.png';
+import rumahQuran from '../assets/foto/program/rumah-quran.png';
+import gedung from '../assets/foto/program/stam.png';
 
-/** [PLACEHOLDER] Ganti dengan foto asli: tambahkan `image: import(...)` per item atau gunakan import.meta.glob. */
 const items = [
-  { cap: 'Penyaluran wakaf mushaf Al-Qur’an', tone: 'rose', emblem: 'book', ratio: '4 / 5' },
-  { cap: 'Studio Wesal TV di Graha Mawaddah', tone: 'plum', emblem: 'tv', ratio: '4 / 3' },
-  { cap: 'Santri TABS 1 Banjarnegara', tone: 'blush', emblem: 'cap', ratio: '1 / 1' },
-  { cap: 'Sumur wakaf untuk warga', tone: 'sand', emblem: 'drop', ratio: '4 / 3' },
-  { cap: 'Pembangunan masjid', tone: 'rose', emblem: 'mosque', ratio: '3 / 4' },
-  { cap: 'Iftar jama’i bersama santri', tone: 'blush', emblem: 'bowl', ratio: '4 / 3' },
-  { cap: 'Santriwati TABS 3 Purbalingga', tone: 'plum', emblem: 'cap', ratio: '1 / 1' },
-  { cap: 'Rumah Qur’an', tone: 'sand', emblem: 'book', ratio: '4 / 5' },
-  { cap: 'Tanggap bencana', tone: 'rose', emblem: 'shield', ratio: '4 / 3' },
-  { cap: 'Penyaluran daging qurban', tone: 'blush', emblem: 'heart', ratio: '3 / 4' },
-  { cap: 'Gedung Graha Mawaddah', tone: 'plum', emblem: 'home', ratio: '4 / 3' },
-  { cap: 'Santri TABS 2 Purbalingga', tone: 'sand', emblem: 'cap', ratio: '1 / 1' },
+  { image: wakafQuran, cap: 'Penyaluran wakaf mushaf Al-Qur’an', tone: 'rose', emblem: 'book', ratio: '4 / 5' },
+  { image: wesalTv, cap: 'Studio Wesal TV di Graha Mawaddah', tone: 'plum', emblem: 'tv', ratio: '4 / 3' },
+  { image: tabs1, cap: 'Santri TABS 1 Banjarnegara', tone: 'blush', emblem: 'cap', ratio: '1 / 1' },
+  { image: airBersih, cap: 'Sumur wakaf untuk warga', tone: 'sand', emblem: 'drop', ratio: '4 / 3' },
+  { image: masjid, cap: 'Pembangunan masjid', tone: 'rose', emblem: 'mosque', ratio: '3 / 4' },
+  { image: tabs3, cap: 'Santriwati TABS 3 Purbalingga', tone: 'plum', emblem: 'cap', ratio: '1 / 1' },
+  { image: rumahQuran, cap: 'Rumah Qur’an', tone: 'sand', emblem: 'book', ratio: '4 / 5' },
+  { image: gedung, cap: 'Gedung Graha Mawaddah', tone: 'plum', emblem: 'home', ratio: '4 / 3' },
+  { image: tabs2, cap: 'Santri TABS 2 Purbalingga', tone: 'sand', emblem: 'cap', ratio: '1 / 1' },
 ] as const;
 ---
 <Base title="Galeri" description="Dokumentasi kegiatan dakwah, pendidikan, dan sosial Yayasan Mawaddah Indonesia.">
@@ -30,7 +35,7 @@ const items = [
         {items.map((it, i) => (
           <li data-reveal style={`--i:${i % 3}`}>
             <div class="tile">
-              <Media alt={it.cap} tone={it.tone} emblem={it.emblem} ratio={it.ratio} label={it.cap} sizes="(min-width: 960px) 30vw, (min-width: 640px) 45vw, 92vw" />
+              <Media image={it.image} alt={it.cap} tone={it.tone} emblem={it.emblem} ratio={it.ratio} label={it.cap} sizes="(min-width: 960px) 30vw, (min-width: 640px) 45vw, 92vw" />
               <span class="cap small">{it.cap}</span>
               <span class="zoom" aria-hidden="true"><Icon name="expand" /></span>
               <button type="button" class="tile-btn" data-open={i} aria-label={`Perbesar: ${it.cap}`}></button>
