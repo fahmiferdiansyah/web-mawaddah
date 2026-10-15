@@ -1,0 +1,36 @@
+---
+import Icon from './Icon.astro';
+import { almaz, waLinkTo } from '../data/site';
+interface Props { class?: string; label?: string }
+const { class: cls = 'btn', label = 'Tanya paket via WhatsApp' } = Astro.props;
+---
+<details class="cs-pick">
+  <summary class={cls}><Icon name="chat" /> {label}</summary>
+  <div class="cs-menu" role="group" aria-label="Pilih CS Almaz Tour">
+    <p class="cs-title">Pilih CS yang ingin dihubungi</p>
+    <ul>
+      {almaz.whatsapp.map((w) => (
+        <li><a href={waLinkTo(w.wa, almaz.pesan)} target="_blank" rel="noopener"><strong>{w.name}</strong><span>{w.label}</span></a></li>
+      ))}
+    </ul>
+  </div>
+</details>
+<script>
+  // tutup menu saat klik di luar
+  document.addEventListener('click', (e) => {
+    document.querySelectorAll<HTMLDetailsElement>('details.cs-pick[open]').forEach((d) => {
+      if (!d.contains(e.target as Node)) d.open = false;
+    });
+  });
+</script>
+<style>
+  .cs-pick { position: relative; display: inline-block; }
+  .cs-pick summary { list-style: none; cursor: pointer; }
+  .cs-pick summary::-webkit-details-marker { display: none; }
+  .cs-menu { position: absolute; z-index: 20; top: calc(100% + 0.5rem); left: 0; min-width: 18rem; max-width: 90vw; padding: 1rem; border-radius: 1rem; background: #fff; color: #2a1020; box-shadow: 0 12px 40px rgba(0,0,0,.28); }
+  .cs-title { margin: 0 0 .5rem; font-size: .85rem; font-weight: 600; opacity: .7; }
+  .cs-menu ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
+  .cs-menu a { display: flex; justify-content: space-between; gap: 1rem; padding: .65rem .8rem; border-radius: .7rem; background: #faf3f6; color: inherit; text-decoration: none; }
+  .cs-menu a:hover, .cs-menu a:focus-visible { background: var(--gold, #e3b93f); }
+  .cs-menu span { opacity: .75; font-variant-numeric: tabular-nums; }
+</style>
