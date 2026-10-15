@@ -9,7 +9,7 @@ ringkasan: "Menyalurkan mushaf Al-Qur’an ke masjid, pesantren, rumah Qur’an,
 penerima: "189.940 mushaf telah tersalurkan"
 lokasi: "Seluruh Indonesia"
 foto: "../../assets/foto/program/wakaf-quran.png"
-fotoAlt: "Tumpukan mushaf Al-Qur’an siap disalurkan"
+fotoAlt: "Ibu-ibu menerima wakaf mushaf Al-Qur’an dari Wesal TV"
 ---
 
 Masih banyak masjid, musala, dan pesantren di pelosok Indonesia yang kekurangan mushaf. Satu mushaf yang Anda wakafkan akan dibaca berulang kali — dan pahalanya terus mengalir selama mushaf itu dibaca.

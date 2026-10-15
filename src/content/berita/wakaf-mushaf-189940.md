@@ -4,7 +4,7 @@ tanggal: "2026-08-15"
 kategori: "Sosial"
 ringkasan: "Melalui program Wakaf Mushaf Al-Qur’an, ratusan ribu mushaf telah sampai ke masjid, pesantren, dan rumah Qur’an di berbagai penjuru negeri."
 foto: "../../assets/foto/program/wakaf-quran.png"
-fotoAlt: "Penyerahan mushaf di sebuah masjid"
+fotoAlt: "Ibu-ibu menerima wakaf mushaf Al-Qur’an dari Wesal TV"
 ---
 
 Alhamdulillah, berkat kepercayaan para wakif, Yayasan Mawaddah Indonesia telah menyalurkan **189.940 mushaf Al-Qur’an** ke seluruh Indonesia.

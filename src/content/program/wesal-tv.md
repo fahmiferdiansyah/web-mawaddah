@@ -8,7 +8,7 @@ unggulan: true
 ringkasan: "Televisi keluarga islami yang diproduksi dari Graha Mawaddah: kajian, nasihat keluarga, dan tayangan edukatif yang aman untuk seluruh anggota keluarga."
 lokasi: "Graha Mawaddah, Jakarta Timur"
 foto: "../../assets/foto/program/wesal-tv.png"
-fotoAlt: "Studio Wesal TV di Graha Mawaddah"
+fotoAlt: "Siaran Wesal TV di studio Graha Mawaddah"
 ---
 
 **Wesal TV** adalah kegiatan utama dakwah media Yayasan Mawaddah Indonesia: televisi keluarga islami yang diproduksi dan disiarkan dari Graha Mawaddah.
