@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+---
+<Base title="Kabar dari Pengurus" description="Kabar terbaru kegiatan Yayasan Mawaddah Indonesia.">
+  <meta slot="head" name="robots" content="noindex" />
+  <article>
+    <header class="ahead container-narrow">
+      <nav class="crumbs small"><a href="/berita/"><Icon name="arrow-left" /> Semua kabar</a></nav>
+      <p class="meta small" id="a-meta"></p>
+      <h1 class="display atitle" id="a-judul">Memuat…</h1>
+      <p class="lead" id="a-ringkas"></p>
+    </header>
+    <div class="container-narrow abody">
+      <img id="a-foto" alt="" hidden />
+      <div class="prose" id="a-isi"></div>
+      <p class="small muted" id="a-penulis"></p>
+    </div>
+  </article>
+</Base>
+
+<script>
+  import { supabase, esc, tgl, mdRingan } from '../../lib/supabase';
+  const slug = new URLSearchParams(location.search).get('s');
+  const $ = (id: string) => document.getElementById(id)!;
+  (async () => {
+    const { data } = slug ? await supabase.from('artikel').select('*').eq('slug', slug).eq('status', 'terbit').maybeSingle() : { data: null };
+    if (!data) { $('a-judul').textContent = 'Artikel tidak ditemukan'; return; }
+    document.title = `${data.judul} — Yayasan Mawaddah Indonesia`;
+    $('a-judul').textContent = data.judul;
+    $('a-ringkas').textContent = data.ringkasan;
+    $('a-meta').innerHTML = `<span class="tag">${esc(data.kategori)}</span> · ${tgl(data.terbit_at)}`;
+    $('a-isi').innerHTML = mdRingan(data.isi);
+    $('a-penulis').textContent = `Ditulis oleh ${data.penulis_nama}`;
+    if (data.foto_url) { const i = $('a-foto') as HTMLImageElement; i.src = data.foto_url; i.hidden = false; }
+  })();
+</script>
+
+<style>
+  #a-foto { width: 100%; border-radius: var(--r-lg); margin-bottom: var(--s-6); }
+  #a-foto[hidden] { display: none; }
+  .atitle { font-size: var(--step-4); }
+</style>

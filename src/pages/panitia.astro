@@ -1,0 +1,300 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Portal Panitia & Pengurus" description="Halaman internal panitia dan pengurus Yayasan Mawaddah Indonesia.">
+  <meta slot="head" name="robots" content="noindex, nofollow" />
+  <section class="section-tight portal">
+    <div class="container">
+      <!-- Masuk -->
+      <div id="v-login" class="card login" hidden>
+        <h1 class="display">Portal <em>panitia &amp; pengurus</em></h1>
+        <p class="muted">Khusus panitia dan pengurus Yayasan Mawaddah Indonesia.</p>
+        <form id="f-login" class="stack" novalidate>
+          <div class="field"><label for="l-email">Email</label><input class="input" id="l-email" type="email" autocomplete="username" required /></div>
+          <div class="field"><label for="l-pass">Kata sandi</label><input class="input" id="l-pass" type="password" autocomplete="current-password" required /></div>
+          <p class="error-text" id="l-err" role="alert" hidden></p>
+          <button class="btn" type="submit">Masuk</button>
+          <button class="link" type="button" id="l-reset">Lupa kata sandi?</button>
+        </form>
+      </div>
+
+      <!-- Tanpa akses -->
+      <div id="v-noaccess" class="card login" hidden>
+        <h1 class="display">Akun belum <em>terdaftar.</em></h1>
+        <p class="muted">Akun Anda belum diberi akses portal. Hubungi admin yayasan agar didaftarkan sebagai panitia atau pengurus.</p>
+        <button class="btn btn-ghost" data-logout>Keluar</button>
+      </div>
+
+      <!-- Panel -->
+      <div id="v-app" hidden>
+        <header class="bar">
+          <div><p class="eyebrow">Portal internal</p><h1 class="display" id="who"></h1></div>
+          <button class="btn btn-ghost btn-sm" data-logout>Keluar</button>
+        </header>
+        <nav class="tabs" role="tablist" aria-label="Menu portal">
+          <button role="tab" data-tab="pendaftar" aria-selected="true">Pendaftar STAM</button>
+          <button role="tab" data-tab="artikel" aria-selected="false">Artikel Kabar</button>
+          <button role="tab" data-tab="staf" aria-selected="false" id="tab-staf" hidden>Staf</button>
+        </nav>
+
+        <section id="t-pendaftar" class="pane">
+          <div class="tools">
+            <input class="input" id="p-cari" type="search" placeholder="Cari nama, NIK, nomor, WhatsApp…" />
+            <select class="input" id="p-status"><option value="">Semua status</option><option>Baru</option><option>Administrasi</option><option>Lulus Administrasi</option><option>Tidak Lulus</option></select>
+            <button class="btn btn-ghost btn-sm" id="p-csv">Unduh CSV</button>
+          </div>
+          <p class="small muted" id="p-count"></p>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nomor</th><th>Nama</th><th>Kota</th><th>WhatsApp</th><th>Daftar</th><th>Status</th></tr></thead><tbody id="p-body"></tbody></table></div>
+        </section>
+
+        <section id="t-artikel" class="pane" hidden>
+          <div class="tools">
+            <button class="btn btn-sm" id="a-baru">Tulis artikel</button>
+            <select class="input" id="a-status"><option value="">Semua status</option><option value="menunggu">Menunggu persetujuan</option><option value="draft">Draf</option><option value="terbit">Terbit</option><option value="ditolak">Perlu revisi</option></select>
+          </div>
+          <p class="small muted" id="a-info"></p>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Judul</th><th>Penulis</th><th>Diubah</th><th>Status</th></tr></thead><tbody id="a-body"></tbody></table></div>
+        </section>
+
+        <section id="t-staf" class="pane" hidden>
+          <form id="s-form" class="tools" novalidate>
+            <input class="input" id="s-email" type="email" placeholder="Email akun" required />
+            <input class="input" id="s-nama" placeholder="Nama" />
+            <select class="input" id="s-peran"><option value="pengurus">Pengurus</option><option value="panitia">Panitia</option><option value="admin">Admin</option><option value="nonaktif">Nonaktifkan</option></select>
+            <button class="btn btn-sm" type="submit">Simpan</button>
+          </form>
+          <p class="small muted">Akun dibuat dulu di Supabase (Authentication → Users → Add user), lalu didaftarkan di sini.</p>
+          <p class="error-text" id="s-err" role="alert" hidden></p>
+          <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Nama</th><th>Email</th><th>Peran</th></tr></thead><tbody id="s-body"></tbody></table></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <dialog id="dlg" class="dlg"><div id="dlg-body"></div></dialog>
+</Base>
+
+<script>
+  import { supabase, esc, tgl } from '../lib/supabase';
+
+  const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+  const show = (id: string) => ['v-login', 'v-noaccess', 'v-app'].forEach((v) => ($(v).hidden = v !== id));
+  let peran = '';
+  let uid = '';
+  let nama = '';
+  let pendaftar: any[] = [];
+  let artikel: any[] = [];
+
+  // ---------- Sesi ----------
+  async function init() {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) return show('v-login');
+    uid = data.session.user.id;
+    const [{ data: p }, { data: s }] = await Promise.all([supabase.rpc('portal_peran'), supabase.from('portal_staf').select('nama').eq('user_id', uid).maybeSingle()]);
+    if (!p) return show('v-noaccess');
+    peran = p as string; nama = (s as any)?.nama ?? '';
+    $('who').textContent = `${nama || 'Halo'} · ${peran}`;
+    $('tab-staf').hidden = peran !== 'admin';
+    show('v-app');
+    loadPendaftar(); loadArtikel();
+  }
+
+  $('f-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('l-err'); err.hidden = true;
+    const { error } = await supabase.auth.signInWithPassword({ email: ($('l-email') as HTMLInputElement).value.trim(), password: ($('l-pass') as HTMLInputElement).value });
+    if (error) { err.textContent = 'Email atau kata sandi salah.'; err.hidden = false; return; }
+    init();
+  });
+  $('l-reset').addEventListener('click', async () => {
+    const email = ($('l-email') as HTMLInputElement).value.trim();
+    const err = $('l-err'); err.hidden = false;
+    if (!email) { err.textContent = 'Isi email dulu, lalu klik "Lupa kata sandi?".'; return; }
+    await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/panitia/' });
+    err.textContent = 'Jika email terdaftar, tautan atur ulang kata sandi telah dikirim.';
+  });
+  supabase.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') { const p = prompt('Kata sandi baru (minimal 8 karakter):'); if (p && p.length >= 8) supabase.auth.updateUser({ password: p }).then(() => alert('Kata sandi diperbarui.')); } });
+  document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); }));
+
+  // ---------- Tab ----------
+  document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((x) => x.setAttribute('aria-selected', String(x === b)));
+    ['pendaftar', 'artikel', 'staf'].forEach((t) => ($('t-' + t).hidden = t !== b.dataset.tab));
+    if (b.dataset.tab === 'staf') loadStaf();
+  }));
+
+  // ---------- Pendaftar ----------
+  async function loadPendaftar() {
+    const { data, error } = await supabase.from('pendaftar_stam').select('*').order('created_at', { ascending: false });
+    if (error) { $('p-count').textContent = 'Gagal memuat: ' + error.message; return; }
+    pendaftar = data ?? []; renderPendaftar();
+  }
+  function renderPendaftar() {
+    const q = ($('p-cari') as HTMLInputElement).value.toLowerCase();
+    const st = ($('p-status') as HTMLSelectElement).value;
+    const rows = pendaftar.filter((r) => (!st || r.status === st) && (!q || [r.nama_lengkap, r.nik, r.nomor, r.whatsapp, r.kota].join(' ').toLowerCase().includes(q)));
+    $('p-count').textContent = `${rows.length} dari ${pendaftar.length} pendaftar`;
+    $('p-body').innerHTML = rows.map((r) => `<tr tabindex="0" data-id="${r.id}"><td>${esc(r.nomor)}</td><td><strong>${esc(r.nama_lengkap)}</strong></td><td>${esc(r.kota)}</td><td>${esc(r.whatsapp)}</td><td>${tgl(r.created_at)}</td><td><span class="pill">${esc(r.hasil_seleksi || r.status)}</span></td></tr>`).join('') || '<tr><td colspan="6" class="muted">Belum ada data.</td></tr>';
+  }
+  ['p-cari', 'p-status'].forEach((i) => $(i).addEventListener('input', renderPendaftar));
+  $('p-body').addEventListener('click', (e) => { const tr = (e.target as HTMLElement).closest('tr[data-id]') as HTMLElement | null; if (tr) detailPendaftar(tr.dataset.id!); });
+  $('p-body').addEventListener('keydown', (e) => { if (e.key === 'Enter') (e.target as HTMLElement).click(); });
+
+  const kv = (k: string, v: unknown) => `<div class="kv"><dt>${esc(k)}</dt><dd>${esc(v || '—')}</dd></div>`;
+  function detailPendaftar(id: string) {
+    const r = pendaftar.find((x) => x.id === id); if (!r) return;
+    const pd = r.pendidikan || {}, kb = r.kemampuan || {}, ot = r.orang_tua || {}, mt = r.motivasi || {};
+    const edit = peran === 'admin' || peran === 'panitia';
+    const wa = String(r.whatsapp).replace(/\D/g, '').replace(/^0/, '62');
+    openDlg(`
+      <h2 class="display">${esc(r.nama_lengkap)}</h2>
+      <p class="muted">${esc(r.nomor)} · mendaftar ${tgl(r.created_at)} · <a class="link" href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a></p>
+      <h3>Data diri</h3><dl class="kvs">${kv('Panggilan', r.nama_panggilan)}${kv('TTL', `${r.tempat_lahir}, ${tgl(r.tanggal_lahir)}`)}${kv('Jenis kelamin', r.jenis_kelamin)}${kv('Status nikah', r.status_nikah)}${kv('NIK', r.nik)}${kv('No. KK', r.nomor_kk)}${kv('Alamat', `${r.alamat}, ${r.desa || ''} ${r.kecamatan || ''} ${r.kota}, ${r.provinsi} ${r.kode_pos || ''}`)}${kv('Email', r.email)}</dl>
+      <h3>Pendidikan</h3><dl class="kvs">${['sd', 'smp', 'sma', 'pesantren'].map((j) => kv(j.toUpperCase(), `${pd[j]?.lembaga || ''} ${pd[j]?.tahun ? '(' + pd[j].tahun + ')' : ''}`)).join('')}${kv('Terakhir', r.pendidikan_terakhir)}</dl>
+      <h3>Kemampuan</h3><dl class="kvs">${kv('Baca Al-Qur’an', kb.baca_quran)}${kv('Hafalan (juz)', kb.hafalan_juz)}${kv('Bahasa Arab', kb.bahasa_arab)}${kv('Kajian', `${kb.pernah_kajian || ''} ${kb.kajian_ket || ''}`)}${kv('Dakwah', `${kb.pernah_dakwah || ''} ${kb.dakwah_ket || ''}`)}</dl>
+      <h3>Orang tua/wali</h3><dl class="kvs">${kv('Ayah', `${ot.ayah?.nama || ''} · ${ot.ayah?.pekerjaan || ''} · ${ot.ayah?.wa || ''}`)}${kv('Alamat ayah', ot.ayah?.alamat)}${kv('Ibu', `${ot.ibu?.nama || ''} · ${ot.ibu?.pekerjaan || ''} · ${ot.ibu?.wa || ''}`)}</dl>
+      <h3>Motivasi</h3><dl class="kvs">${kv('Alasan', mt.alasan)}${kv('Harapan', mt.harapan)}${kv('Minat', [...(mt.minat || []), mt.minat_lain].filter(Boolean).join(', '))}${kv('Dokumen siap', (r.dokumen || []).join(', '))}</dl>
+      <h3>Bagian panitia</h3>
+      <form id="pf" class="stack" novalidate>
+        <div class="g2"><div class="field"><label for="pf-st">Status</label><select class="input" id="pf-st" ${edit ? '' : 'disabled'}>${['Baru', 'Administrasi', 'Lulus Administrasi', 'Tidak Lulus'].map((s) => `<option ${s === r.status ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+        <div class="field"><label for="pf-hs">Hasil seleksi</label><select class="input" id="pf-hs" ${edit ? '' : 'disabled'}>${['', 'Diterima', 'Tidak Diterima'].map((s) => `<option value="${s}" ${s === (r.hasil_seleksi || '') ? 'selected' : ''}>${s || '—'}</option>`).join('')}</select></div></div>
+        <div class="field"><label for="pf-ct">Catatan panitia</label><textarea class="input" id="pf-ct" rows="3" ${edit ? '' : 'disabled'}>${esc(r.catatan_panitia || '')}</textarea></div>
+        <p class="error-text" id="pf-err" role="alert" hidden></p>
+        <div class="cluster">${edit ? '<button class="btn btn-sm" type="submit">Simpan</button>' : ''}<button class="btn btn-ghost btn-sm" type="button" data-close>Tutup</button></div>
+      </form>`);
+    $('pf').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await supabase.from('pendaftar_stam').update({ status: ($('pf-st') as HTMLSelectElement).value, hasil_seleksi: ($('pf-hs') as HTMLSelectElement).value || null, catatan_panitia: ($('pf-ct') as HTMLTextAreaElement).value.trim() || null }).eq('id', id);
+      if (error) { $('pf-err').textContent = error.message; $('pf-err').hidden = false; return; }
+      closeDlg(); loadPendaftar();
+    });
+  }
+  $('p-csv').addEventListener('click', () => {
+    const cols = ['nomor', 'created_at', 'status', 'hasil_seleksi', 'nama_lengkap', 'nama_panggilan', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'nik', 'nomor_kk', 'alamat', 'desa', 'kecamatan', 'kota', 'provinsi', 'kode_pos', 'whatsapp', 'email', 'status_nikah', 'pendidikan_terakhir', 'catatan_panitia'];
+    const cell = (v: unknown) => { let s = String(v ?? ''); if (/^[=+\-@]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    const csv = [cols.join(','), ...pendaftar.map((r) => cols.map((c) => cell(r[c])).join(','))].join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' })); a.download = 'pendaftar-stam.csv'; a.click();
+  });
+
+  // ---------- Artikel ----------
+  const label: Record<string, string> = { draft: 'Draf', menunggu: 'Menunggu persetujuan', terbit: 'Terbit', ditolak: 'Perlu revisi' };
+  async function loadArtikel() {
+    const { data, error } = await supabase.from('artikel').select('*').order('updated_at', { ascending: false });
+    if (error) { $('a-info').textContent = 'Gagal memuat: ' + error.message; return; }
+    artikel = data ?? []; renderArtikel();
+  }
+  function renderArtikel() {
+    const st = ($('a-status') as HTMLSelectElement).value;
+    const rows = artikel.filter((a) => !st || a.status === st);
+    const wait = artikel.filter((a) => a.status === 'menunggu').length;
+    $('a-info').textContent = peran === 'admin' ? `${wait} artikel menunggu persetujuan Anda.` : 'Artikel yang Anda kirim akan tayang setelah disetujui admin.';
+    $('a-body').innerHTML = rows.map((a) => `<tr tabindex="0" data-id="${a.id}"><td><strong>${esc(a.judul)}</strong></td><td>${esc(a.penulis_nama)}</td><td>${tgl(a.updated_at)}</td><td><span class="pill ${a.status}">${label[a.status]}</span></td></tr>`).join('') || '<tr><td colspan="4" class="muted">Belum ada artikel.</td></tr>';
+  }
+  $('a-status').addEventListener('input', renderArtikel);
+  $('a-baru').addEventListener('click', () => editor(null));
+  $('a-body').addEventListener('click', (e) => { const tr = (e.target as HTMLElement).closest('tr[data-id]') as HTMLElement | null; if (tr) editor(artikel.find((a) => a.id === tr.dataset.id)); });
+
+  function editor(a: any | null) {
+    const isAdmin = peran === 'admin';
+    const mine = !a || a.penulis_id === uid;
+    const locked = a && a.status === 'terbit' && !isAdmin || a && !mine && !isAdmin;
+    const d = locked ? 'disabled' : '';
+    openDlg(`
+      <h2 class="display">${a ? 'Artikel' : 'Artikel baru'}</h2>
+      ${a ? `<p class="muted"><span class="pill ${a.status}">${label[a.status]}</span> · ${esc(a.penulis_nama)}</p>` : ''}
+      ${a?.catatan_admin ? `<p class="note"><strong>Catatan admin:</strong> ${esc(a.catatan_admin)}</p>` : ''}
+      <form id="af" class="stack" novalidate>
+        <div class="field"><label for="af-j">Judul</label><input class="input" id="af-j" maxlength="200" value="${esc(a?.judul || '')}" ${d} /></div>
+        <div class="g2"><div class="field"><label for="af-k">Kategori</label><select class="input" id="af-k" ${d}>${['Kabar Yayasan', 'Dakwah', 'Pendidikan', 'Sosial'].map((k) => `<option ${k === (a?.kategori || 'Kabar Yayasan') ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
+        <div class="field"><label for="af-f">Alamat foto (opsional)</label><input class="input" id="af-f" type="url" placeholder="https://…" value="${esc(a?.foto_url || '')}" ${d} /></div></div>
+        <div class="field"><label for="af-r">Ringkasan (10–400 huruf)</label><textarea class="input" id="af-r" rows="2" maxlength="400" ${d}>${esc(a?.ringkasan || '')}</textarea></div>
+        <div class="field"><label for="af-i">Isi artikel</label><textarea class="input" id="af-i" rows="12" ${d}>${esc(a?.isi || '')}</textarea>
+          <span class="hint">Format: ## Judul bagian · - daftar · **tebal** · *miring* · [teks](https://tautan). Pisahkan paragraf dengan baris kosong.</span></div>
+        ${isAdmin && a ? `<div class="field"><label for="af-c">Catatan untuk penulis (jika ditolak)</label><input class="input" id="af-c" value="${esc(a.catatan_admin || '')}" /></div>` : ''}
+        <p class="error-text" id="af-err" role="alert" hidden></p>
+        <div class="cluster">
+          ${locked ? '' : '<button class="btn btn-ghost btn-sm" type="submit" data-do="draft">Simpan draf</button><button class="btn btn-sm" type="submit" data-do="menunggu">Kirim untuk persetujuan</button>'}
+          ${isAdmin && a ? '<button class="btn btn-sm" type="submit" data-do="terbit">Terbitkan</button><button class="btn btn-ghost btn-sm" type="submit" data-do="ditolak">Kembalikan untuk revisi</button>' : ''}
+          ${a && (isAdmin || (mine && ['draft', 'ditolak'].includes(a.status))) ? '<button class="btn btn-ghost btn-sm" type="button" id="af-del">Hapus</button>' : ''}
+          <button class="btn btn-ghost btn-sm" type="button" data-close>Tutup</button>
+        </div>
+      </form>`);
+    const f = $('af') as HTMLFormElement;
+    let action = 'draft';
+    f.querySelectorAll<HTMLButtonElement>('[data-do]').forEach((b) => b.addEventListener('click', () => (action = b.dataset.do!)));
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const err = $('af-err'); err.hidden = true;
+      const row: any = { judul: ($('af-j') as HTMLInputElement).value.trim(), kategori: ($('af-k') as HTMLSelectElement).value, ringkasan: ($('af-r') as HTMLTextAreaElement).value.trim(), isi: ($('af-i') as HTMLTextAreaElement).value.trim(), foto_url: ($('af-f') as HTMLInputElement).value.trim() || null, status: action };
+      if (row.foto_url && !/^https:\/\//.test(row.foto_url)) { err.textContent = 'Alamat foto harus diawali https://'; err.hidden = false; return; }
+      if (isAdmin && a) row.catatan_admin = ($('af-c') as HTMLInputElement)?.value.trim() || null;
+      if (action === 'ditolak' && !row.catatan_admin) { err.textContent = 'Tulis catatan revisi untuk penulis.'; err.hidden = false; return; }
+      const q = a ? supabase.from('artikel').update(row).eq('id', a.id) : supabase.from('artikel').insert({ ...row, penulis_id: uid });
+      const { error } = await q;
+      if (error) { err.textContent = error.message.includes('check') ? 'Periksa judul (min. 5 huruf), ringkasan (min. 10 huruf), dan isi (min. 20 huruf).' : error.message; err.hidden = false; return; }
+      closeDlg(); loadArtikel();
+    });
+    $('af-del')?.addEventListener('click', async () => {
+      if (!confirm('Hapus artikel ini?')) return;
+      const { error } = await supabase.from('artikel').delete().eq('id', a.id);
+      if (error) { $('af-err').textContent = error.message; $('af-err').hidden = false; return; }
+      closeDlg(); loadArtikel();
+    });
+  }
+
+  // ---------- Staf (admin) ----------
+  async function loadStaf() {
+    const { data, error } = await supabase.rpc('portal_daftar_staf');
+    if (error) { $('s-err').textContent = error.message; $('s-err').hidden = false; return; }
+    $('s-body').innerHTML = (data as any[]).map((s) => `<tr><td>${esc(s.nama)}</td><td>${esc(s.email)}</td><td><span class="pill">${esc(s.peran)}</span></td></tr>`).join('');
+  }
+  $('s-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('s-err'); err.hidden = true;
+    const { error } = await supabase.rpc('portal_set_staf', { p_email: ($('s-email') as HTMLInputElement).value, p_nama: ($('s-nama') as HTMLInputElement).value, p_peran: ($('s-peran') as HTMLSelectElement).value });
+    if (error) { err.textContent = error.message; err.hidden = false; return; }
+    ($('s-form') as HTMLFormElement).reset(); loadStaf();
+  });
+
+  // ---------- Dialog ----------
+  const dlg = $('dlg') as HTMLDialogElement;
+  function openDlg(html: string) { $('dlg-body').innerHTML = html; dlg.showModal(); }
+  function closeDlg() { dlg.close(); }
+  dlg.addEventListener('click', (e) => { const t = e.target as HTMLElement; if (t === dlg || t.hasAttribute('data-close')) closeDlg(); });
+
+  init();
+</script>
+
+<style>
+  .portal { min-height: 70vh; }
+  .card { padding: var(--s-6); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-2); }
+  .login { max-width: 30rem; margin: var(--s-7) auto; display: grid; gap: var(--s-4); }
+  .login h1 { font-size: var(--step-3); }
+  .stack { display: grid; gap: var(--s-4); }
+  .bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-4); margin-bottom: var(--s-5); }
+  .bar h1 { font-size: var(--step-3); }
+  .tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: var(--s-5); }
+  .tabs button { padding: 0.6rem 1.1rem; border-radius: var(--r-pill); background: #fff; box-shadow: inset 0 0 0 1px var(--line-strong); font-weight: 600; cursor: pointer; }
+  .tabs button[aria-selected='true'] { background: var(--rose); color: #fff; box-shadow: none; }
+  .tools { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: var(--s-3); align-items: center; }
+  .tools .input { width: auto; flex: 1 1 12rem; }
+  .tbl-wrap { overflow-x: auto; border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-1); }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+  .tbl th, .tbl td { padding: 0.7rem 0.9rem; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .tbl td:first-child { white-space: normal; }
+  .tbl th { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+  .tbl tbody tr[data-id] { cursor: pointer; }
+  .tbl tbody tr[data-id]:hover, .tbl tbody tr[data-id]:focus-visible { background: rgb(211 164 40 / 0.1); outline: none; }
+  .pill { display: inline-block; padding: 0.2rem 0.65rem; border-radius: var(--r-pill); font-size: 0.78rem; font-weight: 650; background: #eee6ea; }
+  .pill.menunggu { background: #fde9b8; } .pill.terbit { background: #cfeed6; } .pill.ditolak { background: #f7cfcf; }
+  .pane[hidden], [hidden] { display: none !important; }
+  .dlg { width: min(46rem, 94vw); max-height: 90vh; padding: var(--s-6); border: 0; border-radius: var(--r-lg); box-shadow: var(--shadow-2); }
+  .dlg::backdrop { background: rgb(30 10 20 / 0.55); }
+  .dlg h3 { margin-top: var(--s-5); font-size: 1rem; color: var(--rose); }
+  .kvs { display: grid; gap: 0.35rem; margin: 0.4rem 0 0; }
+  .kv { display: grid; grid-template-columns: 9rem 1fr; gap: 0.6rem; font-size: 0.92rem; }
+  .kv dt { color: var(--ink-soft); } .kv dd { margin: 0; overflow-wrap: anywhere; }
+  .g2 { display: grid; gap: var(--s-4); } @media (min-width: 640px) { .g2 { grid-template-columns: 1fr 1fr; } }
+  .note { padding: 0.8rem 1rem; border-radius: var(--r-md); background: #fdf1d6; }
+  @media (max-width: 520px) { .kv { grid-template-columns: 1fr; gap: 0; } }
+</style>

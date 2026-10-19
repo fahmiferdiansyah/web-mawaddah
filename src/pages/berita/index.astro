@@ -11,6 +11,13 @@ const [first, ...rest] = all;
   <PageHero eyebrow="Kabar" title="Cerita dari *lapangan.*"
     lead="Catatan kegiatan, laporan penyaluran, dan kisah para penerima manfaat — agar Anda tahu ke mana kebaikan Anda mengalir." />
 
+  <section class="section-tight" id="kabar-baru" hidden>
+    <div class="container">
+      <h2 class="display new-title">Kabar <em>terbaru</em> dari pengurus</h2>
+      <div class="grid" id="kabar-list"></div>
+    </div>
+  </section>
+
   <section class="section-tight">
     <div class="container">
       {first && (
@@ -27,7 +34,27 @@ const [first, ...rest] = all;
   </section>
 </Base>
 
+<script>
+  import { supabase, esc, tgl } from '../../lib/supabase';
+  supabase.from('artikel').select('slug,judul,kategori,ringkasan,foto_url,terbit_at').eq('status', 'terbit').order('terbit_at', { ascending: false }).limit(12).then(({ data }) => {
+    if (!data || !data.length) return;
+    document.getElementById('kabar-list')!.innerHTML = data.map((a) => `
+      <article class="ncard-db">
+        ${a.foto_url ? `<img src="${esc(a.foto_url)}" alt="" loading="lazy" />` : ''}
+        <p class="small muted"><span class="tag">${esc(a.kategori)}</span> · ${tgl(a.terbit_at)}</p>
+        <h3><a href="/berita/baca/?s=${encodeURIComponent(a.slug)}">${esc(a.judul)}</a></h3>
+        <p class="muted">${esc(a.ringkasan)}</p>
+      </article>`).join('');
+    document.getElementById('kabar-baru')!.hidden = false;
+  });
+</script>
+
 <style>
+  .new-title { font-size: var(--step-3); margin-bottom: var(--s-6); }
+  #kabar-baru[hidden] { display: none; }
+  .ncard-db { display: grid; gap: var(--s-3); align-content: start; }
+  .ncard-db img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-lg); }
+  .ncard-db h3 { font-size: var(--step-1); line-height: 1.3; }
   .feature { padding-bottom: var(--s-8); margin-bottom: var(--s-8); border-bottom: 1px solid var(--line); }
   @media (min-width: 960px) {
     .feature :global(.ncard) { grid-template-columns: 1.4fr 1fr; gap: var(--s-8); align-items: center; }
