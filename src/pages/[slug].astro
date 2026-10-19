@@ -102,7 +102,11 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
             )}
             {isPsb ? (
               <>
-                <a class="btn full" href={P.wa ? waLinkTo(P.wa, daftarTeks) : waLink(daftarTeks)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+                {props.entry.id === 'stam' ? (
+                  <a class="btn full" href="/daftar-stam/"><Icon name="arrow-right" /> Isi formulir pendaftaran</a>
+                ) : (
+                  <a class="btn full" href={P.wa ? waLinkTo(P.wa, daftarTeks) : waLink(daftarTeks)} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+                )}
                 <a class="btn btn-ghost full" href="/psb/">{props.entry.id === 'stam' ? 'Info PMB' : 'Info PSB'}</a>
               </>
             ) : P.pilar === 'pendidikan' && !P.donasi ? null : (

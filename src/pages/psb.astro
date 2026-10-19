@@ -15,7 +15,7 @@ const berjalan = tabs.filter((t) => !/^P[SM]B Dibuka$/.test(t.data.status ?? '')
 // [PLACEHOLDER] Alur umum — sesuaikan dengan ketentuan panitia PSB
 const alur = [
   { t: 'Hubungi admin PSB & PMB', d: 'Tanyakan brosur, persyaratan, dan rincian biaya melalui WhatsApp.' },
-  { t: 'Isi formulir pendaftaran', d: 'Lengkapi data calon santri dan berkas yang diminta panitia.' },
+  { t: 'Isi formulir pendaftaran', d: 'STAM: isi formulir online di situs ini. TABS: lengkapi data lewat admin.' },
   { t: 'Tes & wawancara', d: 'Calon santri mengikuti tes bacaan Al-Qur’an dan wawancara bersama orang tua.' },
   { t: 'Pengumuman & daftar ulang', d: 'Calon santri yang diterima melakukan daftar ulang dan bersiap masuk asrama.' },
 ];
@@ -25,7 +25,8 @@ const alur = [
     lead="Pendaftaran kini dibuka untuk TABS 1 Banjarnegara, TABS 2 Putra Purbalingga, TABS 3 Putri Purbalingga, TABS 5 Cianjur (Penerimaan Santri Baru), serta STAM — program kaderisasi da’i setingkat D2 di Graha Mawaddah (Penerimaan Mahasiswa Baru)."
     crumbs={[{ href: '/pendidikan/', label: 'Pendidikan' }]}>
     <div class="cluster" data-reveal style="--i:4">
-      <a class="btn" href={waLink('Assalamu’alaikum, saya ingin mendaftar PSB TABS / PMB STAM Yayasan Mawaddah.')} target="_blank" rel="noopener"><Icon name="chat" /> Daftar via WhatsApp</a>
+      <a class="btn" href={waLink('Assalamu’alaikum, saya ingin mendaftar PSB TABS / PMB STAM Yayasan Mawaddah.')} target="_blank" rel="noopener"><Icon name="chat" /> Daftar TABS via WhatsApp</a>
+      <a class="btn" href="/daftar-stam/"><Icon name="arrow-right" /> Formulir STAM</a>
       <a class="btn btn-ghost-light" href="#alur">Lihat alur pendaftaran</a>
     </div>
   </PageHero>
@@ -41,7 +42,7 @@ const alur = [
             <p class="muted">{t.data.ringkasan}</p>
             <p class="oc-loc small"><Icon name="map-pin" /> {t.data.lokasi}</p>
             <div class="cluster">
-              <a class="btn btn-sm" href={t.data.wa ? waLinkTo(t.data.wa, `Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`)} target="_blank" rel="noopener">Daftar</a>
+              <a class="btn btn-sm" target={t.id === 'stam' ? undefined : '_blank'} rel={t.id === 'stam' ? undefined : 'noopener'} href={t.id === 'stam' ? '/daftar-stam/' : t.data.wa ? waLinkTo(t.data.wa, `Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`) : waLink(`Assalamu’alaikum, saya ingin mendaftar ${t.id === 'stam' ? 'PMB' : 'PSB'} ${t.data.title}.`)}>{t.id === 'stam' ? 'Isi formulir' : 'Daftar'}</a>
               <a class="link small" href={`/${t.id}/`}>Profil pesantren <Icon name="arrow-right" /></a>
             </div>
           </div>

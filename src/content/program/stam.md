@@ -30,4 +30,4 @@ STAM tidak hanya mengajarkan ilmu syar'i, tetapi juga membekali calon da'i denga
 
 STAM bertempat di Graha Mawaddah, Jl. Swadaya 1 No. 59, Pondok Ranggon, Cipayung, Jakarta Timur.
 
-Informasi pendaftaran ada di halaman [PSB & PMB](/psb/), atau tanyakan langsung melalui WhatsApp admin.
+Pendaftaran dilakukan melalui [formulir online STAM](/daftar-stam/). Informasi lain ada di halaman [PSB & PMB](/psb/), atau tanyakan langsung melalui WhatsApp admin.
