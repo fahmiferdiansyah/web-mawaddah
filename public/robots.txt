@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /panitia/
 
 Sitemap: https://mawaddah.or.id/sitemap-index.xml
-
-Disallow: /panitia/
