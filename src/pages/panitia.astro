@@ -22,6 +22,7 @@ import Base from '../layouts/Base.astro';
       <div id="v-noaccess" class="card login" hidden>
         <h1 class="display">Akun belum <em>terdaftar.</em></h1>
         <p class="muted">Akun Anda belum diberi akses portal. Hubungi admin yayasan agar didaftarkan sebagai panitia atau pengurus.</p>
+        <p class="small muted" id="na-detail"></p>
         <button class="btn btn-ghost" data-logout>Keluar</button>
       </div>
 
@@ -90,9 +91,10 @@ import Base from '../layouts/Base.astro';
     const { data } = await supabase.auth.getSession();
     if (!data.session) return show('v-login');
     uid = data.session.user.id;
-    const [{ data: p }, { data: s }] = await Promise.all([supabase.rpc('portal_peran'), supabase.from('portal_staf').select('nama').eq('user_id', uid).maybeSingle()]);
-    if (!p) return show('v-noaccess');
-    peran = p as string; nama = (s as any)?.nama ?? '';
+    const { data: row, error: e1 } = await supabase.from('portal_staf').select('nama, peran').eq('user_id', uid).maybeSingle();
+    if (e1) { $('na-detail').textContent = 'Detail teknis: ' + e1.message; return show('v-noaccess'); }
+    if (!row) { $('na-detail').textContent = 'Masuk sebagai: ' + (data.session.user.email ?? uid); return show('v-noaccess'); }
+    peran = (row as any).peran; nama = (row as any).nama ?? '';
     $('who').textContent = `${nama || 'Halo'} · ${peran}`;
     $('tab-staf').hidden = peran !== 'admin';
     show('v-app');
