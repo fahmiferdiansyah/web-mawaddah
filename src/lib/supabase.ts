@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Kunci publishable aman di sisi klien: seluruh akses dikunci Row Level Security di database.
-export const SUPABASE_URL = 'https://ggnsloyuiclkegxjwsnz.supabase.co';
-export const SUPABASE_KEY = 'sb_publishable_rcsfU4R75dJYwdQNSs7jwA_-lSAepLQ';
+export const SUPABASE_URL = 'https://algdzqcpjfxusssrxjjd.supabase.co';
+export const SUPABASE_KEY = 'sb_publishable_S4Ua3EP0XZ0l613MldblxA_wyF3ccLR';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: true, storageKey: 'mawaddah-portal-auth' },
