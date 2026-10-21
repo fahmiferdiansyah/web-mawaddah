@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import logo from '../assets/logo-horizontal.webp';
 import Icon from './Icon.astro';
+import AkunMenu from './AkunMenu.astro';
 import { site, pilar, tentangMenu, waLink, type PilarKey } from '../data/site';
 
 const path = Astro.url.pathname;
@@ -28,7 +29,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
     <ul class="tb-links">
       <li><a href="/psb/" class="tb-psb"><span class="dot" aria-hidden="true"></span> PSB &amp; PMB dibuka</a></li>
       <li class="hide-sm"><a href="/haji-umrah/"><Icon name="star8" /> Haji &amp; Umrah</a></li>
-      <li class="hide-sm"><a href="/rekening/"><Icon name="shield" /> Rekening Resmi</a></li>
+      <AkunMenu />
     </ul>
   </div>
 </div>
@@ -142,6 +143,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
   </nav>
   <div class="container sheet-foot">
     <a class="btn btn-light" href="/donasi/"><Icon name="heart" /> Donasi sekarang</a>
+    <a class="btn btn-ghost-light" href="/panitia/" data-akun-sheet><Icon name="user" /> <span>Login</span></a>
     <a class="btn btn-ghost-light" href={waLink('Assalamu’alaikum, saya ingin bertanya tentang Yayasan Mawaddah Indonesia.')} rel="noopener" target="_blank">
       <Icon name="chat" /> WhatsApp admin
     </a>
@@ -150,7 +152,7 @@ const inTentang = tentangPaths.some((p) => path.startsWith(p)) && !['/kontak/', 
 
 <style>
   /* — Topbar — */
-  .topbar { font-size: 0.82rem; }
+  .topbar { position: relative; z-index: calc(var(--z-header) + 1); font-size: 0.82rem; }
   .tb-inner { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 2.5rem; }
   .tb-info, .tb-links { display: flex; align-items: center; gap: var(--s-5); list-style: none; padding: 0; }
   .topbar li, .topbar a { display: inline-flex; align-items: center; gap: 0.45em; color: var(--on-plum-soft); }

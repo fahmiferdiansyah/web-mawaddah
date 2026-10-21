@@ -1,0 +1,314 @@
+---
+import Icon from './Icon.astro';
+---
+<li class="akun" data-akun>
+  <a href="/panitia/" class="akun-login" data-akun-login><Icon name="user" /> <span>Login</span></a>
+  <div class="akun-user" data-akun-user hidden>
+    <button type="button" class="akun-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="akun-menu" data-akun-btn>
+      <span class="akun-av" data-akun-av><Icon name="user" /></span>
+      <span class="akun-nm" data-akun-nm></span>
+      <Icon name="chevron-down" class="akun-chev" />
+    </button>
+    <div class="akun-menu" id="akun-menu" role="menu" hidden>
+      <button type="button" role="menuitem" data-akun-act="info"><Icon name="info" /> Informasi akun</button>
+      <button type="button" role="menuitem" data-akun-act="foto"><Icon name="camera" /> Tambah foto</button>
+      <button type="button" role="menuitem" data-akun-act="sandi"><Icon name="key" /> Ganti password</button>
+      <button type="button" role="menuitem" data-akun-act="lupa"><Icon name="mail" /> Lupa password</button>
+      <button type="button" role="menuitem" data-akun-act="portal"><Icon name="file" /> Portal panitia</button>
+      <button type="button" role="menuitem" data-akun-act="keluar" class="keluar"><Icon name="log-out" /> Keluar</button>
+    </div>
+  </div>
+</li>
+
+<dialog id="akun-dlg" class="akun-dlg" aria-labelledby="akun-dlg-judul">
+  <div class="akun-dlg-head">
+    <h2 id="akun-dlg-judul"></h2>
+    <button type="button" class="akun-x" data-akun-tutup aria-label="Tutup"><Icon name="x" /></button>
+  </div>
+  <div class="akun-dlg-body" id="akun-dlg-isi"></div>
+</dialog>
+
+<script>
+  import { SESI_KEY, PROFIL_KEY, fotoUrl } from '../lib/config';
+
+  type Profil = { uid?: string; email?: string; nama?: string; peran?: string; foto?: boolean; fv?: number };
+
+  const q = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
+  const root = q('[data-akun]')!;
+  const loginEl = q<HTMLAnchorElement>('[data-akun-login]')!;
+  const userEl = q('[data-akun-user]')!;
+  const btn = q<HTMLButtonElement>('[data-akun-btn]')!;
+  const menu = q('#akun-menu')!;
+  const dlg = q<HTMLDialogElement>('#akun-dlg')!;
+  const sheetLink = q<HTMLAnchorElement>('[data-akun-sheet]');
+  document.body.append(dlg); // keluar dari topbar agar gayanya tidak terpengaruh
+
+  const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+  const tgl = (iso?: string) => (iso ? new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
+
+  // ---------- Sesi & profil (tanpa memuat pustaka Supabase) ----------
+  function sesi(): any | null {
+    try { const s = JSON.parse(localStorage.getItem(SESI_KEY) || 'null'); return s && s.user ? s : null; } catch { return null; }
+  }
+  function profil(): Profil {
+    try { return JSON.parse(localStorage.getItem(PROFIL_KEY) || '{}') || {}; } catch { return {}; }
+  }
+  const simpanProfil = (p: Profil) => { try { localStorage.setItem(PROFIL_KEY, JSON.stringify(p)); } catch { /* abaikan */ } };
+  const hapusSemua = () => { try { localStorage.removeItem(SESI_KEY); localStorage.removeItem(PROFIL_KEY); } catch { /* abaikan */ } };
+
+  function render() {
+    const s = sesi();
+    const p = profil();
+    const masuk = !!s;
+    loginEl.hidden = masuk;
+    userEl.toggleAttribute('hidden', !masuk);
+    if (sheetLink) sheetLink.querySelector('span')!.textContent = masuk ? (p.nama || s.user.email.split('@')[0]) : 'Login';
+    if (!masuk) { tutupMenu(); return; }
+    const nama = p.nama || String(s.user.email || '').split('@')[0];
+    q('[data-akun-nm]')!.textContent = nama;
+    const av = q('[data-akun-av]')!;
+    if (p.foto && s.user.id) {
+      av.innerHTML = '';
+      const img = new Image();
+      img.alt = ''; img.src = fotoUrl(s.user.id, p.fv);
+      img.onerror = () => { av.innerHTML = ''; av.append(inisial(nama)); };
+      av.append(img);
+    } else { av.innerHTML = ''; av.append(inisial(nama)); }
+    if (!p.uid || p.uid !== s.user.id) muatProfil();
+  }
+  const inisial = (n: string) => document.createTextNode((n.trim()[0] || '?').toUpperCase());
+
+  let memuat = false;
+  async function muatProfil() {
+    if (memuat) return; memuat = true;
+    try {
+      const { supabase } = await import('../lib/supabase');
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) { hapusSemua(); return render(); }
+      const u = data.session.user;
+      const { data: row } = await supabase.from('portal_staf').select('nama, peran').eq('user_id', u.id).maybeSingle();
+      let foto = false;
+      try { foto = (await fetch(fotoUrl(u.id), { method: 'HEAD' })).ok; } catch { /* abaikan */ }
+      simpanProfil({ uid: u.id, email: u.email, nama: (row as any)?.nama, peran: (row as any)?.peran, foto, fv: Date.now() });
+    } finally { memuat = false; }
+    render();
+  }
+
+  // ---------- Menu ----------
+  function bukaMenu() { menu.removeAttribute('hidden'); btn.setAttribute('aria-expanded', 'true'); q<HTMLElement>('[role=menuitem]', menu)?.focus(); }
+  function tutupMenu() { menu.setAttribute('hidden', ''); btn.setAttribute('aria-expanded', 'false'); }
+  btn.addEventListener('click', () => (menu.hasAttribute('hidden') ? bukaMenu() : tutupMenu()));
+  document.addEventListener('click', (e) => { if (!root.contains(e.target as Node)) tutupMenu(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !menu.hasAttribute('hidden')) { tutupMenu(); btn.focus(); } });
+  menu.addEventListener('keydown', (e) => {
+    const items = Array.from(menu.querySelectorAll<HTMLElement>('[role=menuitem]'));
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  });
+  menu.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-akun-act]');
+    if (!b) return;
+    tutupMenu();
+    aksi(b.dataset.akunAct!);
+  });
+
+  // ---------- Dialog ----------
+  function dialog(judul: string, html: string) {
+    q('#akun-dlg-judul', dlg)!.textContent = judul;
+    q('#akun-dlg-isi', dlg)!.innerHTML = html;
+    if (!dlg.open) dlg.showModal();
+    q<HTMLElement>('input, button.utama', dlg)?.focus();
+  }
+  dlg.addEventListener('click', (e) => { const t = e.target as HTMLElement; if (t === dlg || t.closest('[data-akun-tutup]')) dlg.close(); });
+  const pesan = (el: Element | null, teks: string, ok = false) => { if (!el) return; el.textContent = teks; el.className = 'akun-pesan ' + (ok ? 'ok' : 'err'); el.removeAttribute('hidden'); };
+
+  async function klien() {
+    const { supabase } = await import('../lib/supabase');
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) { hapusSemua(); render(); dlg.close(); return null; }
+    return { supabase, user: data.session.user };
+  }
+
+  async function aksi(nama: string) {
+    if (nama === 'portal') { location.href = '/panitia/'; return; }
+    if (nama === 'keluar') {
+      const { supabase } = await import('../lib/supabase');
+      await supabase.auth.signOut();
+      hapusSemua(); render();
+      if (location.pathname.startsWith('/panitia')) location.reload();
+      return;
+    }
+    if (nama === 'info') return info();
+    if (nama === 'foto') return foto();
+    if (nama === 'sandi') return sandi(false);
+    if (nama === 'sandi-baru') return sandi(true);
+    if (nama === 'lupa') return lupa();
+  }
+
+  async function info() {
+    dialog('Informasi akun', '<p class="akun-muted">Memuat…</p>');
+    const k = await klien(); if (!k) return;
+    const { data: row } = await k.supabase.from('portal_staf').select('nama, peran').eq('user_id', k.user.id).maybeSingle();
+    const r = row as any;
+    const baris = (a: string, b: unknown) => `<div class="akun-baris"><dt>${a}</dt><dd>${esc(b || '—')}</dd></div>`;
+    dialog('Informasi akun', `<dl class="akun-dl">${baris('Nama', r?.nama)}${baris('Email', k.user.email)}${baris('Peran', r?.peran)}${baris('Terdaftar sejak', tgl(k.user.created_at))}${baris('Login terakhir', tgl(k.user.last_sign_in_at))}</dl>
+      <div class="akun-aksi"><button type="button" class="akun-tombol sekunder" data-akun-tutup>Tutup</button></div>`);
+  }
+
+  function sandi(pemulihan: boolean) {
+    dialog(pemulihan ? 'Buat password baru' : 'Ganti password', `
+      <form class="akun-form" novalidate>
+        ${pemulihan ? '' : '<label>Password lama<input type="password" name="lama" autocomplete="current-password" required /></label>'}
+        <label>Password baru<input type="password" name="baru" autocomplete="new-password" minlength="8" required /><small>Minimal 8 karakter.</small></label>
+        <label>Ulangi password baru<input type="password" name="ulang" autocomplete="new-password" required /></label>
+        <p class="akun-pesan" hidden role="alert"></p>
+        <div class="akun-aksi"><button type="submit" class="akun-tombol utama">Simpan password</button><button type="button" class="akun-tombol sekunder" data-akun-tutup>Batal</button></div>
+      </form>`);
+    const f = q<HTMLFormElement>('form', dlg)!;
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const m = q('.akun-pesan', f);
+      const baru = (f.elements.namedItem('baru') as HTMLInputElement).value;
+      const ulang = (f.elements.namedItem('ulang') as HTMLInputElement).value;
+      const lama = (f.elements.namedItem('lama') as HTMLInputElement | null)?.value ?? '';
+      if (baru.length < 8) return pesan(m, 'Password baru minimal 8 karakter.');
+      if (baru !== ulang) return pesan(m, 'Pengulangan password tidak sama.');
+      if (!pemulihan && !lama) return pesan(m, 'Isi password lama.');
+      if (!pemulihan && baru === lama) return pesan(m, 'Password baru harus berbeda dari yang lama.');
+      const tombol = q<HTMLButtonElement>('button[type=submit]', f)!; tombol.disabled = true;
+      try {
+        const k = await klien(); if (!k) return;
+        if (!pemulihan) {
+          const { error: e1 } = await k.supabase.auth.signInWithPassword({ email: k.user.email!, password: lama });
+          if (e1) return pesan(m, 'Password lama salah.');
+        }
+        const { error } = await k.supabase.auth.updateUser({ password: baru });
+        if (error) return pesan(m, error.message.includes('different') ? 'Password baru harus berbeda dari yang lama.' : 'Gagal menyimpan: ' + error.message);
+        f.reset(); pesan(m, 'Password berhasil diganti.', true);
+        if (pemulihan) setTimeout(() => dlg.close(), 1500);
+      } finally { tombol.disabled = false; }
+    });
+  }
+
+  async function lupa() {
+    const s = sesi(); const email = s?.user?.email ?? '';
+    dialog('Lupa password', `
+      <p>Kami akan mengirim tautan untuk membuat password baru ke <strong>${esc(email)}</strong>.</p>
+      <p class="akun-pesan" hidden role="alert"></p>
+      <div class="akun-aksi"><button type="button" class="akun-tombol utama" data-kirim>Kirim tautan</button><button type="button" class="akun-tombol sekunder" data-akun-tutup>Batal</button></div>`);
+    q<HTMLButtonElement>('[data-kirim]', dlg)!.addEventListener('click', async (e) => {
+      const t = e.currentTarget as HTMLButtonElement; t.disabled = true;
+      const m = q('.akun-pesan', dlg);
+      const { supabase } = await import('../lib/supabase');
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/panitia/' });
+      if (error) { pesan(m, 'Gagal mengirim: ' + error.message); t.disabled = false; return; }
+      pesan(m, 'Tautan sudah dikirim. Periksa kotak masuk (dan folder spam) email Anda.', true);
+    });
+  }
+
+  // Potong tengah jadi persegi 256px agar ringan
+  async function perkecil(file: File): Promise<Blob> {
+    const bmp = await createImageBitmap(file);
+    const sisi = Math.min(bmp.width, bmp.height), ukuran = 256;
+    const c = document.createElement('canvas'); c.width = c.height = ukuran;
+    c.getContext('2d')!.drawImage(bmp, (bmp.width - sisi) / 2, (bmp.height - sisi) / 2, sisi, sisi, 0, 0, ukuran, ukuran);
+    return await new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('gagal'))), 'image/jpeg', 0.85));
+  }
+
+  function foto() {
+    const p = profil(); const s = sesi();
+    const saatIni = p.foto && s ? `<img class="akun-prev" src="${fotoUrl(s.user.id, p.fv)}" alt="Foto saat ini" />` : '<span class="akun-prev kosong"></span>';
+    dialog('Foto profil', `
+      <form class="akun-form" novalidate>
+        <div class="akun-prevwrap">${saatIni}</div>
+        <label>Pilih foto (JPG, PNG, atau WebP)<input type="file" name="berkas" accept="image/jpeg,image/png,image/webp" /></label>
+        <p class="akun-pesan" hidden role="alert"></p>
+        <div class="akun-aksi"><button type="submit" class="akun-tombol utama">Simpan foto</button>${p.foto ? '<button type="button" class="akun-tombol sekunder" data-hapus>Hapus foto</button>' : ''}<button type="button" class="akun-tombol sekunder" data-akun-tutup>Batal</button></div>
+      </form>`);
+    const f = q<HTMLFormElement>('form', dlg)!;
+    const m = q('.akun-pesan', f);
+    const input = f.elements.namedItem('berkas') as HTMLInputElement;
+    input.addEventListener('change', () => {
+      const b = input.files?.[0]; if (!b) return;
+      const w = q('.akun-prevwrap', f)!; w.innerHTML = ''; const i = new Image(); i.className = 'akun-prev'; i.alt = 'Pratinjau'; i.src = URL.createObjectURL(b); w.append(i);
+    });
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const b = input.files?.[0];
+      if (!b) return pesan(m, 'Pilih foto dulu.');
+      if (!/^image\/(jpeg|png|webp)$/.test(b.type)) return pesan(m, 'Format harus JPG, PNG, atau WebP.');
+      if (b.size > 8 * 1024 * 1024) return pesan(m, 'Ukuran foto maksimal 8 MB.');
+      const tombol = q<HTMLButtonElement>('button[type=submit]', f)!; tombol.disabled = true;
+      try {
+        const k = await klien(); if (!k) return;
+        const blob = await perkecil(b);
+        const { error } = await k.supabase.storage.from('avatar').upload(`${k.user.id}/foto.jpg`, blob, { upsert: true, contentType: 'image/jpeg', cacheControl: '60' });
+        if (error) return pesan(m, /bucket|not found/i.test(error.message) ? 'Penyimpanan foto belum disiapkan di database. Hubungi admin situs.' : 'Gagal mengunggah: ' + error.message);
+        simpanProfil({ ...profil(), foto: true, fv: Date.now() }); render();
+        pesan(m, 'Foto berhasil disimpan.', true);
+        setTimeout(() => dlg.close(), 1200);
+      } catch { pesan(m, 'Foto tidak bisa diproses. Coba foto lain.'); } finally { tombol.disabled = false; }
+    });
+    q('[data-hapus]', f)?.addEventListener('click', async () => {
+      const k = await klien(); if (!k) return;
+      const { error } = await k.supabase.storage.from('avatar').remove([`${k.user.id}/foto.jpg`]);
+      if (error) return pesan(m, 'Gagal menghapus: ' + error.message);
+      simpanProfil({ ...profil(), foto: false, fv: Date.now() }); render(); dlg.close();
+    });
+  }
+
+  // ---------- Sinyal dari halaman lain ----------
+  window.addEventListener('akun:refresh', () => { simpanProfil({}); render(); });
+  window.addEventListener('akun:buka', (e) => aksi((e as CustomEvent).detail));
+  window.addEventListener('storage', (e) => { if (e.key === SESI_KEY || e.key === PROFIL_KEY) render(); });
+  render();
+</script>
+
+<style>
+  .akun { position: relative; }
+  .akun-login[hidden], .akun-user[hidden] { display: none !important; }
+  .akun-btn { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.25rem 0.3rem 0.25rem 0.25rem; border-radius: 999px; color: var(--on-plum); cursor: pointer; font: inherit; font-weight: 600; }
+  .akun-btn:hover, .akun-btn[aria-expanded='true'] { background: rgb(255 255 255 / 0.12); }
+  .akun-av { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; overflow: hidden; background: #e6bd4a; color: #3a0920 !important; font-weight: 700; font-size: 0.85rem; flex: none; }
+  .akun-av :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .akun-nm { max-width: 9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .akun-btn :global(.akun-chev) { width: 0.9em !important; height: 0.9em !important; transition: transform 300ms var(--ease-out); }
+  .akun-btn[aria-expanded='true'] :global(.akun-chev) { transform: rotate(180deg); }
+  .akun-menu { position: absolute; right: 0; top: calc(100% + 0.35rem); z-index: 70; width: 15.5rem; padding: 0.4rem; border-radius: var(--r-md); background: #fff; color: var(--ink); box-shadow: 0 2px 6px rgb(110 18 63 / 0.08), 0 24px 50px -14px rgb(110 18 63 / 0.35); border: 1px solid var(--line); }
+  .akun-menu[hidden] { display: none; }
+  .akun-menu button { display: flex; align-items: center; gap: 0.7rem; width: 100%; padding: 0.65rem 0.8rem; border-radius: var(--r-sm); font: inherit; font-size: 0.92rem; font-weight: 500; color: var(--ink); text-align: left; cursor: pointer; }
+  .akun-menu button:hover, .akun-menu button:focus-visible { background: var(--paper-2); color: var(--rose); outline: none; }
+  .akun-menu button :global(.icon) { color: var(--rose) !important; width: 1.05rem !important; height: 1.05rem !important; flex: none; }
+  .akun-menu .keluar { margin-top: 0.25rem; border-top: 1px solid var(--line); border-radius: 0 0 var(--r-sm) var(--r-sm); }
+  @media (max-width: 519px) { .akun-nm, .akun-login span { display: none; } .akun-btn :global(.akun-chev) { display: none; } }
+
+  /* Dialog (dipindah ke <body>, jadi pakai gaya sendiri) */
+  .akun-dlg { width: min(30rem, 94vw); padding: 0; border: 0; border-radius: var(--r-lg); background: #fff; color: var(--ink); font-size: 1rem; box-shadow: var(--shadow-2); }
+  .akun-dlg::backdrop { background: rgb(30 10 20 / 0.55); }
+  .akun-dlg-head { display: flex; justify-content: space-between; align-items: center; padding: var(--s-5) var(--s-5) 0; }
+  .akun-dlg-head h2 { font-size: 1.35rem; }
+  .akun-x { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; border-radius: 50%; cursor: pointer; }
+  .akun-x:hover { background: var(--paper-2); }
+  .akun-dlg-body { padding: var(--s-4) var(--s-5) var(--s-5); display: grid; gap: var(--s-4); }
+  .akun-dlg-body :global(.akun-form) { display: grid; gap: var(--s-4); }
+  .akun-dlg-body :global(label) { display: grid; gap: 0.35rem; font-size: 0.9rem; font-weight: 560; }
+  .akun-dlg-body :global(input[type='password']), .akun-dlg-body :global(input[type='file']) { width: 100%; min-height: 3rem; padding: 0.7rem 0.9rem; border-radius: var(--r-md); border: 1px solid var(--line-strong); background: #fff; font: inherit; font-weight: 400; }
+  .akun-dlg-body :global(input:focus-visible) { outline: none; border-color: var(--rose); box-shadow: 0 0 0 4px rgb(211 164 40 / 0.18); }
+  .akun-dlg-body :global(small), .akun-dlg-body :global(.akun-muted) { color: var(--ink-soft); font-weight: 400; }
+  .akun-dlg-body :global(.akun-aksi) { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .akun-dlg-body :global(.akun-tombol) { min-height: 2.75rem; padding: 0.6rem 1.2rem; border-radius: 999px; font: inherit; font-weight: 650; cursor: pointer; }
+  .akun-dlg-body :global(.akun-tombol.utama) { background: #e6bd4a; color: #3a0920; }
+  .akun-dlg-body :global(.akun-tombol.sekunder) { box-shadow: inset 0 0 0 1px var(--line-strong); }
+  .akun-dlg-body :global(.akun-tombol:disabled) { opacity: 0.6; cursor: progress; }
+  .akun-dlg-body :global(.akun-pesan) { padding: 0.65rem 0.9rem; border-radius: var(--r-md); font-size: 0.9rem; }
+  .akun-dlg-body :global(.akun-pesan.err) { background: #fbe4e2; color: #8c1d18; }
+  .akun-dlg-body :global(.akun-pesan.ok) { background: #dff3e4; color: #1d5b2e; }
+  .akun-dlg-body :global(.akun-pesan[hidden]) { display: none; }
+  .akun-dlg-body :global(.akun-dl) { display: grid; gap: 0.6rem; margin: 0; }
+  .akun-dlg-body :global(.akun-baris) { display: grid; grid-template-columns: 9rem 1fr; gap: 0.6rem; font-size: 0.95rem; }
+  .akun-dlg-body :global(.akun-baris dt) { color: var(--ink-soft); }
+  .akun-dlg-body :global(.akun-baris dd) { margin: 0; overflow-wrap: anywhere; }
+  .akun-dlg-body :global(.akun-prevwrap) { display: grid; place-items: center; }
+  .akun-dlg-body :global(.akun-prev) { width: 8rem; height: 8rem; border-radius: 50%; object-fit: cover; background: var(--paper-2); }
+</style>

@@ -98,6 +98,7 @@ import Base from '../layouts/Base.astro';
     $('who').textContent = `${nama || 'Halo'} · ${peran}`;
     $('tab-staf').hidden = peran !== 'admin';
     show('v-app');
+    window.dispatchEvent(new Event('akun:refresh'));
     loadPendaftar(); loadArtikel();
   }
 
@@ -115,8 +116,8 @@ import Base from '../layouts/Base.astro';
     await supabase.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/panitia/' });
     err.textContent = 'Jika email terdaftar, tautan atur ulang kata sandi telah dikirim.';
   });
-  supabase.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') { const p = prompt('Kata sandi baru (minimal 8 karakter):'); if (p && p.length >= 8) supabase.auth.updateUser({ password: p }).then(() => alert('Kata sandi diperbarui.')); } });
-  document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await supabase.auth.signOut(); location.reload(); }));
+  supabase.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') window.dispatchEvent(new CustomEvent('akun:buka', { detail: 'sandi-baru' })); });
+  document.querySelectorAll('[data-logout]').forEach((b) => b.addEventListener('click', async () => { await supabase.auth.signOut(); try { localStorage.removeItem('mawaddah-profil'); } catch { /* abaikan */ } location.reload(); }));
 
   // ---------- Tab ----------
   document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((b) => b.addEventListener('click', () => {
