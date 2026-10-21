@@ -8,6 +8,7 @@ unggulan: true
 status: "PSB Dibuka"
 ringkasan: "Pesantren baru untuk santri putra di Cianjur. Penerimaan Santri Baru (PSB) sedang dibuka."
 lokasi: "Cianjur, Jawa Barat"
+peta: "https://maps.app.goo.gl/3Yq6yfv2VMRAKfw37"
 penerima: "Santri putra"
 foto: "../../assets/foto/program/tabs-5.png"
 wa: "6285775134407"

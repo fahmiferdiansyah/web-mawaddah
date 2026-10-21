@@ -8,6 +8,7 @@ unggulan: true
 status: "PMB Dibuka"
 ringkasan: "Program kaderisasi da'i setingkat D2: 1 tahun materi dan 1 tahun praktek vokasi, dibekali ilmu syar'i dan kemampuan entrepreneurship."
 lokasi: "Graha Mawaddah, Jakarta Timur"
+peta: "https://maps.app.goo.gl/Ru62vWFYwBvFPDsVA"
 penerima: "Calon da'i"
 donasi: false
 foto: "../../assets/foto/program/stam.png"

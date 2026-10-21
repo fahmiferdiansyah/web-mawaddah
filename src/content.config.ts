@@ -19,6 +19,7 @@ const program = defineCollection({
       ikon: z.enum(['book', 'moon', 'heart', 'cap', 'users', 'sprout', 'drop', 'mosque', 'tv', 'home', 'bowl', 'shield', 'hands']).default('heart'),
       status: z.string().optional(), // mis. "PSB Dibuka", "PMB Dibuka"
       lokasi: z.string().optional(),
+      peta: z.string().url().optional(), // tautan Google Maps lokasi
       penerima: z.string().optional(),
       jadwal: z.string().optional(),
       target: z.number().optional(),

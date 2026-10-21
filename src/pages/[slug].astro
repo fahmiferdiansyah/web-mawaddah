@@ -97,7 +97,9 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
               <dl class="facts">
                 {P.penerima && <div><dt><Icon name="users" /> {P.pilar === 'pendidikan' ? 'Santri' : 'Capaian'}</dt><dd>{P.penerima}</dd></div>}
                 {P.jadwal && <div><dt><Icon name="calendar" /> Waktu</dt><dd>{P.jadwal}</dd></div>}
-                {P.lokasi && <div><dt><Icon name="map-pin" /> Lokasi</dt><dd>{P.lokasi}</dd></div>}
+                {P.lokasi && (P.peta
+                  ? <div><dt><a class="peta-dt" href={P.peta} target="_blank" rel="noopener" aria-label={`Buka peta ${P.lokasi} di Google Maps`}><Icon name="map-pin" /> Lokasi</a></dt><dd>{P.lokasi}<br /><a class="link peta-link" href={P.peta} target="_blank" rel="noopener">Buka di Google Maps <Icon name="arrow-up-right" /></a></dd></div>
+                  : <div><dt><Icon name="map-pin" /> Lokasi</dt><dd>{P.lokasi}</dd></div>)}
               </dl>
             )}
             {isPsb ? (
@@ -155,6 +157,10 @@ const shareUrl = props.kind === 'program' ? new URL(`/${props.entry.id}/`, Astro
   .facts dt { display: inline-flex; align-items: center; gap: 0.45em; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
   .facts dt :global(.icon) { color: var(--rose); }
   .facts dd { font-weight: 560; }
+  .peta-dt { display: inline-flex; align-items: center; gap: 0.45em; }
+  .peta-dt:hover { color: var(--rose); }
+  .peta-link { display: inline-flex; align-items: center; gap: 0.35em; font-size: 0.85rem; font-weight: 600; margin-top: 0.2rem; }
+  .peta-link :global(.icon) { width: 0.95em; height: 0.95em; }
   .full { width: 100%; }
   .share { justify-self: start; }
   @media (min-width: 960px) {

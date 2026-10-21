@@ -22,7 +22,9 @@ const href = `/${entry.id}/`;
     <h3><a href={href}>{d.menu}</a></h3>
     <p class="muted desc">{d.ringkasan}</p>
     {d.target && d.terkumpul !== undefined && <Progress target={d.target} terkumpul={d.terkumpul} compact />}
-    {(d.lokasi || d.jadwal) && <p class="meta small"><Icon name={d.lokasi ? 'map-pin' : 'calendar'} /> {d.lokasi ?? d.jadwal}</p>}
+    {(d.lokasi || d.jadwal) && (d.lokasi && d.peta
+      ? <p class="meta small"><a class="peta" href={d.peta} target="_blank" rel="noopener" aria-label={`Buka peta ${d.lokasi} di Google Maps`}><Icon name="map-pin" /> {d.lokasi}</a></p>
+      : <p class="meta small"><Icon name={d.lokasi ? 'map-pin' : 'calendar'} /> {d.lokasi ?? d.jadwal}</p>)}
     <span class="more" aria-hidden="true">Selengkapnya <Icon name="arrow-right" /></span>
   </div>
 </article>
@@ -49,6 +51,8 @@ const href = `/${entry.id}/`;
   .pcard-body { display: grid; gap: var(--s-2); align-content: start; padding: var(--s-5); }
   .tag :global(.icon) { width: 1em; height: 1em; }
   h3 { font-size: 1.2rem; line-height: 1.3; }
+  .peta { position: relative; z-index: 3; display: inline-flex; align-items: center; gap: 0.4em; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: color var(--d-2), text-decoration-color var(--d-2); }
+  .peta:hover, .peta:focus-visible { color: var(--rose); text-decoration-color: currentColor; }
   h3 a::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: var(--r-lg); }
   .desc { font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   .compact .desc { -webkit-line-clamp: 2; }

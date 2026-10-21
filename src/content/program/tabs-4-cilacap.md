@@ -8,6 +8,7 @@ unggulan: true
 status: "Segera Dibuka"
 ringkasan: "Pesantren baru untuk santri putra di Cilacap. Penerimaan Santri Baru (PSB) segera dibuka."
 lokasi: "Cilacap, Jawa Tengah"
+peta: "https://maps.app.goo.gl/mmakggek7P3dZXX97"
 penerima: "Santri putra"
 foto: "../../assets/foto/program/tabs-4.png"
 fotoAlt: "Lokasi TABS 4 Cilacap"

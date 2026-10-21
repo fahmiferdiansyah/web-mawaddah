@@ -7,6 +7,7 @@ urutan: 1
 status: "PSB Dibuka"
 ringkasan: "Pesantren berasrama untuk santri putra di Banjarnegara — pesantren pertama Yayasan Mawaddah Indonesia, berfokus pada tahfidz dan adab."
 lokasi: "Banjarnegara, Jawa Tengah"
+peta: "https://maps.app.goo.gl/eadKB7wMTAyFK9sb7"
 penerima: "Santri putra"
 foto: "../../assets/foto/program/tabs-1.png"
 wa: "6285188188721"
