@@ -267,6 +267,9 @@ import Icon from './Icon.astro';
 
 <style>
   .akun { position: relative; }
+  .akun-login { display: inline-flex; align-items: center; gap: 0.45em; padding: 0.3rem 0.85rem; border-radius: 999px; white-space: nowrap; font-weight: 600; line-height: 1; color: var(--on-plum); background: rgb(255 255 255 / 0.12); transition: background var(--d-2); }
+  .akun-login:hover { background: rgb(255 255 255 / 0.22); }
+  .akun-login :global(.icon) { width: 1.05em; height: 1.05em; flex: none; color: #e6bd4a; }
   .akun-login[hidden], .akun-user[hidden] { display: none !important; }
   .akun-btn { display: inline-flex; align-items: center; gap: 0.5em; padding: 0.25rem 0.3rem 0.25rem 0.25rem; border-radius: 999px; color: var(--on-plum); cursor: pointer; font: inherit; font-weight: 600; }
   .akun-btn:hover, .akun-btn[aria-expanded='true'] { background: rgb(255 255 255 / 0.12); }
