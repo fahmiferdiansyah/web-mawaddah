@@ -8,6 +8,12 @@ const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matc
 /* ---------- Muncul saat terlihat ---------- */
 const revealTargets = document.querySelectorAll<HTMLElement>('[data-reveal], [data-split], [data-media], [data-count], [data-progress], [data-inview]');
 
+/* Angka "tahun berkhidmat" dihitung di peramban agar selalu mengikuti tahun berjalan */
+document.querySelectorAll<HTMLElement>('[data-sejak]').forEach((el) => {
+  const th = new Date().getFullYear() - Number(el.dataset.sejak);
+  if (th > 0) { el.dataset.count = String(th); el.textContent = format(th, el); }
+});
+
 function onEnter(el: HTMLElement) {
   el.classList.add('is-in');
   if (el.hasAttribute('data-count')) countUp(el);

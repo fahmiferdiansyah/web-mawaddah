@@ -160,7 +160,7 @@ const jejak = [
         {capaian.map((s, i) => (
           <div data-reveal style={`--i:${i}`}>
             <dt class="small muted">{s.label}</dt>
-            <dd class="serif num count" data-count={s.angka} data-suffix={s.suffix}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</dd>
+            <dd class="serif num count" data-count={s.angka} data-suffix={s.suffix} data-sejak={'sejak' in s ? s.sejak : undefined}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</dd>
           </div>
         ))}
       </dl>

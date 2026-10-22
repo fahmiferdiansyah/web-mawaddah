@@ -89,7 +89,7 @@ const tentangPoin = [
         {capaian.map((s, i) => (
           <div class="stat" data-reveal style={`--i:${i}`}>
             <dd>
-              <span class="count" data-count={s.angka} data-suffix={s.suffix}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</span>
+              <span class="count" data-count={s.angka} data-suffix={s.suffix} data-sejak={'sejak' in s ? s.sejak : undefined}>{new Intl.NumberFormat('id-ID').format(s.angka)}{s.suffix}</span>
             </dd>
             <dt>{s.label}</dt>
           </div>
