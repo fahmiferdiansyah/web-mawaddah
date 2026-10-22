@@ -56,8 +56,8 @@ export const rekening = [
 
 /** Pendaftaran STAM: rekening biaya pendaftaran & admin khusus STAM */
 export const stamInfo = {
-  rekening: '7352994477',
-  atasNama: 'YYS MAWADDAH INDONESIA TABS X',
+  rekening: '7112111257',
+  atasNama: 'Yayasan Mawaddah Indonesia',
   adminWa: '6285710463077',
   adminTampil: '+62 857-1046-3077',
 } as const;
