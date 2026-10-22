@@ -54,6 +54,14 @@ export const rekening = [
   { bank: 'Bank Syariah Indonesia', kode: 'BSI', nomor: '7112111241', atasNama: 'Yayasan Mawaddah Indonesia', peruntukan: 'Wakaf Pesantren' },
 ] as const;
 
+/** Pendaftaran STAM: rekening biaya pendaftaran & admin khusus STAM */
+export const stamInfo = {
+  rekening: '7352994477',
+  atasNama: 'YYS MAWADDAH INDONESIA TABS X',
+  adminWa: '6285710463077',
+  adminTampil: '+62 857-1046-3077',
+} as const;
+
 /** Legalitas yayasan */
 export const legalitas = [
   { label: 'Akta Pendirian', value: 'Akta Notaris Nomor 02, tanggal 8 April 2016', note: 'Notaris Hitler Masya Patrianagara, S.H.' },

@@ -157,6 +157,7 @@ import Base from '../layouts/Base.astro';
       <h3>Kemampuan</h3><dl class="kvs">${kv('Baca Al-Qur’an', kb.baca_quran)}${kv('Hafalan (juz)', kb.hafalan_juz)}${kv('Bahasa Arab', kb.bahasa_arab)}${kv('Kajian', `${kb.pernah_kajian || ''} ${kb.kajian_ket || ''}`)}${kv('Dakwah', `${kb.pernah_dakwah || ''} ${kb.dakwah_ket || ''}`)}</dl>
       <h3>Orang tua/wali</h3><dl class="kvs">${kv('Ayah', `${ot.ayah?.nama || ''} · ${ot.ayah?.pekerjaan || ''} · ${ot.ayah?.wa || ''}`)}${kv('Alamat ayah', ot.ayah?.alamat)}${kv('Ibu', `${ot.ibu?.nama || ''} · ${ot.ibu?.pekerjaan || ''} · ${ot.ibu?.wa || ''}`)}</dl>
       <h3>Motivasi</h3><dl class="kvs">${kv('Alasan', mt.alasan)}${kv('Harapan', mt.harapan)}${kv('Minat', [...(mt.minat || []), mt.minat_lain].filter(Boolean).join(', '))}${kv('Dokumen siap', (r.dokumen || []).join(', '))}</dl>
+      <h3>Berkas persyaratan</h3><div id="pf-berkas" class="muted">Memuat…</div>
       <h3>Bagian panitia</h3>
       <form id="pf" class="stack" novalidate>
         <div class="g2"><div class="field"><label for="pf-st">Status</label><select class="input" id="pf-st" ${edit ? '' : 'disabled'}>${['Baru', 'Administrasi', 'Lulus Administrasi', 'Tidak Lulus'].map((s) => `<option ${s === r.status ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
@@ -165,6 +166,13 @@ import Base from '../layouts/Base.astro';
         <p class="error-text" id="pf-err" role="alert" hidden></p>
         <div class="cluster">${edit ? '<button class="btn btn-sm" type="submit">Simpan</button>' : ''}<button class="btn btn-ghost btn-sm" type="button" data-close>Tutup</button></div>
       </form>`);
+    const namaBerkas: Record<string, string> = { ijazah: 'Ijazah/SKL', identitas: 'KTP/Kartu pelajar', kk: 'Kartu Keluarga', pasfoto: 'Pas foto', sehat: 'Surat keterangan sehat', lainnya: 'Dokumen lainnya' };
+    const bk = Object.entries((r.berkas || {}) as Record<string, string>);
+    if (!bk.length) $('pf-berkas').textContent = 'Tidak ada berkas diunggah.';
+    else supabase.storage.from('berkas-stam').createSignedUrls(bk.map(([, path]) => path), 3600).then(({ data, error }) => {
+      if (error || !data) { $('pf-berkas').textContent = 'Gagal memuat berkas.'; return; }
+      $('pf-berkas').innerHTML = '<ul>' + bk.map(([k], i) => `<li>${data[i]?.signedUrl ? `<a class="link" href="${data[i].signedUrl}" target="_blank" rel="noopener">${esc(namaBerkas[k] || k)}</a>` : esc(namaBerkas[k] || k) + ' (gagal)'}</li>`).join('') + '</ul>';
+    });
     $('pf').addEventListener('submit', async (e) => {
       e.preventDefault();
       const { error } = await supabase.from('pendaftar_stam').update({ status: ($('pf-st') as HTMLSelectElement).value, hasil_seleksi: ($('pf-hs') as HTMLSelectElement).value || null, catatan_panitia: ($('pf-ct') as HTMLTextAreaElement).value.trim() || null }).eq('id', id);

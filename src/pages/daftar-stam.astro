@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { site, waLink } from '../data/site';
+import { stamInfo, waLinkTo } from '../data/site';
 
 // Kunci publishable Supabase aman ditaruh di sisi klien: tabel dikunci RLS,
 // publik hanya bisa memanggil fungsi daftar_stam() (kirim data, tidak bisa membaca).
@@ -23,7 +23,14 @@ const komitmen = [
   'Bersedia menaati seluruh tata tertib dan ketentuan STAM.',
   'Bersedia mengikuti seluruh proses pendidikan dengan sungguh-sungguh.',
 ];
-const dokumen = ['Fotokopi KTP/Kartu Identitas', 'Fotokopi Kartu Keluarga', 'Fotokopi Ijazah/SKL terakhir', 'Pas Foto', 'Surat Keterangan Sehat', 'Dokumen pendukung lainnya'];
+const berkas = [
+  { k: 'ijazah', l: 'Ijazah / SKL SMA/MA sederajat', h: 'Foto atau scan ijazah, atau Surat Keterangan Lulus (SKL).', req: true },
+  { k: 'identitas', l: 'KTP (atau kartu pelajar jika belum 17 tahun)', h: 'Foto/scan yang jelas dan terbaca.', req: true },
+  { k: 'kk', l: 'Kartu Keluarga (KK)', h: 'Foto/scan Kartu Keluarga yang memuat nama Anda.', req: true },
+  { k: 'pasfoto', l: 'Pas foto terbaru memakai jas, latar belakang merah', h: 'Foto digital. Cetakan 3x4 dan 4x6 masing-masing 4 lembar diserahkan langsung saat daftar ulang.', req: true },
+  { k: 'sehat', l: 'Surat keterangan sehat', h: 'Menyatakan bebas penyakit menular dan bebas narkotika. Boleh menyusul bila belum ada.', req: false },
+  { k: 'lainnya', l: 'Dokumen pendukung lainnya', h: 'Opsional, misalnya sertifikat atau surat rekomendasi.', req: false },
+];
 const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Entrepreneurship', 'Manajemen', 'Sosial Kemasyarakatan'];
 ---
 <Base title="Formulir Pendaftaran STAM Angkatan 1" description="Formulir pendaftaran online Sekolah Tadrib Ad Du’at Mawaddah (STAM) Angkatan ke-1 Tahun Ajaran 2027/2028." >
@@ -124,9 +131,25 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
         </fieldset>
 
         <fieldset>
-          <legend>G. Dokumen persyaratan</legend>
-          <p class="hint">Centang berkas yang sudah Anda siapkan. Berkas dikirim ke panitia melalui WhatsApp setelah formulir terkirim.</p>
-          <div class="opts col">{dokumen.map((d) => <label><input type="checkbox" name="dokumen" value={d} /> {d}</label>)}</div>
+          <legend>G. Berkas persyaratan</legend>
+          <p class="hint">Unggah foto atau scan berkas berikut (JPG, PNG, atau PDF; maksimal 2 MB per berkas — foto dikecilkan otomatis). Berkas bertanda * wajib diunggah.</p>
+          {berkas.map((b) => (
+            <div class="field upl">
+              <label for={`f_${b.k}`}>{b.l} {b.req && <span class="req">*</span>}</label>
+              <input class="input" type="file" id={`f_${b.k}`} name={`f_${b.k}`} data-berkas={b.k} data-req={b.req ? '1' : ''} accept="image/jpeg,image/png,application/pdf" />
+              <span class="hint">{b.h}</span>
+            </div>
+          ))}
+        </fieldset>
+
+        <fieldset>
+          <legend>Ketentuan pendaftaran lainnya</legend>
+          <ul class="info">
+            <li><strong>Formulir pendaftaran:</strong> halaman ini adalah formulir pendaftaran resmi STAM.</li>
+            <li><strong>Ujian masuk:</strong> calon mahasantri mengikuti ujian masuk melalui Google Form untuk melihat kemampuan awal dan menilai hasil pembelajaran setelah lulus. Soal berupa materi dasar yang dipelajari selama kegiatan belajar mengajar. Tautan ujian diberikan panitia setelah pendaftaran diterima.</li>
+            <li><strong>Biaya pendaftaran:</strong> transfer ke rekening <strong>{stamInfo.rekening}</strong> a.n. {stamInfo.atasNama}. Pembayaran dapat melalui jenis pembayaran atau bank yang paling mudah Anda jangkau. Kirim bukti transfer ke admin STAM.</li>
+            <li><strong>Admin STAM:</strong> <a class="link" href={waLinkTo(stamInfo.adminWa, 'Assalamu’alaikum, saya ingin bertanya tentang pendaftaran STAM.')} target="_blank" rel="noopener">{stamInfo.adminTampil}</a></li>
+          </ul>
         </fieldset>
 
         <fieldset>
@@ -137,7 +160,7 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
 
         <p id="form-error" class="error-text" role="alert" hidden></p>
         <button class="btn" type="submit" id="kirim"><Icon name="arrow-right" /> Kirim pendaftaran</button>
-        <p class="hint">Data hanya digunakan panitia STAM untuk proses seleksi. Ada kendala? <a class="link" href={waLink('Assalamu’alaikum, saya mengalami kendala mengisi formulir pendaftaran STAM.')} target="_blank" rel="noopener">Hubungi admin</a> ({site.phone}).</p>
+        <p class="hint">Data hanya digunakan panitia STAM untuk proses seleksi. Ada kendala? <a class="link" href={waLinkTo(stamInfo.adminWa, 'Assalamu’alaikum, saya mengalami kendala mengisi formulir pendaftaran STAM.')} target="_blank" rel="noopener">Hubungi admin STAM</a> ({stamInfo.adminTampil}).</p>
       </form>
 
       <div id="sukses" class="done" hidden tabindex="-1">
@@ -145,14 +168,14 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
         <h2 class="display">Alhamdulillah, pendaftaran terkirim.</h2>
         <p>Nomor pendaftaran Anda:</p>
         <p class="nomor serif" id="nomor"></p>
-        <p>Simpan nomor ini. Panitia akan menghubungi Anda melalui WhatsApp. Kirimkan berkas persyaratan dengan menyebut nomor pendaftaran.</p>
-        <a class="btn" id="wa-konfirmasi" href="#" target="_blank" rel="noopener"><Icon name="chat" /> Kirim berkas via WhatsApp</a>
+        <p>Simpan nomor ini. Berkas Anda sudah kami terima. Panitia akan menghubungi Anda melalui WhatsApp. Kirim bukti transfer biaya pendaftaran ke admin STAM dengan menyebut nomor pendaftaran.</p>
+        <a class="btn" id="wa-konfirmasi" href="#" target="_blank" rel="noopener"><Icon name="chat" /> Hubungi admin STAM</a>
       </div>
     </div>
   </section>
 </Base>
 
-<script is:inline define:vars={{ SUPABASE_URL, SUPABASE_KEY, WA: site.whatsapp }}>
+<script is:inline define:vars={{ SUPABASE_URL, SUPABASE_KEY, WA: stamInfo.adminWa }}>
   (function () {
     var form = document.getElementById('form-stam');
     var err = document.getElementById('form-error');
@@ -161,6 +184,60 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
     var val = function (n) { return ($(n) && $(n).value || '').trim(); };
     var radio = function (n) { var r = form.querySelector('input[name="' + n + '"]:checked'); return r ? r.value : ''; };
     var checks = function (n) { return Array.prototype.map.call(form.querySelectorAll('input[name="' + n + '"]:checked'), function (c) { return c.value; }); };
+
+
+    // ---------- Unggah berkas ----------
+    var MAKS = 2 * 1024 * 1024;
+    var folder = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); });
+    var berkasPath = {}, dokumenNama = [], terunggah = {};
+    var labelBerkas = { ijazah: 'Ijazah/SKL', identitas: 'KTP/Kartu pelajar', kk: 'Kartu Keluarga', pasfoto: 'Pas foto', sehat: 'Surat keterangan sehat', lainnya: 'Dokumen lainnya' };
+    function berkasErr(msg) { var e = new Error(msg); e.berkas = true; return e; }
+
+    function kecilkan(file) {
+      if (!/^image\/(jpeg|png)$/.test(file.type)) return Promise.resolve(file);
+      return new Promise(function (resolve) {
+        var img = new Image(), url = URL.createObjectURL(file);
+        img.onload = function () {
+          var w = img.naturalWidth, h = img.naturalHeight, sk = Math.min(1, 1600 / Math.max(w, h));
+          if (sk === 1 && file.size <= MAKS) { URL.revokeObjectURL(url); return resolve(file); }
+          var c = document.createElement('canvas'); c.width = Math.round(w * sk); c.height = Math.round(h * sk);
+          var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+          URL.revokeObjectURL(url);
+          c.toBlob(function (b) { resolve(b || file); }, 'image/jpeg', 0.82);
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+        img.src = url;
+      });
+    }
+
+    function unggahSatu(key, file) {
+      if (terunggah[key] && terunggah[key].file === file) { berkasPath[key] = terunggah[key].path; return Promise.resolve(); }
+      return kecilkan(file).then(function (blob) {
+        var tipe = blob.type;
+        if (!/^(image\/(jpeg|png)|application\/pdf)$/.test(tipe)) throw berkasErr(labelBerkas[key] + ': format harus JPG, PNG, atau PDF.');
+        if (blob.size > MAKS) throw berkasErr(labelBerkas[key] + ': ukuran berkas lebih dari 2 MB. Kecilkan berkas lalu coba lagi.');
+        var ext = tipe === 'application/pdf' ? 'pdf' : tipe === 'image/png' ? 'png' : 'jpg';
+        var path = folder + '/' + key + '.' + ext;
+        return fetch(SUPABASE_URL + '/storage/v1/object/berkas-stam/' + path, {
+          method: 'POST',
+          headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': tipe },
+          body: blob
+        }).then(function (r) {
+          if (!r.ok) throw berkasErr(labelBerkas[key] + ': gagal diunggah. Coba lagi atau hubungi admin.');
+          berkasPath[key] = path; terunggah[key] = { file: file, path: path };
+        });
+      });
+    }
+
+    function uploadSemua() {
+      berkasPath = {}; dokumenNama = [];
+      var tugas = [];
+      form.querySelectorAll('input[data-berkas]').forEach(function (inp) {
+        var f = inp.files && inp.files[0];
+        if (f) { dokumenNama.push(labelBerkas[inp.dataset.berkas]); tugas.push(unggahSatu(inp.dataset.berkas, f)); }
+      });
+      return Promise.all(tugas);
+    }
 
     function fail(msg, el) { err.textContent = msg; err.hidden = false; if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); } else err.scrollIntoView({ block: 'center' }); }
 
@@ -180,6 +257,12 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
       for (var k = 0; k < kom.length; k++) if (!kom[k].checked) return fail('Seluruh komitmen pada bagian F harus disetujui.', kom[k]);
       if (!$('pernyataan').checked) return fail('Pernyataan pada bagian H harus disetujui.', $('pernyataan'));
 
+      var inputs = form.querySelectorAll('input[data-berkas]');
+      for (var f = 0; f < inputs.length; f++) {
+        var fl = inputs[f].files && inputs[f].files[0];
+        if (!fl && inputs[f].dataset.req) return fail('Berkas ' + labelBerkas[inputs[f].dataset.berkas] + ' wajib diunggah.', inputs[f]);
+      }
+
       var pend = {};
       ['sd', 'smp', 'sma', 'pesantren'].forEach(function (j) { pend[j] = { lembaga: val('pd_' + j + '_lembaga'), tahun: val('pd_' + j + '_tahun') }; });
       var payload = {
@@ -194,14 +277,17 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
         orang_tua: { ayah: { nama: val('ayah_nama'), pekerjaan: val('ayah_pekerjaan'), wa: val('ayah_wa'), alamat: val('ayah_alamat') },
           ibu: { nama: val('ibu_nama'), pekerjaan: val('ibu_pekerjaan'), wa: val('ibu_wa') } },
         motivasi: { alasan: val('alasan'), harapan: val('harapan'), minat: checks('minat'), minat_lain: val('minat_lain') },
-        komitmen_setuju: true, dokumen: checks('dokumen'), pernyataan_setuju: true
+        komitmen_setuju: true, dokumen: [], berkas: {}, pernyataan_setuju: true
       };
 
       btn.disabled = true; btn.setAttribute('aria-busy', 'true');
-      fetch(SUPABASE_URL + '/rest/v1/rpc/daftar_stam', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY },
-        body: JSON.stringify({ p: payload })
+      uploadSemua().then(function () {
+        payload.dokumen = dokumenNama; payload.berkas = berkasPath;
+        return fetch(SUPABASE_URL + '/rest/v1/rpc/daftar_stam', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY },
+          body: JSON.stringify({ p: payload })
+        });
       }).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
           if (!res.ok) {
@@ -209,11 +295,11 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
             return fail(/sudah terdaftar/.test(m) ? 'NIK ini sudah terdaftar. Jika merasa belum mendaftar, hubungi admin.' : 'Pendaftaran belum terkirim. Periksa data lalu coba lagi, atau hubungi admin.', null);
           }
           document.getElementById('nomor').textContent = res.j;
-          document.getElementById('wa-konfirmasi').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Assalamu’alaikum, saya telah mendaftar STAM dengan nomor pendaftaran ' + res.j + ' a.n. ' + payload.nama_lengkap + '. Berikut berkas persyaratan saya.');
+          document.getElementById('wa-konfirmasi').href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent('Assalamu’alaikum, saya telah mendaftar STAM dengan nomor pendaftaran ' + res.j + ' a.n. ' + payload.nama_lengkap + '. Berikut bukti transfer pendaftaran saya.');
           form.hidden = true;
           var s = document.getElementById('sukses'); s.hidden = false; s.focus(); window.scrollTo({ top: 0, behavior: 'smooth' });
         })
-        .catch(function () { fail('Koneksi bermasalah. Periksa internet Anda lalu coba lagi.', null); })
+        .catch(function (e) { fail(e && e.berkas ? e.message : 'Koneksi bermasalah. Periksa internet Anda lalu coba lagi.', null); })
         .finally(function () { btn.disabled = false; btn.removeAttribute('aria-busy'); });
     });
   })();
@@ -232,6 +318,8 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
   .opts label { display: inline-flex; align-items: flex-start; gap: 0.55rem; font-weight: 450; }
   .opts input { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--rose); flex: none; }
   .sub { font-weight: 650; margin: 0; }
+  .upl { gap: 0.3rem; }
+  .info { margin: 0; padding-left: 1.2rem; display: grid; gap: var(--s-3); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
   .done { display: grid; gap: var(--s-4); justify-items: start; padding: var(--s-7); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-2); outline: none; }
   .done[hidden], .form[hidden] { display: none; }
