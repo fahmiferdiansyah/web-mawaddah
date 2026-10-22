@@ -150,8 +150,8 @@ import Base from '../layouts/Base.astro';
     const edit = peran === 'admin' || peran === 'panitia';
     const wa = String(r.whatsapp).replace(/\D/g, '').replace(/^0/, '62');
     openDlg(`
-      <h2 class="display">${esc(r.nama_lengkap)}</h2>
-      <p class="muted">${esc(r.nomor)} · mendaftar ${tgl(r.created_at)} · <a class="link" href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a></p>
+      <div class="dlg-head"><h2>${esc(r.nama_lengkap)}</h2>
+      <p class="muted">${esc(r.nomor)} · mendaftar ${tgl(r.created_at)} · <a class="link" href="https://wa.me/${wa}" target="_blank" rel="noopener">WhatsApp</a></p></div>
       <h3>Data diri</h3><dl class="kvs">${kv('Panggilan', r.nama_panggilan)}${kv('TTL', `${r.tempat_lahir}, ${tgl(r.tanggal_lahir)}`)}${kv('Jenis kelamin', r.jenis_kelamin)}${kv('Status nikah', r.status_nikah)}${kv('NIK', r.nik)}${kv('No. KK', r.nomor_kk)}${kv('Alamat', `${r.alamat}, ${r.desa || ''} ${r.kecamatan || ''} ${r.kota}, ${r.provinsi} ${r.kode_pos || ''}`)}${kv('Email', r.email)}</dl>
       <h3>Pendidikan</h3><dl class="kvs">${['sd', 'smp', 'sma', 'pesantren'].map((j) => kv(j.toUpperCase(), `${pd[j]?.lembaga || ''} ${pd[j]?.tahun ? '(' + pd[j].tahun + ')' : ''}`)).join('')}${kv('Terakhir', r.pendidikan_terakhir)}</dl>
       <h3>Kemampuan</h3><dl class="kvs">${kv('Baca Al-Qur’an', kb.baca_quran)}${kv('Hafalan (juz)', kb.hafalan_juz)}${kv('Bahasa Arab', kb.bahasa_arab)}${kv('Kajian', `${kb.pernah_kajian || ''} ${kb.kajian_ket || ''}`)}${kv('Dakwah', `${kb.pernah_dakwah || ''} ${kb.dakwah_ket || ''}`)}</dl>
@@ -164,7 +164,7 @@ import Base from '../layouts/Base.astro';
         <div class="field"><label for="pf-hs">Hasil seleksi</label><select class="input" id="pf-hs" ${edit ? '' : 'disabled'}>${['', 'Diterima', 'Tidak Diterima'].map((s) => `<option value="${s}" ${s === (r.hasil_seleksi || '') ? 'selected' : ''}>${s || '—'}</option>`).join('')}</select></div></div>
         <div class="field"><label for="pf-ct">Catatan panitia</label><textarea class="input" id="pf-ct" rows="3" ${edit ? '' : 'disabled'}>${esc(r.catatan_panitia || '')}</textarea></div>
         <p class="error-text" id="pf-err" role="alert" hidden></p>
-        <div class="cluster">${edit ? '<button class="btn btn-sm" type="submit">Simpan</button>' : ''}<button class="btn btn-ghost btn-sm" type="button" data-close>Tutup</button></div>
+        <div class="cluster dlg-foot">${edit ? '<button class="btn btn-sm" type="submit">Simpan</button>' : ''}<button class="btn btn-ghost btn-sm" type="button" data-close>Tutup</button></div>
       </form>`);
     const namaBerkas: Record<string, string> = { ijazah: 'Ijazah/SKL', identitas: 'KTP/Kartu pelajar', kk: 'Kartu Keluarga', pasfoto: 'Pas foto', sehat: 'Surat keterangan sehat', lainnya: 'Dokumen lainnya' };
     const bk = Object.entries((r.berkas || {}) as Record<string, string>);
@@ -211,19 +211,27 @@ import Base from '../layouts/Base.astro';
     const locked = a && a.status === 'terbit' && !isAdmin || a && !mine && !isAdmin;
     const d = locked ? 'disabled' : '';
     openDlg(`
-      <h2 class="display">${a ? 'Artikel' : 'Artikel baru'}</h2>
-      ${a ? `<p class="muted"><span class="pill ${a.status}">${label[a.status]}</span> · ${esc(a.penulis_nama)}</p>` : ''}
+      <div class="dlg-head"><h2>${a ? 'Ubah artikel' : 'Artikel baru'}</h2>
+      ${a ? `<p class="muted"><span class="pill ${a.status}">${label[a.status]}</span> · ${esc(a.penulis_nama)}</p>` : '<p class="muted">Tulis artikel, simpan sebagai draf, lalu kirim untuk persetujuan admin.</p>'}</div>
       ${a?.catatan_admin ? `<p class="note"><strong>Catatan admin:</strong> ${esc(a.catatan_admin)}</p>` : ''}
       <form id="af" class="stack" novalidate>
         <div class="field"><label for="af-j">Judul</label><input class="input" id="af-j" maxlength="200" value="${esc(a?.judul || '')}" ${d} /></div>
-        <div class="g2"><div class="field"><label for="af-k">Kategori</label><select class="input" id="af-k" ${d}>${['Kabar Yayasan', 'Dakwah', 'Pendidikan', 'Sosial'].map((k) => `<option ${k === (a?.kategori || 'Kabar Yayasan') ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
-        <div class="field"><label for="af-f">Alamat foto (opsional)</label><input class="input" id="af-f" type="url" placeholder="https://…" value="${esc(a?.foto_url || '')}" ${d} /></div></div>
-        <div class="field"><label for="af-r">Ringkasan (10–400 huruf)</label><textarea class="input" id="af-r" rows="2" maxlength="400" ${d}>${esc(a?.ringkasan || '')}</textarea></div>
-        <div class="field"><label for="af-i">Isi artikel</label><textarea class="input" id="af-i" rows="12" ${d}>${esc(a?.isi || '')}</textarea>
+        <div class="field"><label for="af-k">Kategori</label><select class="input" id="af-k" ${d}>${['Kabar Yayasan', 'Dakwah', 'Pendidikan', 'Sosial'].map((k) => `<option ${k === (a?.kategori || 'Kabar Yayasan') ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
+        <div class="field"><span class="label">Foto utama (opsional)</span>
+          <div class="foto">
+            <div class="foto-prev" id="af-prev" aria-live="polite"></div>
+            <div class="foto-ctl">
+              <input type="file" id="af-file" accept="image/jpeg,image/png,image/webp" hidden ${d} />
+              <div class="cluster"><button class="btn btn-ghost btn-sm" type="button" id="af-pilih" ${d}>Pilih foto</button><button class="btn btn-ghost btn-sm" type="button" id="af-hapusfoto" hidden ${d}>Hapus foto</button></div>
+              <span class="hint" id="af-fhint">JPG, PNG, atau WebP. Dikecilkan otomatis, maks. 2 MB. Disarankan foto mendatar.</span>
+            </div>
+          </div></div>
+        <div class="field"><label for="af-r">Ringkasan <span class="muted">(10–400 huruf)</span></label><textarea class="input" id="af-r" rows="3" maxlength="400" ${d}>${esc(a?.ringkasan || '')}</textarea></div>
+        <div class="field"><label for="af-i">Isi artikel</label><textarea class="input" id="af-i" rows="14" ${d}>${esc(a?.isi || '')}</textarea>
           <span class="hint">Format: ## Judul bagian · - daftar · **tebal** · *miring* · [teks](https://tautan). Pisahkan paragraf dengan baris kosong.</span></div>
         ${isAdmin && a ? `<div class="field"><label for="af-c">Catatan untuk penulis (jika ditolak)</label><input class="input" id="af-c" value="${esc(a.catatan_admin || '')}" /></div>` : ''}
         <p class="error-text" id="af-err" role="alert" hidden></p>
-        <div class="cluster">
+        <div class="cluster dlg-foot">
           ${locked ? '' : '<button class="btn btn-ghost btn-sm" type="submit" data-do="draft">Simpan draf</button><button class="btn btn-sm" type="submit" data-do="menunggu">Kirim untuk persetujuan</button>'}
           ${isAdmin && a ? '<button class="btn btn-sm" type="submit" data-do="terbit">Terbitkan</button><button class="btn btn-ghost btn-sm" type="submit" data-do="ditolak">Kembalikan untuk revisi</button>' : ''}
           ${a && (isAdmin || (mine && ['draft', 'ditolak'].includes(a.status))) ? '<button class="btn btn-ghost btn-sm" type="button" id="af-del">Hapus</button>' : ''}
@@ -232,12 +240,48 @@ import Base from '../layouts/Base.astro';
       </form>`);
     const f = $('af') as HTMLFormElement;
     let action = 'draft';
+    let fotoUrl: string | null = a?.foto_url || null;
+    const prev = $('af-prev'), fhint = $('af-fhint'), hapusBtn = $('af-hapusfoto') as HTMLButtonElement, pilihBtn = $('af-pilih') as HTMLButtonElement;
+    const fileIn = $('af-file') as HTMLInputElement;
+    const tampilFoto = () => {
+      prev.innerHTML = fotoUrl ? `<img src="${esc(fotoUrl)}" alt="Pratinjau foto utama" />` : '<span>Belum ada foto</span>';
+      hapusBtn.hidden = !fotoUrl; pilihBtn.textContent = fotoUrl ? 'Ganti foto' : 'Pilih foto';
+    };
+    tampilFoto();
+    pilihBtn.addEventListener('click', () => fileIn.click());
+    hapusBtn.addEventListener('click', () => { fotoUrl = null; tampilFoto(); });
+    const kecilkan = (file: File) => new Promise<Blob>((resolve, reject) => {
+      const img = new Image(), url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const sk = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * sk); c.height = Math.round(img.naturalHeight * sk);
+        const g = c.getContext('2d')!; g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob((b) => (b ? resolve(b) : reject(new Error('Foto gagal diproses.'))), 'image/jpeg', 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Berkas bukan gambar yang valid.')); };
+      img.src = url;
+    });
+    fileIn.addEventListener('change', async () => {
+      const file = fileIn.files?.[0]; if (!file) return;
+      const err = $('af-err'); err.hidden = true;
+      const hint0 = fhint.textContent; fhint.textContent = 'Mengunggah foto…'; pilihBtn.disabled = true;
+      try {
+        const blob = await kecilkan(file);
+        if (blob.size > 2 * 1024 * 1024) throw new Error('Foto masih lebih dari 2 MB. Pilih foto lain.');
+        const path = `${uid}/${Date.now()}.jpg`;
+        const { error } = await supabase.storage.from('foto-artikel').upload(path, blob, { contentType: 'image/jpeg' });
+        if (error) throw new Error(error.message);
+        fotoUrl = supabase.storage.from('foto-artikel').getPublicUrl(path).data.publicUrl;
+        tampilFoto();
+      } catch (ex) { err.textContent = (ex as Error).message || 'Foto gagal diunggah.'; err.hidden = false; }
+      finally { fhint.textContent = hint0; pilihBtn.disabled = false; fileIn.value = ''; }
+    });
     f.querySelectorAll<HTMLButtonElement>('[data-do]').forEach((b) => b.addEventListener('click', () => (action = b.dataset.do!)));
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
       const err = $('af-err'); err.hidden = true;
-      const row: any = { judul: ($('af-j') as HTMLInputElement).value.trim(), kategori: ($('af-k') as HTMLSelectElement).value, ringkasan: ($('af-r') as HTMLTextAreaElement).value.trim(), isi: ($('af-i') as HTMLTextAreaElement).value.trim(), foto_url: ($('af-f') as HTMLInputElement).value.trim() || null, status: action };
-      if (row.foto_url && !/^https:\/\//.test(row.foto_url)) { err.textContent = 'Alamat foto harus diawali https://'; err.hidden = false; return; }
+      const row: any = { judul: ($('af-j') as HTMLInputElement).value.trim(), kategori: ($('af-k') as HTMLSelectElement).value, ringkasan: ($('af-r') as HTMLTextAreaElement).value.trim(), isi: ($('af-i') as HTMLTextAreaElement).value.trim(), foto_url: fotoUrl, status: action };
       if (isAdmin && a) row.catatan_admin = ($('af-c') as HTMLInputElement)?.value.trim() || null;
       if (action === 'ditolak' && !row.catatan_admin) { err.textContent = 'Tulis catatan revisi untuk penulis.'; err.hidden = false; return; }
       const q = a ? supabase.from('artikel').update(row).eq('id', a.id) : supabase.from('artikel').insert({ ...row, penulis_id: uid });
@@ -299,8 +343,23 @@ import Base from '../layouts/Base.astro';
   :global(.pill) { display: inline-block; padding: 0.2rem 0.65rem; border-radius: var(--r-pill); font-size: 0.78rem; font-weight: 650; background: #eee6ea; }
   :global(.pill.menunggu) { background: #fde9b8; } :global(.pill.terbit) { background: #cfeed6; } :global(.pill.ditolak) { background: #f7cfcf; }
   .pane[hidden], [hidden] { display: none !important; }
-  .dlg { width: min(46rem, 94vw); max-height: 90vh; padding: var(--s-6); border: 0; border-radius: var(--r-lg); box-shadow: var(--shadow-2); }
+  .dlg { width: min(48rem, 94vw); max-height: 92vh; margin: auto; padding: 0; border: 0; border-radius: var(--r-lg); box-shadow: var(--shadow-2); overflow: hidden; }
+  .dlg[open] { display: flex; flex-direction: column; }
+  .dlg #dlg-body { display: flex; flex-direction: column; min-height: 0; padding: var(--s-6) var(--s-6) 0; overflow-y: auto; }
   .dlg::backdrop { background: rgb(30 10 20 / 0.55); }
+  .dlg :global(.dlg-head) { padding-bottom: var(--s-4); margin-bottom: var(--s-5); border-bottom: 1px solid var(--line); }
+  .dlg :global(.dlg-head h2) { font-size: var(--step-2); line-height: 1.2; margin: 0 0 0.35rem; }
+  .dlg :global(.dlg-head p) { margin: 0; }
+  .dlg :global(.field) { display: grid; gap: 0.4rem; }
+  .dlg :global(.field label), .dlg :global(.field .label) { font-weight: 650; font-size: 0.95rem; }
+  .dlg :global(.field .input) { min-height: 3rem; }
+  .dlg :global(.field textarea.input) { min-height: 0; line-height: 1.55; resize: vertical; }
+  .dlg :global(.dlg-foot) { position: sticky; bottom: 0; margin: var(--s-4) calc(var(--s-6) * -1) 0; padding: var(--s-4) var(--s-6); background: #fff; border-top: 1px solid var(--line); gap: 0.5rem; }
+  .dlg :global(.foto) { display: grid; gap: var(--s-4); }
+  @media (min-width: 600px) { .dlg :global(.foto) { grid-template-columns: 14rem 1fr; align-items: start; } }
+  .dlg :global(.foto-prev) { aspect-ratio: 16 / 10; border-radius: var(--r-md); background: #f4eef1; border: 1px dashed var(--line-strong); display: grid; place-items: center; overflow: hidden; color: var(--ink-soft); font-size: 0.85rem; }
+  .dlg :global(.foto-prev img) { width: 100%; height: 100%; object-fit: cover; }
+  .dlg :global(.foto-ctl) { display: grid; gap: 0.6rem; align-content: start; }
   .dlg :global(h3) { margin-top: var(--s-5); font-size: 1rem; color: var(--rose); }
   .dlg :global(.kvs) { display: grid; gap: 0.35rem; margin: 0.4rem 0 0; }
   .dlg :global(.kv) { display: grid; grid-template-columns: 9rem 1fr; gap: 0.6rem; font-size: 0.92rem; }
