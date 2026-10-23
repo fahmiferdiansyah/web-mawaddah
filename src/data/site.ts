@@ -91,7 +91,8 @@ export const almaz = {
     { name: 'CS Almaz - Ishaq', label: '0812-1000-9948', wa: '6281210009948' },
     { name: 'CS Almaz - Abdurrozaq', label: '0821-3000-838', wa: '628213000838' },
   ],
-  officeJakarta: 'Jl. Swadaya 1 No. 59 B, Pondok Ranggon, Cipayung, Jakarta Timur',
+  officeCibubur: 'Perumahan Citragrand Cibubur CBD AR01 No. 35, Kelurahan Jatirangga, Kecamatan Jatisampurna, Kota Bekasi, Jawa Barat 17434',
+  officeMaps: 'https://maps.app.goo.gl/fsG2Ca7inhXUuaaW8',
   officePusat: 'Refah Residence Dramaga, Blok R4, Jl. Raya Babengket, Ciampea, Dramaga, Bogor',
   layanan: [
     { icon: 'kaaba', title: 'Umrah', text: 'Paket umrah sesuai sunnah dengan pembimbing Ahlussunnah wal Jama’ah.' },
