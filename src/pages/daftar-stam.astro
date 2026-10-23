@@ -146,7 +146,13 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
           <legend>Ketentuan pendaftaran lainnya</legend>
           <ul class="info">
             <li><strong>Formulir pendaftaran:</strong> halaman ini adalah formulir pendaftaran resmi STAM.</li>
-            <li><strong>Ujian masuk:</strong> calon mahasantri mengikuti ujian masuk melalui Google Form untuk melihat kemampuan awal dan menilai hasil pembelajaran setelah lulus. Soal berupa materi dasar yang dipelajari selama kegiatan belajar mengajar. Tautan ujian diberikan panitia setelah pendaftaran diterima.</li>
+            <li><strong>Ujian masuk:</strong> calon mahasantri yang lolos seleksi administrasi akan mengikuti ujian masuk yang diselenggarakan panitia STAM, meliputi:
+              <ol class="info-sub">
+                <li><strong>Ujian tertulis:</strong> materi dasar yang dipelajari di SMA/MA atau sederajat, dilaksanakan melalui Google Form.</li>
+                <li><strong>Wawancara:</strong> menggali motivasi dan kesiapan mengikuti pendidikan STAM.</li>
+                <li><strong>Tes wawasan keagamaan:</strong> materi dasar keislaman yang dipelajari di SMA/MA atau sederajat.</li>
+              </ol>
+              Jadwal, teknis pelaksanaan, dan ketentuan ujian akan disampaikan panitia setelah seleksi administrasi.</li>
             <li><strong>Biaya pendaftaran:</strong> transfer ke rekening <strong>Bank Syariah Indonesia (BSI) {stamInfo.rekening}</strong> a.n. {stamInfo.atasNama}. Pembayaran dapat melalui jenis pembayaran atau bank yang paling mudah Anda jangkau. Kirim bukti transfer ke admin STAM.</li>
             <li><strong>Admin STAM:</strong> <a class="link" href={waLinkTo(stamInfo.adminWa, 'Assalamu’alaikum, saya ingin bertanya tentang pendaftaran STAM.')} target="_blank" rel="noopener">{stamInfo.adminTampil}</a></li>
           </ul>
@@ -320,6 +326,7 @@ const minat = ['Dakwah', 'Pendidikan', 'Tahfizh Al-Qur’an', 'Leadership', 'Ent
   .sub { font-weight: 650; margin: 0; }
   .upl { gap: 0.3rem; }
   .info { margin: 0; padding-left: 1.2rem; display: grid; gap: var(--s-3); }
+  .info-sub { margin: var(--s-2) 0; padding-left: 1.2rem; display: grid; gap: var(--s-2); }
   .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
   .done { display: grid; gap: var(--s-4); justify-items: start; padding: var(--s-7); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-2); outline: none; }
   .done[hidden], .form[hidden] { display: none; }
