@@ -24,7 +24,8 @@ export async function getStaticPaths() {
     params: { slug: key },
     props: { kind: 'kategori' as const, key, items: all.filter((p) => p.data.pilar === key) },
   }));
-  const programs = all.map((entry) => ({
+  // /stam/ punya halaman pendaratan sendiri: src/pages/stam.astro
+  const programs = all.filter((entry) => entry.id !== 'stam').map((entry) => ({
     params: { slug: entry.id },
     props: {
       kind: 'program' as const,

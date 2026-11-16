@@ -1,0 +1,965 @@
+---
+/**
+ * Halaman pendaratan khusus STAM (Sekolah Tadrib Ad-Du'at Mawaddah) — /stam/
+ * Tema: zaitun–emas–gading dari logo STAM. Semua angka biaya, kuota, dan gelombang
+ * dibaca dari `stamInfo` di src/data/site.ts (satu tempat untuk memperbarui).
+ */
+import { Image } from 'astro:assets';
+import '@fontsource-variable/lora/wght.css';
+import '@fontsource-variable/lora/wght-italic.css';
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { stamInfo, site, legalitas, waLinkTo } from '../data/site';
+
+import lockupLight from '../assets/stam/lockup-light.webp';
+import markLight from '../assets/stam/mark-light.webp';
+import markDark from '../assets/stam/mark.webp';
+import gedung from '../assets/foto/program/stam.png';
+import masjid from '../assets/stam/masjid.webp';
+import kelas from '../assets/stam/kelas.webp';
+
+const { biaya, kuota, kuotaPromo, gelombang, admin } = stamInfo;
+const rp = (n: number) => 'Rp' + n.toLocaleString('id-ID');
+const hemat = biaya.uangMasukNormal - biaya.uangMasukPromo;
+const perHari = Math.round(biaya.syahriyah / 30 / 1000);
+const terisi = stamInfo.terisi === null ? null : Math.max(0, Math.min(kuota, stamInfo.terisi));
+const sisaPromo = terisi === null ? null : Math.max(0, kuotaPromo - terisi);
+
+const pesan = {
+  tanya: 'Assalamu’alaikum Ustadz, saya ingin bertanya tentang pendaftaran STAM Angkatan 1.',
+  daftar: 'Assalamu’alaikum Ustadz, saya ingin mendaftar STAM Angkatan 1. Mohon arahannya.',
+};
+const wa = (kind: keyof typeof pesan, i = 0) => waLinkTo(admin[i].wa, pesan[kind]);
+
+const seats = Array.from({ length: kuota }, (_, i) => ({
+  i,
+  kind: terisi !== null && i < terisi ? 'taken' : i < kuotaPromo ? 'promo' : 'reg',
+}));
+
+const bekal = [
+  { ikon: 'book', judul: 'Ilmu Syar’i', sub: 'Fondasi yang kokoh dan terarah', poin: ['Al-Qur’an & tahfizh, target minimal 5 juz mutqin', 'Aqidah & akhlak', 'Hadits dan fiqih', 'Bahasa Arab', 'Dasar-dasar dakwah'] },
+  { ikon: 'sprout', judul: 'Jiwa Wirausaha', sub: 'Mandiri secara ekonomi', poin: ['Wawasan bisnis', 'Manajemen usaha', 'Manajemen keuangan', 'Keterampilan ekonomi mandiri'] },
+  { ikon: 'star8', judul: 'Kepemimpinan', sub: 'Disiplin, ibadah, mentoring', poin: ['Pembinaan karakter & kedisiplinan', 'Mentoring berkelanjutan', 'Manajemen organisasi', 'Ceramah, khutbah & komunikasi umat'] },
+] as const;
+
+const celah = [
+  { no: '01', judul: 'Ilmu yang belum terarah', teks: 'Semangat berdakwah besar, tetapi belajar sepotong-sepotong tanpa kurikulum dan pembimbing. Padahal dakwah menuntut fondasi aqidah, fiqih, dan bahasa Arab yang kokoh.' },
+  { no: '02', judul: 'Memimpin tanpa bekal', teks: 'Da’i dituntut mengelola masjid, majelis, pendidikan, dan kegiatan sosial. Namun jarang ada yang dilatih memimpin dan menata organisasi sejak awal.' },
+  { no: '03', judul: 'Dakwah yang bergantung', teks: 'Tanpa kemandirian ekonomi, dakwah berhenti ketika dukungan berhenti, dan marwah serta izzah seorang da’i ikut dipertaruhkan.' },
+] as const;
+
+const lulusan = [
+  { judul: 'Berilmu secara terstruktur', teks: 'Dasar-dasar ilmu syar’i yang tertata rapi, bukan potongan-potongan pengetahuan.' },
+  { judul: 'Dekat dengan Al-Qur’an', teks: 'Mampu membaca, menghafal, memahami, dan menjaga hafalan, dengan target minimal 5 juz mutqin.' },
+  { judul: 'Berakhlak dan disiplin', teks: 'Karakter da’i yang bertanggung jawab dan mampu bekerja sama dalam tim.' },
+  { judul: 'Terampil menyampaikan', teks: 'Ceramah, khutbah, mengajar, berkomunikasi dengan masyarakat, dan mengelola kegiatan dakwah.' },
+  { judul: 'Siap memimpin dan berusaha', teks: 'Bekal manajemen organisasi, kepemimpinan, dan wawasan entrepreneurship untuk berdiri di atas kaki sendiri.' },
+  { judul: 'Berpengalaman dan berjejaring', teks: 'Magang di lembaga nyata: masjid, pesantren, sekolah, lembaga dakwah, hingga dunia usaha.' },
+] as const;
+
+const fasilitas = ['Kelas & asrama ber-AC', 'Auditorium ber-AC', 'Masjid ber-AC milik sendiri', 'Gedung milik sendiri', 'Dapur milik sendiri', 'Ruang makan nyaman', 'Kamar mandi nyaman'];
+
+const syarat = ['Khusus ikhwan', 'Lulusan SMA/MA/sederajat', 'Siap tinggal di asrama', 'Ijazah SMA/MA atau SKL', 'KTP & Kartu Keluarga', 'Pas foto berjas, latar merah', 'Surat keterangan sehat'];
+
+const cocok = [
+  'Lulusan SMA/MA/sederajat yang ingin menjadikan dakwah sebagai jalan hidup',
+  'Ingin berdakwah dengan bekal ilmu, bukan hanya semangat',
+  'Siap tinggal di asrama dan hidup disiplin selama 2 tahun',
+  'Ingin mandiri secara ekonomi dan tidak menggantungkan dakwah pada orang lain',
+  'Mau belajar memimpin dan berani turun langsung ke lapangan',
+];
+const belum = [
+  'Belum siap berasrama atau terikat jadwal yang tertib',
+  'Mencari jalan pintas tanpa proses belajar dan praktik',
+  'Belum bersedia mengikuti seluruh rangkaian pendidikan selama 2 tahun',
+];
+
+const alur = [
+  { judul: 'Isi formulir online', teks: 'Data diri, riwayat pendidikan, motivasi, dan unggah berkas, semuanya dari ponsel.' },
+  { judul: 'Bayar pendaftaran', teks: `${rp(biaya.pendaftaran)} ke rekening resmi, lalu kirim bukti transfer ke admin.` },
+  { judul: 'Seleksi administrasi', teks: 'Panitia memeriksa kelengkapan data dan berkas Anda.' },
+  { judul: 'Ujian masuk', teks: 'Tiga tahap: ujian tertulis via Google Form, wawancara, dan tes wawasan keagamaan dasar.' },
+  { judul: 'Daftar ulang & mulai belajar', teks: 'Lolos seleksi, lakukan daftar ulang, dan bergabung sebagai mahasantri angkatan pertama.' },
+] as const;
+
+const faq = [
+  { q: 'Siapa yang boleh mendaftar?', a: 'Khusus ikhwan lulusan SMA/MA atau sederajat yang siap tinggal di asrama selama masa pendidikan.' },
+  { q: 'Berapa biaya yang harus disiapkan?', a: `Biaya pendaftaran ${rp(biaya.pendaftaran)}. Uang masuk normal ${rp(biaya.uangMasukNormal)}, namun <strong>diskon 50% menjadi ${rp(biaya.uangMasukPromo)}</strong> khusus ${kuotaPromo} pendaftar pertama. Syahriyah ${rp(biaya.syahriyah)} per bulan.` },
+  { q: 'Bagaimana cara mendaftar dan membayar?', a: `Isi <a href="/daftar-stam/">formulir pendaftaran online</a>, lalu transfer biaya pendaftaran ke <strong>BSI ${stamInfo.rekening}</strong> a.n. ${stamInfo.atasNama}. Kirim bukti transfer ke admin STAM melalui WhatsApp. Bayarlah hanya ke rekening resmi ini.` },
+  { q: 'Apa saja yang dipelajari di STAM?', a: 'Tahun pertama: Al-Qur’an dan tahfizh (target minimal 5 juz mutqin), aqidah dan akhlak, hadits, fiqih, bahasa Arab, dakwah, leadership, entrepreneurship, manajemen organisasi, dan manajemen keuangan. Tahun kedua: praktik lapangan melalui magang di lembaga yang relevan.' },
+  { q: 'Bagaimana ujian masuknya?', a: 'Ada tiga tahap: ujian tertulis (materi dasar SMA/MA, melalui Google Form), wawancara untuk menggali motivasi dan kesiapan, serta tes wawasan keagamaan dasar. Jadwal disampaikan panitia setelah seleksi administrasi.' },
+  { q: 'Berkas apa yang perlu disiapkan?', a: 'Ijazah atau SKL SMA/MA, KTP, Kartu Keluarga, pas foto berjas latar merah, dan surat keterangan sehat (boleh menyusul bila belum ada).' },
+  { q: 'Kapan pendaftaran ditutup?', a: `Gelombang 1 ditutup ${gelombang[0].label}, Gelombang 2 ${gelombang[1].label}, dan Gelombang 3 ${gelombang[2].label}. Kuota angkatan pertama hanya ${kuota} mahasantri, dan diskon uang masuk hanya untuk ${kuotaPromo} pendaftar pertama.` },
+  { q: 'Apakah ada keringanan atau skema pembayaran?', a: 'Silakan sampaikan kondisi Anda langsung kepada admin STAM melalui WhatsApp. Ustadz akan menjelaskan ketentuan pembayaran yang berlaku.' },
+  { q: 'Di mana lokasi STAM?', a: `STAM bertempat di Graha Mawaddah, ${stamInfo.alamat}. <a href="${stamInfo.peta}" target="_blank" rel="noopener">Buka di Google Maps</a>.` },
+];
+
+const strip = (h: string) => h.replace(/<[^>]+>/g, '');
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: 'Sekolah Tadrib Ad-Du’at Mawaddah (STAM)',
+    alternateName: 'STAM',
+    url: new URL('/stam/', Astro.site).toString(),
+    logo: new URL('/icon-512.png', Astro.site).toString(),
+    parentOrganization: { '@type': 'NGO', name: site.name },
+    address: { '@type': 'PostalAddress', streetAddress: 'Jl. Swadaya I No. 59, Pondok Ranggon, Cipayung', addressLocality: 'Jakarta Timur', addressRegion: 'DKI Jakarta', postalCode: '13860', addressCountry: 'ID' },
+    telephone: '+' + admin[0].wa,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: strip(f.a) } })),
+  },
+];
+
+const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}T23:59:59+07:00` }));
+---
+<Base
+  bare
+  bodyClass="stam"
+  themeColor="#1f2118"
+  title="Pendaftaran STAM Angkatan 1 Dibuka · Sekolah Tadrib Ad-Du’at Mawaddah"
+  description={`Pendidikan da’i berasrama 2 tahun di Jakarta Timur: ilmu syar’i, kepemimpinan, dan wirausaha. Diskon 50% uang masuk untuk ${kuotaPromo} pendaftar pertama. Kuota hanya ${kuota} mahasantri.`}
+  image="/og-stam.jpg"
+>
+  <Fragment slot="head">
+    {jsonLd.map((d) => <script type="application/ld+json" set:html={JSON.stringify(d)} />)}
+    <script type="application/json" id="stam-waves" set:html={JSON.stringify(waves)} />
+  </Fragment>
+
+  <!-- Pita pengumuman -->
+  <div class="s-announce" data-announce>
+    <a href="#biaya" class="s-announce-in">
+      <Icon name="clock" />
+      <span><strong data-wave-label>Gelombang 1 ditutup {gelombang[0].label}</strong><span class="s-hide-sm"> · diskon 50% uang masuk untuk {kuotaPromo} pendaftar pertama</span></span>
+      <span class="s-announce-left" data-days-left hidden></span>
+      <Icon name="arrow-right" class="s-hide-sm" />
+    </a>
+  </div>
+
+  <!-- Header -->
+  <header class="s-header">
+    <div class="s-wrap s-header-in">
+      <a href="#atas" class="s-brand" aria-label="STAM — Sekolah Tadrib Ad-Du’at Mawaddah">
+        <Image src={lockupLight} alt="Sekolah Tadrib Ad-Du’at Mawaddah" width={360} height={126} loading="eager" />
+      </a>
+      <nav class="s-nav" aria-label="Navigasi halaman">
+        <a href="#bekal">Keunggulan</a>
+        <a href="#kurikulum">Kurikulum</a>
+        <a href="#biaya">Biaya</a>
+        <a href="#alur">Alur</a>
+        <a href="#faq">Tanya Jawab</a>
+      </nav>
+      <a class="s-btn s-btn-gold s-btn-sm" href="/daftar-stam/"><span>Daftar<span class="s-hide-sm"> Sekarang</span></span> <Icon name="arrow-right" /></a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="s-hero" id="atas">
+    <Image class="s-hero-mark" src={markLight} alt="" aria-hidden="true" loading="eager" />
+    <span class="s-orb s-orb-a" aria-hidden="true"></span>
+    <span class="s-orb s-orb-b" aria-hidden="true"></span>
+    <div class="s-wrap s-hero-grid">
+      <div class="s-hero-copy">
+        <p class="s-chip s-rise" style="--d:0ms"><span class="s-dot"></span> Penerimaan Mahasantri Baru · Angkatan Pertama · TA 2027/2028</p>
+        <h1 class="s-h1 s-rise" style="--d:90ms">
+          Ilmunya mumpuni.
+          <em>Usahanya mandiri.</em>
+        </h1>
+        <p class="s-hero-lead s-rise" style="--d:180ms">
+          Program kaderisasi da’i berasrama <strong>2 tahun</strong> di Jakarta Timur. Kuasai ilmu syar’i yang terarah, ditempa jiwa kepemimpinan, dan dibekali keterampilan usaha, agar kelak dakwahmu berdiri di atas kakimu sendiri.
+        </p>
+        <div class="s-cta-row s-rise" style="--d:270ms">
+          <a class="s-btn s-btn-gold s-btn-lg s-pulse" href="/daftar-stam/">Amankan Kursi Angkatan Pertama <Icon name="arrow-right" /></a>
+          <a class="s-btn s-btn-ghost s-btn-lg" href={wa('tanya')} target="_blank" rel="noopener"><Icon name="chat" /> Tanya Ustadz</a>
+        </div>
+        <ul class="s-hero-points s-rise" style="--d:360ms">
+          <li><Icon name="check" /> Khusus ikhwan lulusan SMA/MA/sederajat</li>
+          <li><Icon name="check" /> Hanya {kuota} kursi untuk angkatan pertama</li>
+          <li><Icon name="check" /> Daftar online, hanya {rp(biaya.pendaftaran)}</li>
+        </ul>
+      </div>
+
+      <aside class="s-ticket s-rise" style="--d:300ms" aria-label="Hitung mundur pendaftaran">
+        <p class="s-ticket-kicker"><span class="s-live"></span> <span data-wave-name>Gelombang 1</span> segera ditutup</p>
+        <div class="s-cd" data-countdown role="timer" aria-live="off">
+          <div><b data-cd="d">00</b><span>hari</span></div>
+          <div><b data-cd="h">00</b><span>jam</span></div>
+          <div><b data-cd="m">00</b><span>menit</span></div>
+          <div><b data-cd="s">00</b><span>detik</span></div>
+        </div>
+        <p class="s-ticket-note">Ditutup <strong data-wave-date>{gelombang[0].label}</strong></p>
+        <hr class="s-tear" />
+        <div class="s-promo">
+          <p class="s-promo-tag">Diskon 50% uang masuk · {kuotaPromo} pendaftar pertama</p>
+          <p class="s-promo-price"><s>{rp(biaya.uangMasukNormal)}</s> <strong>{rp(biaya.uangMasukPromo)}</strong></p>
+          <p class="s-promo-save">Hemat {rp(hemat)}</p>
+        </div>
+        <div class="s-seats s-seats-mini" aria-hidden="true">
+          {seats.map((s) => <i class={`s-seat s-seat-${s.kind}`}></i>)}
+        </div>
+        <p class="s-seats-cap">
+          {sisaPromo === null
+            ? <><b>{kuotaPromo} kursi diskon</b> dari {kuota} kursi total</>
+            : <>Sisa <b>{sisaPromo}</b> dari {kuotaPromo} kursi diskon</>}
+        </p>
+        <a class="s-btn s-btn-gold s-btn-block" href="/daftar-stam/">Daftar sebelum kehabisan <Icon name="arrow-right" /></a>
+      </aside>
+    </div>
+  </section>
+
+  <!-- PITA ANGKA -->
+  <section class="s-ribbon" aria-label="Sekilas STAM">
+    <div class="s-wrap s-ribbon-grid">
+      <div><b class="count" data-count="2" data-suffix=" Tahun">2 Tahun</b><span>1 tahun ilmu, 1 tahun praktik</span></div>
+      <div><b class="count" data-count={kuota}>{kuota}</b><span>kuota maksimal mahasantri</span></div>
+      <div><b><span class="count" data-count="5">5</span> Juz</b><span>target minimal hafalan mutqin</span></div>
+      <div><b>Rp<span class="count" data-count={hemat / 1_000_000} data-suffix=" Juta">{hemat / 1_000_000} Juta</span></b><span>hemat uang masuk, {kuotaPromo} pendaftar pertama</span></div>
+    </div>
+  </section>
+
+  <!-- MASALAH -->
+  <section class="s-sec" id="masalah">
+    <div class="s-wrap">
+      <header class="s-head" data-reveal>
+        <p class="s-kicker">Mengapa STAM ada</p>
+        <h2 class="s-h2">Niat berdakwah itu mulia. <em>Tetapi niat saja belum cukup.</em></h2>
+        <p class="s-lead">Dakwah di tengah masyarakat membutuhkan kader yang bukan hanya paham agama, tetapi juga mampu memimpin dan berdiri mandiri. Tiga celah inilah yang sering menghentikan langkah para calon da’i.</p>
+      </header>
+      <div class="s-gaps">
+        {celah.map((c, i) => (
+          <article class="s-gap" data-reveal style={`--i:${i}`}>
+            <span class="s-gap-no">{c.no}</span>
+            <h3>{c.judul}</h3>
+            <p>{c.teks}</p>
+          </article>
+        ))}
+      </div>
+      <p class="s-bridge" data-reveal>STAM dirancang untuk menutup <em>ketiga celah itu sekaligus</em>, dalam 2 tahun.</p>
+    </div>
+  </section>
+
+  <!-- 3 BEKAL -->
+  <section class="s-sec s-sand" id="bekal">
+    <div class="s-wrap">
+      <header class="s-head s-center" data-reveal>
+        <p class="s-kicker">3 bekal utama</p>
+        <h2 class="s-h2">Bukan sekadar menjadi da’i. <em>Menjadi da’i yang berilmu, mampu memimpin, dan mandiri.</em></h2>
+      </header>
+      <div class="s-bekal">
+        {bekal.map((b, i) => (
+          <article class="s-card" data-reveal style={`--i:${i}`}>
+            <span class="s-ico"><Icon name={b.ikon} /></span>
+            <h3>{b.judul}</h3>
+            <p class="s-card-sub">{b.sub}</p>
+            <ul class="s-list">{b.poin.map((p) => <li>{p}</li>)}</ul>
+          </article>
+        ))}
+      </div>
+      <article class="s-card s-card-wide" data-reveal>
+        <span class="s-ico s-ico-gold"><Icon name="mosque" /></span>
+        <div>
+          <h3>Plus: praktik lapangan sungguhan</h3>
+          <p>Belajar langsung lewat magang dan kemitraan dengan lembaga independen yang terpercaya: masjid, pesantren, sekolah Islam, lembaga sosial dan dakwah, media dakwah, hingga unit usaha, lengkap dengan pembimbing, target kompetensi, laporan kegiatan, dan evaluasi akhir.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- KURIKULUM: 2 TAHUN -->
+  <section class="s-sec s-dark" id="kurikulum">
+    <div class="s-wrap">
+      <header class="s-head" data-reveal>
+        <p class="s-kicker s-kicker-gold">Perjalanan 2 tahun</p>
+        <h2 class="s-h2">Dua tahun akan berlalu, <em>apa pun pilihanmu.</em></h2>
+        <p class="s-lead">Pertanyaannya hanya satu: dua tahun ke depan kamu ingin menjadi siapa? Di STAM, setiap bulannya terarah, dari ruang kelas hingga lapangan dakwah.</p>
+      </header>
+      <div class="s-path" data-reveal aria-hidden="true">
+        <span class="s-path-a">1 Tahun · Pendalaman Ilmu Syar’i</span>
+        <span class="s-path-b">1 Tahun · Praktik Lapangan</span>
+      </div>
+      <div class="s-years">
+        <article class="s-year" data-reveal>
+          <p class="s-year-no">Tahun 1</p>
+          <h3>Pendalaman ilmu & pembinaan intensif</h3>
+          <ul class="s-list s-list-light">
+            <li>Al-Qur’an dan tahfizh, target minimal 5 juz mutqin</li>
+            <li>Aqidah & akhlak, hadits, fiqih, dan bahasa Arab</li>
+            <li>Leadership dan pengembangan karakter</li>
+            <li>Entrepreneurship, manajemen organisasi & industri, manajemen keuangan</li>
+            <li>Keterampilan dakwah dan komunikasi</li>
+          </ul>
+        </article>
+        <article class="s-year s-year-b" data-reveal style="--i:1">
+          <p class="s-year-no">Tahun 2</p>
+          <h3>Tadrib: praktik lapangan</h3>
+          <ul class="s-list s-list-light">
+            <li>Magang di masjid, pesantren, sekolah Islam, lembaga sosial & dakwah, media dakwah, atau unit usaha</li>
+            <li>Dibimbing langsung oleh pembimbing lapangan</li>
+            <li>Target kompetensi yang jelas dan terukur</li>
+            <li>Laporan kegiatan dan evaluasi akhir</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- LULUSAN -->
+  <section class="s-sec" id="lulusan">
+    <div class="s-wrap">
+      <header class="s-head" data-reveal>
+        <p class="s-kicker">Setelah 2 tahun</p>
+        <h2 class="s-h2">Lulusan STAM adalah da’i yang <em>siap diturunkan ke tengah umat.</em></h2>
+      </header>
+      <div class="s-grid3">
+        {lulusan.map((l, i) => (
+          <article class="s-mini" data-reveal style={`--i:${i % 3}`}>
+            <span class="s-tick"><Icon name="check" /></span>
+            <h3>{l.judul}</h3>
+            <p>{l.teks}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FASILITAS -->
+  <section class="s-sec s-sand" id="fasilitas">
+    <div class="s-wrap s-fas">
+      <div class="s-fas-copy" data-reveal>
+        <p class="s-kicker">Fasilitas</p>
+        <h2 class="s-h2">Tempat belajar yang <em>nyaman dan sepenuhnya milik sendiri.</em></h2>
+        <p class="s-lead">Belajar, beribadah, makan, dan beristirahat dalam satu lingkungan di Graha Mawaddah, Pondok Ranggon, Jakarta Timur.</p>
+        <ul class="s-checks">{fasilitas.map((f) => <li><Icon name="check" /> {f}</li>)}</ul>
+        <a class="s-link" href={stamInfo.peta} target="_blank" rel="noopener"><Icon name="map-pin" /> Lihat lokasi di Google Maps</a>
+      </div>
+      <div class="s-photos" data-reveal style="--i:1">
+        <figure class="s-ph s-ph-a"><Image src={gedung} alt="Gedung Graha Mawaddah tempat STAM" widths={[480, 800]} sizes="(min-width: 960px) 28rem, 90vw" /></figure>
+        <figure class="s-ph s-ph-b"><Image src={masjid} alt="Ruang shalat di Graha Mawaddah" widths={[480, 800]} sizes="(min-width: 960px) 20rem, 60vw" /></figure>
+        <figure class="s-ph s-ph-c"><Image src={kelas} alt="Ruang kelas STAM" widths={[480, 800]} sizes="(min-width: 960px) 20rem, 60vw" /></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- COCOK / BELUM COCOK -->
+  <section class="s-sec" id="cocok">
+    <div class="s-wrap">
+      <header class="s-head s-center" data-reveal>
+        <p class="s-kicker">Seleksi diri</p>
+        <h2 class="s-h2">STAM <em>cocok untukmu</em> jika…</h2>
+      </header>
+      <div class="s-fit">
+        <div class="s-fit-yes" data-reveal>
+          <h3>Ini kamu</h3>
+          <ul>{cocok.map((c) => <li><Icon name="check" /> {c}</li>)}</ul>
+        </div>
+        <div class="s-fit-no" data-reveal style="--i:1">
+          <h3>Mungkin belum waktunya jika</h3>
+          <ul>{belum.map((c) => <li><Icon name="x" /> {c}</li>)}</ul>
+          <p>Jujur pada diri sendiri adalah langkah pertama menjadi da’i yang amanah.</p>
+        </div>
+      </div>
+      <div class="s-parents" data-reveal>
+        <div>
+          <p class="s-kicker s-kicker-gold">Untuk Ayah &amp; Bunda</p>
+          <h3>Titipkan putra Anda di tempat yang jelas dan terpercaya.</h3>
+        </div>
+        <ul>
+          <li><Icon name="shield" /><span><b>Berbadan hukum.</b> Yayasan Mawaddah Indonesia berdiri sejak {site.founded}, {legalitas[1].value}.</span></li>
+          <li><Icon name="home" /><span><b>Lingkungan terbina.</b> Gedung, masjid, dan dapur milik sendiri, dengan asrama berpendingin ruangan.</span></li>
+          <li><Icon name="file" /><span><b>Biaya jelas.</b> Pendaftaran, uang masuk, dan syahriyah tertulis terbuka di halaman ini.</span></li>
+          <li><Icon name="chat" /><span><b>Mudah dihubungi.</b> Dua ustadz admin siap menjawab langsung lewat WhatsApp.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BIAYA -->
+  <section class="s-sec s-dark s-price" id="biaya">
+    <Image class="s-price-mark" src={markLight} alt="" aria-hidden="true" />
+    <div class="s-wrap s-price-grid">
+      <div class="s-price-copy" data-reveal>
+        <p class="s-kicker s-kicker-gold">Biaya & kuota</p>
+        <h2 class="s-h2">Kursi angkatan pertama <em>terbatas.</em> Diskonnya lebih terbatas lagi.</h2>
+        <p class="s-lead">Hanya <strong>{kuota} mahasantri</strong> yang kami terima. Dari {kuota} kursi itu, <strong>{kuotaPromo} pendaftar pertama</strong> mendapat diskon 50% uang masuk, dihitung berdasarkan urutan pendaftar, bukan siapa yang paling lama berpikir.</p>
+        <div class="s-seats" aria-hidden="true">
+          {seats.map((s) => <i class={`s-seat s-seat-${s.kind}`}></i>)}
+        </div>
+        <ul class="s-legend">
+          <li><i class="s-seat s-seat-promo"></i> {kuotaPromo} kursi diskon 50%</li>
+          <li><i class="s-seat s-seat-reg"></i> {kuota - kuotaPromo} kursi reguler</li>
+          {terisi !== null && <li><i class="s-seat s-seat-taken"></i> Sudah terisi ({terisi})</li>}
+        </ul>
+        {sisaPromo !== null && <p class="s-hot"><span class="s-live"></span> Sisa {sisaPromo} kursi diskon dari {kuotaPromo}</p>}
+      </div>
+
+      <div class="s-bill" data-reveal style="--i:1">
+        <p class="s-bill-head">Tiket Angkatan Pertama</p>
+        <dl>
+          <div><dt>Pendaftaran <small>sekali bayar</small></dt><dd>{rp(biaya.pendaftaran)}</dd></div>
+          <div class="s-bill-main"><dt>Uang masuk <small>diskon 50% · {kuotaPromo} pendaftar pertama</small></dt><dd><s>{rp(biaya.uangMasukNormal)}</s>{rp(biaya.uangMasukPromo)}</dd></div>
+          <div><dt>Syahriyah <small>per bulan · ± Rp{perHari} ribu per hari</small></dt><dd>{rp(biaya.syahriyah)}</dd></div>
+        </dl>
+        <p class="s-save">Anda hemat <b>{rp(hemat)}</b> bila termasuk {kuotaPromo} pendaftar pertama.</p>
+        <a class="s-btn s-btn-gold s-btn-block s-btn-lg" href="/daftar-stam/">Amankan Kursi Saya <Icon name="arrow-right" /></a>
+        <div class="s-rek">
+          <p>Transfer biaya pendaftaran hanya ke rekening resmi:</p>
+          <button type="button" class="s-copy" data-copy={stamInfo.rekening}>
+            <span><b>BSI {stamInfo.rekening}</b><small>a.n. {stamInfo.atasNama}</small></span>
+            <span class="s-copy-l"><Icon name="copy" /> <span data-copy-label>Salin</span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALUR & GELOMBANG -->
+  <section class="s-sec s-sand" id="alur">
+    <div class="s-wrap">
+      <header class="s-head s-center" data-reveal>
+        <p class="s-kicker">Cara mendaftar</p>
+        <h2 class="s-h2">Lima langkah <em>menuju bangku mahasantri.</em></h2>
+      </header>
+      <ol class="s-steps">
+        {alur.map((a, i) => (
+          <li class="s-step" data-reveal style={`--i:${i}`}>
+            <span class="s-step-no">{i + 1}</span>
+            <h3>{a.judul}</h3>
+            <p>{a.teks}</p>
+          </li>
+        ))}
+      </ol>
+
+      <div class="s-waves" data-reveal>
+        <h3>Jadwal pendaftaran</h3>
+        <div class="s-wave-list" data-wave-list>
+          {gelombang.map((g, i) => (
+            <div class:list={['s-wave', { 'is-now': i === 0 }]} data-wave={g.no}>
+              <p class="s-wave-n">Gelombang {g.no}</p>
+              <p class="s-wave-d">Ditutup {g.label}</p>
+              <p class="s-wave-s" data-wave-status>{i === 0 ? 'Sedang dibuka' : 'Segera'}</p>
+            </div>
+          ))}
+        </div>
+        <p class="s-small">Syarat & berkas: {syarat.join(' · ')}.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DI BALIK STAM -->
+  <section class="s-sec" id="tim">
+    <div class="s-wrap">
+      <header class="s-head" data-reveal>
+        <p class="s-kicker">Di balik STAM</p>
+        <h2 class="s-h2">Dikelola <em>Yayasan Mawaddah Indonesia</em>, lembaga dakwah, pendidikan, dan sosial sejak {site.founded}.</h2>
+        <p class="s-lead">Yayasan yang juga mengelola Wesal TV, pesantren Taisiru Ar-Rahman Boarding School, wakaf mushaf Al-Qur’an, serta pembangunan masjid dan sumur. Berbadan hukum dengan {legalitas[1].value}.</p>
+      </header>
+      <div class="s-grid3">
+        {[
+          { n: 'M. Ibrahim Ar-Rayyan, Lc, S.Pd, M.Pd', r: 'Mudir STAM' },
+          { n: 'Sa’im Kurniawan, A.Md, S.Pd.I', r: 'Kepala Depdik' },
+          { n: 'KH. Afifuddien, S.H.I., M.M.', r: 'Ketua Yayasan' },
+        ].map((p, i) => (
+          <article class="s-person" data-reveal style={`--i:${i}`}>
+            <span class="s-avatar" aria-hidden="true"><Image src={markDark} alt="" width={40} /></span>
+            <p class="s-person-r">{p.r}</p>
+            <h3>{p.n}</h3>
+          </article>
+        ))}
+      </div>
+      <p class="s-support" data-reveal>Didukung oleh: <b>Wesal TV</b> · <b>Yayasan Mawaddah Indonesia</b> · <b>Almaz Tour</b></p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="s-sec s-sand" id="faq">
+    <div class="s-wrap s-faq-wrap">
+      <header class="s-head" data-reveal>
+        <p class="s-kicker">Tanya jawab</p>
+        <h2 class="s-h2">Yang paling sering <em>ditanyakan.</em></h2>
+        <p class="s-lead">Belum menemukan jawabannya? Tanyakan langsung kepada ustadz admin kami.</p>
+        <a class="s-btn s-btn-olive" href={wa('tanya', 1)} target="_blank" rel="noopener"><Icon name="chat" /> Chat {admin[1].nama}</a>
+      </header>
+      <div class="s-faq" data-reveal style="--i:1">
+        {faq.map((f, i) => (
+          <details class="s-q" open={i === 0}>
+            <summary><span>{f.q}</span><Icon name="chevron-down" /></summary>
+            <div class="s-a" set:html={f.a} />
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PENUTUP -->
+  <section class="s-final" id="daftar">
+    <Image class="s-final-mark" src={markLight} alt="" aria-hidden="true" />
+    <div class="s-wrap s-final-in">
+      <p class="s-ayat arab" lang="ar" dir="rtl">وَلْتَكُن مِّنكُمْ أُمَّةٌ يَدْعُونَ إِلَى ٱلْخَيْرِ وَيَأْمُرُونَ بِٱلْمَعْرُوفِ وَيَنْهَوْنَ عَنِ ٱلْمُنكَرِ ۚ وَأُو۟لَٰٓئِكَ هُمُ ٱلْمُفْلِحُونَ</p>
+      <p class="s-ayat-t">“Dan hendaklah ada di antara kamu segolongan orang yang menyeru kepada kebajikan, menyuruh (berbuat) yang makruf, dan mencegah dari yang mungkar. Mereka itulah orang-orang yang beruntung.” <span>(QS. Ali ‘Imran: 104)</span></p>
+      <h2 class="s-h2 s-final-h">Jadilah salah satu dari <em>{kuota} perintis</em> angkatan pertama STAM.</h2>
+      <p class="s-lead s-final-lead">Dua tahun lagi akan tiba. Pilih untuk tiba sebagai da’i yang berilmu, mampu memimpin, dan mandiri. <strong data-wave-label-2>Gelombang 1 ditutup {gelombang[0].label}.</strong></p>
+      <div class="s-cd s-cd-wide" data-countdown aria-hidden="true">
+        <div><b data-cd="d">00</b><span>hari</span></div>
+        <div><b data-cd="h">00</b><span>jam</span></div>
+        <div><b data-cd="m">00</b><span>menit</span></div>
+        <div><b data-cd="s">00</b><span>detik</span></div>
+      </div>
+      <div class="s-cta-row s-cta-center">
+        <a class="s-btn s-btn-gold s-btn-lg s-pulse" href="/daftar-stam/">Daftar STAM Sekarang <Icon name="arrow-right" /></a>
+      </div>
+      <p class="s-or">Atau tanya langsung kepada ustadz admin:</p>
+      <div class="s-cta-row s-cta-center s-cta-wa">
+        {admin.map((a, i) => (
+          <a class="s-btn s-btn-ghost" href={wa('daftar', i)} target="_blank" rel="noopener"><Icon name="chat" /> {a.nama} · {a.tampil}</a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <footer class="s-footer">
+    <div class="s-wrap s-footer-in">
+      <div>
+        <Image src={lockupLight} alt="Sekolah Tadrib Ad-Du’at Mawaddah" width={360} height={126} />
+        <p class="s-footer-t">Sekolah Tadrib Ad-Du’at Mawaddah · program Yayasan Mawaddah Indonesia.</p>
+      </div>
+      <address>
+        <p><Icon name="map-pin" /> {stamInfo.alamat}</p>
+        <p><Icon name="phone" /> {admin.map((a) => `${a.tampil} (${a.nama})`).join(' · ')}</p>
+        <p><Icon name="instagram" /> <a href={`https://instagram.com/${stamInfo.instagram}`} target="_blank" rel="noopener">@{stamInfo.instagram}</a></p>
+      </address>
+      <div class="s-footer-l">
+        <nav aria-label="Tautan situs"><a href="/">Situs Yayasan Mawaddah Indonesia</a><a href="/psb/">PSB &amp; PMB</a><a href="/kontak/">Kontak</a></nav>
+        <p>© {new Date().getFullYear()} Yayasan Mawaddah Indonesia</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bilah CTA seluler -->
+  <div class="s-mbar" data-mbar>
+    <a class="s-btn s-btn-gold" href="/daftar-stam/"><span data-mbar-text>Daftar STAM Sekarang</span> <Icon name="arrow-right" /></a>
+    <a class="s-mbar-wa" href={wa('tanya')} target="_blank" rel="noopener" aria-label="Tanya admin via WhatsApp"><Icon name="chat" /></a>
+  </div>
+</Base>
+
+<script>
+  type Wave = { no: number; label: string; end: string };
+  const waves: Wave[] = JSON.parse(document.getElementById('stam-waves')?.textContent ?? '[]');
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const $$ = <T extends HTMLElement>(s: string) => [...document.querySelectorAll<T>(s)];
+
+  function tick() {
+    const now = Date.now();
+    const cur = waves.find((w) => new Date(w.end).getTime() > now);
+    const idx = cur ? waves.indexOf(cur) : waves.length;
+
+    // status tiap gelombang
+    $$('[data-wave]').forEach((el) => {
+      const i = Number(el.dataset.wave) - 1;
+      el.classList.toggle('is-now', i === idx);
+      el.classList.toggle('is-past', i < idx);
+      const st = el.querySelector('[data-wave-status]');
+      if (st) st.textContent = i < idx ? 'Telah ditutup' : i === idx ? 'Sedang dibuka' : 'Segera';
+    });
+
+    if (!cur) {
+      $$('[data-wave-name]').forEach((e) => (e.textContent = 'Pendaftaran'));
+      $$('[data-wave-label]').forEach((e) => (e.textContent = 'Seluruh gelombang telah ditutup, hubungi admin untuk info terbaru'));
+      $$('[data-wave-label-2]').forEach((e) => (e.textContent = 'Hubungi admin untuk info gelombang berikutnya.'));
+      $$('[data-countdown]').forEach((e) => (e.hidden = true));
+      return;
+    }
+
+    const ms = Math.max(0, new Date(cur.end).getTime() - now);
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
+    const v: Record<string, string> = { d: pad(d), h: pad(h), m: pad(m), s: pad(s) };
+    $$('[data-cd]').forEach((e) => (e.textContent = v[e.dataset.cd!]));
+
+    $$('[data-wave-name]').forEach((e) => (e.textContent = `Gelombang ${cur.no}`));
+    $$('[data-wave-date]').forEach((e) => (e.textContent = cur.label));
+    $$('[data-wave-label]').forEach((e) => (e.textContent = `Gelombang ${cur.no} ditutup ${cur.label}`));
+    $$('[data-wave-label-2]').forEach((e) => (e.textContent = `Gelombang ${cur.no} ditutup ${cur.label}.`));
+
+    const left = d > 0 ? `${d} hari lagi` : h > 0 ? `${h} jam lagi` : 'hari terakhir';
+    $$('[data-days-left]').forEach((e) => { e.hidden = false; e.textContent = `· ${left}`; });
+    document.body.classList.toggle('is-hot', d < 4);
+    $$('[data-mbar-text]').forEach((e) => (e.textContent = d < 4 ? `Daftar · ${left}` : 'Daftar STAM Sekarang'));
+  }
+  tick();
+  let timer = window.setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', () => {
+    window.clearInterval(timer);
+    if (!document.hidden) { tick(); timer = window.setInterval(tick, 1000); }
+  });
+
+  // Bilah CTA seluler: muncul setelah hero lewat, hilang saat bagian biaya/penutup terlihat
+  const bar = document.querySelector<HTMLElement>('[data-mbar]');
+  const hero = document.getElementById('atas');
+  if (bar && hero && 'IntersectionObserver' in window) {
+    let heroOut = false, ctaIn = false;
+    const apply = () => bar.classList.toggle('is-on', heroOut && !ctaIn);
+    new IntersectionObserver(([e]) => { heroOut = !e.isIntersecting; apply(); }).observe(hero);
+    const io = new IntersectionObserver((es) => { ctaIn = es.some((e) => e.isIntersecting); apply(); });
+    ['biaya', 'daftar'].forEach((id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  }
+</script>
+
+<style is:global>
+  body.stam {
+    --cream: #fffcf3;
+    --sand: #f6f0df;
+    --sand-2: #ece3c9;
+    --ink: #23251b;
+    --ink-soft: #55574a;
+    --sage: #737665;
+    --sage-deep: #4e5142;
+    --olive: #2b2e22;
+    --olive-deep: #1f2118;
+    --gold: #bc9c61;
+    --gold-light: #e0c48a;
+    --gold-deep: #7f6228;
+    --rust: #b4532a;
+    --line: rgb(35 37 27 / 0.13);
+    --paper: var(--cream);
+    --f-serif: 'Lora Variable', Georgia, 'Times New Roman', serif;
+    --s-gutter: clamp(1.25rem, 0.6rem + 3.2vw, 3.5rem);
+    background: var(--cream);
+    color: var(--ink);
+    padding-bottom: 0;
+  }
+  .stam ::selection { background: var(--gold-light); color: var(--olive-deep); }
+  .stam :focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 3px; }
+  .stam .s-dark :focus-visible, .stam .s-hero :focus-visible, .stam .s-final :focus-visible, .stam .s-header :focus-visible, .stam .s-footer :focus-visible { outline-color: var(--gold-light); }
+  .stam .s-wrap { width: min(100% - 2 * var(--s-gutter), 74rem); margin-inline: auto; }
+  .stam .s-hide-sm { display: none; }
+  @media (min-width: 640px) { .stam .s-hide-sm { display: inline; } }
+
+  /* — Pita pengumuman — */
+  .s-announce { background: linear-gradient(90deg, var(--gold-light), #ecd49c 50%, var(--gold-light)); color: var(--olive-deep); }
+  @media (min-width: 640px) { .s-announce-in { font-size: 0.875rem; } }
+  .s-announce-in { font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 0.55rem var(--s-gutter); text-align: center; line-height: 1.35; }
+  .s-announce-in .icon { width: 1.05em; height: 1.05em; }
+  .s-announce-left { font-weight: 700; color: var(--rust); }
+  .is-hot .s-announce-left { animation: s-blink 1.4s steps(2, jump-none) infinite; }
+  @keyframes s-blink { 50% { opacity: 0.45; } }
+
+  /* — Header — */
+  .s-header { position: sticky; top: 0; z-index: 40; background: rgb(31 33 24 / 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid rgb(224 196 138 / 0.16); }
+  .s-header-in { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.25rem; }
+  .s-brand img { height: 2.35rem; width: auto; }
+  .s-nav { display: none; gap: 1.75rem; font-size: 0.9rem; font-weight: 560; color: #d8d3bd; }
+  .s-nav a { padding: 0.4rem 0; transition: color 200ms; }
+  .s-nav a:hover { color: var(--gold-light); }
+  @media (min-width: 1000px) { .s-nav { display: flex; } }
+
+  /* — Tombol — */
+  .s-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.6em; min-height: 3rem; padding: 0.8rem 1.4rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; line-height: 1.2; text-align: center; transition: transform 160ms var(--ease-out), box-shadow 300ms, background 300ms, color 300ms; cursor: pointer; }
+  .s-btn:active { transform: scale(0.97); }
+  .s-btn-sm { min-height: 2.6rem; padding: 0.5rem 1.1rem; font-size: 0.875rem; }
+  .s-btn-lg { min-height: 3.4rem; padding: 0.95rem 1.75rem; font-size: 1rem; }
+  .s-btn-block { width: 100%; }
+  .s-btn-gold { background: linear-gradient(180deg, #ecd49c, var(--gold-light) 40%, var(--gold)); color: var(--olive-deep); box-shadow: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 10px 26px -10px rgb(188 156 97 / 0.7); }
+  .s-btn-ghost { box-shadow: inset 0 0 0 1.5px rgb(255 252 243 / 0.5); color: var(--cream); }
+  .s-btn-olive { background: var(--olive); color: var(--cream); }
+  @media (hover: hover) {
+    .s-btn-gold:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 16px 34px -10px rgb(188 156 97 / 0.85); }
+    .s-btn-ghost:hover { background: var(--cream); color: var(--olive-deep); }
+    .s-btn-olive:hover { background: var(--sage-deep); }
+  }
+  .s-pulse { animation: s-pulse 2.8s var(--ease-out) infinite; }
+  @keyframes s-pulse { 0% { box-shadow: 0 0 0 0 rgb(224 196 138 / 0.55), 0 10px 26px -10px rgb(188 156 97 / 0.7); } 70%, 100% { box-shadow: 0 0 0 16px rgb(224 196 138 / 0), 0 10px 26px -10px rgb(188 156 97 / 0.7); } }
+
+  /* — Hero — */
+  .s-hero { position: relative; overflow: clip; isolation: isolate; color: var(--cream); background:
+    radial-gradient(60rem 38rem at 85% -10%, rgb(188 156 97 / 0.22), transparent 60%),
+    radial-gradient(48rem 30rem at -10% 110%, rgb(115 118 101 / 0.35), transparent 60%),
+    linear-gradient(160deg, #2b2e22 0%, #1f2118 70%); padding-block: clamp(2.5rem, 1.5rem + 5vw, 6.5rem) clamp(3rem, 2rem + 4vw, 6rem); }
+  .s-hero-mark { position: absolute; z-index: -1; right: -6%; bottom: -14%; width: min(66vw, 46rem); height: auto; opacity: 0.07; pointer-events: none; }
+  .s-orb { position: absolute; z-index: -1; border-radius: 50%; background: var(--gold); opacity: 0.9; }
+  .s-orb-a { width: 0.9rem; height: 0.9rem; right: 9%; top: 5%; animation: s-float 7s ease-in-out infinite; }
+  .s-orb-b { width: 0.55rem; height: 0.55rem; right: 44%; bottom: 12%; background: var(--gold-light); animation: s-float 9s ease-in-out infinite reverse; }
+  @keyframes s-float { 50% { transform: translateY(-14px); } }
+  @media (min-width: 980px) { .s-orb-a { right: auto; left: 3%; top: 12%; } }
+  .s-hero-grid { display: grid; gap: 2.5rem; align-items: center; }
+  @media (min-width: 980px) { .s-hero-grid { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr); gap: 3.5rem; } }
+  .s-rise { animation: s-rise 1s var(--ease-out) both; animation-delay: var(--d, 0ms); }
+  @keyframes s-rise { from { opacity: 0; transform: translateY(22px); } }
+  .s-chip { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.45rem 1rem; border-radius: 999px; background: rgb(224 196 138 / 0.12); border: 1px solid rgb(224 196 138 / 0.3); color: var(--gold-light); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; line-height: 1.35; }
+  .s-dot { flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--gold-light); }
+  .s-h1 { margin-top: 1.4rem; font-size: clamp(2.6rem, 1.2rem + 5.6vw, 4.9rem); font-weight: 800; line-height: 1.02; letter-spacing: -0.035em; color: var(--cream); text-wrap: balance; }
+  @media (min-width: 980px) { .s-h1 { white-space: nowrap; } }
+  .s-h1 em { display: block; font-family: var(--f-serif); font-style: italic; font-weight: 600; letter-spacing: -0.02em; color: var(--gold-light); }
+  .s-hero-lead { margin-top: 1.5rem; max-width: 34rem; font-size: clamp(1.05rem, 1rem + 0.35vw, 1.25rem); line-height: 1.65; color: #ddd8c4; }
+  .s-hero-lead strong { color: var(--cream); }
+  .s-cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2rem; }
+  .s-cta-center { justify-content: center; }
+  @media (max-width: 520px) { .s-cta-row .s-btn { width: 100%; } }
+  .s-hero-points { margin-top: 1.75rem; display: grid; gap: 0.5rem; font-size: 0.95rem; color: #d3cdb4; list-style: none; padding: 0; }
+  .s-hero-points li { display: flex; align-items: center; gap: 0.6rem; }
+  .s-hero-points .icon { color: var(--gold-light); }
+
+  /* Tiket hitung mundur */
+  .s-ticket { background: var(--cream); color: var(--ink); border-radius: 1.75rem; padding: clamp(1.4rem, 1rem + 1.6vw, 2.1rem); box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.65), 0 0 0 1px rgb(224 196 138 / 0.35); position: relative; }
+  .s-ticket-kicker { display: flex; align-items: center; gap: 0.55rem; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rust); }
+  .s-live { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--rust); box-shadow: 0 0 0 0 rgb(180 83 42 / 0.6); animation: s-live 1.8s infinite; flex: none; }
+  @keyframes s-live { 70% { box-shadow: 0 0 0 9px rgb(180 83 42 / 0); } 100% { box-shadow: 0 0 0 0 rgb(180 83 42 / 0); } }
+  .s-cd { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; margin-top: 1rem; }
+  .s-cd > div { background: var(--olive-deep); color: var(--cream); border-radius: 0.9rem; padding: 0.75rem 0.25rem 0.6rem; text-align: center; }
+  .s-cd b { display: block; font-size: clamp(1.7rem, 1.2rem + 1.8vw, 2.5rem); line-height: 1; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--gold-light); }
+  .s-cd span { display: block; margin-top: 0.35rem; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: #c9c4ac; }
+  .s-ticket-note { margin-top: 0.85rem; font-size: 0.9rem; color: var(--ink-soft); text-align: center; }
+  .s-tear { border: 0; border-top: 2px dashed var(--sand-2); margin: 1.25rem 0; }
+  .s-promo { text-align: center; }
+  .s-promo-tag { font-size: 0.8rem; font-weight: 700; color: var(--gold-deep); letter-spacing: 0.03em; }
+  .s-promo-price { margin-top: 0.35rem; display: flex; justify-content: center; align-items: baseline; flex-wrap: wrap; gap: 0.2rem 0.8rem; }
+  .s-promo-price s { font-size: 1.05rem; color: var(--ink-soft); text-decoration-color: var(--rust); text-decoration-thickness: 2px; }
+  .s-promo-price strong { font-size: clamp(2rem, 1.5rem + 1.8vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .s-promo-save { display: inline-block; margin-top: 0.35rem; padding: 0.25rem 0.8rem; border-radius: 999px; background: #f4e1d8; color: var(--rust); font-weight: 700; font-size: 0.85rem; }
+  .s-seats-mini { margin-block: 1.1rem 0.4rem; }
+  .s-seats-cap { font-size: 0.85rem; color: var(--ink-soft); text-align: center; margin-bottom: 1.1rem; }
+  .s-seats-cap b { color: var(--ink); }
+
+  /* Kursi (titik logo) */
+  .s-seats { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.45rem; max-width: 26rem; }
+  .s-seats-mini { max-width: none; gap: 0.3rem; }
+  .s-seat { display: block; aspect-ratio: 1; border-radius: 50%; }
+  .s-seat-promo { background: var(--gold); box-shadow: 0 0 0 2px rgb(188 156 97 / 0.25); }
+  .s-seat-reg { background: transparent; box-shadow: inset 0 0 0 2px var(--sage); }
+  .s-seat-taken { background: #5b5e4d; box-shadow: none; opacity: 0.55; }
+  .s-price .s-seat-reg { box-shadow: inset 0 0 0 2px #8d907d; }
+
+  /* — Pita angka — */
+  .s-ribbon { background: linear-gradient(180deg, var(--gold-light), #d7b977); color: var(--olive-deep); }
+  .s-ribbon-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem 1rem; padding-block: 1.75rem; }
+  @media (min-width: 840px) { .s-ribbon-grid { grid-template-columns: repeat(4, 1fr); padding-block: 2.25rem; } }
+  .s-ribbon-grid > div { padding-inline: 0.25rem; }
+  .s-ribbon b { display: block; font-size: clamp(1.7rem, 1.2rem + 2vw, 2.75rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+  .s-ribbon-grid > div > span { display: block; margin-top: 0.3rem; font-size: 0.88rem; line-height: 1.4; color: #4a431f; }
+  @media (min-width: 840px) { .s-ribbon-grid > div + div { border-left: 1px solid rgb(35 37 27 / 0.2); padding-left: 1.5rem; } }
+
+  /* — Seksi umum — */
+  .s-sec { padding-block: clamp(4rem, 2.5rem + 6vw, 8rem); }
+  .s-sand { background: var(--sand); }
+  .s-dark { background: linear-gradient(170deg, #2b2e22, #1f2118); color: var(--cream); }
+  .s-head { max-width: 46rem; margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem); }
+  .s-center { text-align: center; margin-inline: auto; }
+  .s-kicker { display: inline-block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
+  .s-kicker::before { content: ''; display: inline-block; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--gold); margin-right: 0.65rem; vertical-align: 0.05em; }
+  .s-kicker-gold { color: var(--gold-light); }
+  .s-h2 { margin-top: 0.9rem; font-size: clamp(2rem, 1.3rem + 2.9vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; color: var(--ink); text-wrap: balance; }
+  .s-h2 em { font-family: var(--f-serif); font-style: italic; font-weight: 600; letter-spacing: -0.015em; color: var(--gold-deep); }
+  .s-dark .s-h2, .s-final .s-h2 { color: var(--cream); }
+  .s-dark .s-h2 em, .s-final .s-h2 em { color: var(--gold-light); }
+  .s-lead { margin-top: 1.2rem; font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); line-height: 1.7; color: var(--ink-soft); max-width: 40rem; }
+  .s-center .s-lead { margin-inline: auto; }
+  .s-dark .s-lead, .s-final .s-lead { color: #d3cdb4; }
+  .s-dark .s-lead strong, .s-final .s-lead strong { color: var(--cream); }
+  .s-link { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; font-weight: 650; color: var(--gold-deep); border-bottom: 1.5px solid currentColor; padding-bottom: 0.15rem; }
+
+  /* Masalah */
+  .s-gaps { display: grid; gap: 1.25rem; }
+  @media (min-width: 880px) { .s-gaps { grid-template-columns: repeat(3, 1fr); gap: 1.5rem; } }
+  .s-gap { position: relative; padding: 2rem 1.75rem 1.9rem; border-radius: 1.5rem 1.5rem 1.5rem 0.4rem; background: #fff; box-shadow: 0 1px 0 var(--line) inset, 0 18px 40px -26px rgb(35 37 27 / 0.35); border: 1px solid var(--line); overflow: hidden; }
+  .s-gap-no { position: absolute; right: 1.2rem; top: 0.4rem; font-size: 4.2rem; font-weight: 800; letter-spacing: -0.04em; color: var(--sand-2); line-height: 1; }
+  .s-gap h3 { position: relative; font-size: 1.3rem; font-weight: 700; line-height: 1.25; max-width: 14ch; color: var(--ink); }
+  .s-gap p { position: relative; margin-top: 0.8rem; color: var(--ink-soft); line-height: 1.7; }
+  .s-bridge { margin-top: clamp(2rem, 1.5rem + 2vw, 3.5rem); font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.1rem); font-weight: 700; letter-spacing: -0.02em; text-align: center; text-wrap: balance; }
+  .s-bridge em { font-family: var(--f-serif); font-weight: 600; color: var(--gold-deep); }
+
+  /* Bekal */
+  .s-bekal { display: grid; gap: 1.25rem; }
+  @media (min-width: 880px) { .s-bekal { grid-template-columns: repeat(3, 1fr); } }
+  .s-card { padding: 2rem 1.75rem; border-radius: 1.75rem; background: var(--cream); border: 1px solid var(--line); box-shadow: 0 20px 44px -28px rgb(35 37 27 / 0.4); }
+  .s-card h3 { margin-top: 1.1rem; font-size: 1.5rem; font-weight: 750; letter-spacing: -0.02em; }
+  .s-card-sub { margin-top: 0.2rem; font-weight: 600; color: var(--gold-deep); font-size: 0.95rem; }
+  .s-ico { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--sage); color: var(--cream); }
+  .s-ico .icon { width: 1.5rem; height: 1.5rem; }
+  .s-ico-gold { background: var(--gold); color: var(--olive-deep); flex: none; }
+  .s-list { list-style: none; padding: 0; margin-top: 1.1rem; display: grid; gap: 0.6rem; }
+  .s-list li { position: relative; padding-left: 1.6rem; line-height: 1.55; color: var(--ink-soft); }
+  .s-list li::before { content: ''; position: absolute; left: 0; top: 0.55em; width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--gold); }
+  .s-list-light li { color: #d9d4be; }
+  .s-card-wide { margin-top: 1.25rem; display: grid; gap: 1.25rem; align-items: start; background: var(--olive); color: var(--cream); border-color: transparent; }
+  @media (min-width: 720px) { .s-card-wide { grid-template-columns: auto 1fr; gap: 1.75rem; align-items: center; padding: 2rem 2.25rem; } }
+  .s-card-wide h3 { margin-top: 0; color: var(--cream); }
+  .s-card-wide p { margin-top: 0.5rem; color: #d3cdb4; line-height: 1.7; }
+
+  /* Perjalanan */
+  .s-path { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.5rem; font-weight: 700; font-size: clamp(0.78rem, 0.7rem + 0.5vw, 1rem); }
+  .s-path span { padding: 0.9rem 1rem; text-align: center; line-height: 1.3; }
+  .s-path-a { background: var(--sage); color: var(--cream); border-radius: 999px 0 0 999px; }
+  .s-path-b { background: var(--gold); color: var(--olive-deep); border-radius: 0 999px 999px 0; }
+  .s-years { display: grid; gap: 1.25rem; }
+  @media (min-width: 840px) { .s-years { grid-template-columns: 1fr 1fr; } }
+  .s-year { padding: 2rem; border-radius: 1.75rem; background: rgb(255 252 243 / 0.05); border: 1px solid rgb(224 196 138 / 0.22); }
+  .s-year-b { background: rgb(188 156 97 / 0.1); border-color: rgb(224 196 138 / 0.4); }
+  .s-year-no { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-light); }
+  .s-year h3 { margin-top: 0.5rem; font-size: 1.55rem; font-weight: 750; letter-spacing: -0.02em; color: var(--cream); }
+
+  /* Lulusan */
+  .s-grid3 { display: grid; gap: 1.1rem; }
+  @media (min-width: 680px) { .s-grid3 { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .s-grid3 { grid-template-columns: repeat(3, 1fr); } }
+  .s-mini { padding: 1.6rem 1.5rem; border-radius: 1.3rem; background: #fff; border: 1px solid var(--line); }
+  .s-mini h3 { margin-top: 0.9rem; font-size: 1.15rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
+  .s-mini p { margin-top: 0.45rem; color: var(--ink-soft); line-height: 1.65; font-size: 0.97rem; }
+  .s-tick { display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--gold-light); color: var(--olive-deep); }
+  .s-tick .icon { width: 1.05rem; height: 1.05rem; stroke-width: 2.4; }
+
+  /* Fasilitas */
+  .s-fas { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 960px) { .s-fas { grid-template-columns: 1fr 1.1fr; gap: 4.5rem; } }
+  .s-checks { list-style: none; padding: 0; margin-top: 1.75rem; display: grid; gap: 0.7rem; grid-template-columns: 1fr; }
+  @media (min-width: 520px) { .s-checks { grid-template-columns: 1fr 1fr; } }
+  .s-checks li { display: flex; align-items: center; gap: 0.65rem; font-weight: 560; }
+  .s-checks .icon { color: var(--gold-deep); stroke-width: 2.4; }
+  .s-photos { display: grid; grid-template-columns: 1.05fr 1fr; grid-template-rows: auto auto; gap: 0.9rem; }
+  .s-ph { overflow: hidden; background: var(--sand-2); }
+  .s-ph img { width: 100%; height: 100%; object-fit: cover; }
+  .s-ph-a { grid-row: 1 / span 2; border-radius: 9rem 1.2rem 1.2rem 1.2rem; aspect-ratio: 3 / 4.3; }
+  .s-ph-b { border-radius: 1.2rem 1.2rem 1.2rem 1.2rem; aspect-ratio: 4 / 3; }
+  .s-ph-c { border-radius: 1.2rem 1.2rem 6rem 1.2rem; aspect-ratio: 4 / 3; }
+  .s-ph-b img, .s-ph-c img { aspect-ratio: 4 / 3; }
+
+  /* Cocok / belum */
+  .s-fit { display: grid; gap: 1.25rem; }
+  @media (min-width: 860px) { .s-fit { grid-template-columns: 1.15fr 0.85fr; } }
+  .s-fit > div { padding: 2rem; border-radius: 1.75rem; }
+  .s-fit h3 { font-size: 1.3rem; font-weight: 750; letter-spacing: -0.01em; }
+  .s-fit ul { list-style: none; padding: 0; margin-top: 1.2rem; display: grid; gap: 0.85rem; }
+  .s-fit li { display: flex; gap: 0.75rem; line-height: 1.55; align-items: flex-start; }
+  .s-fit li .icon { margin-top: 0.2em; stroke-width: 2.4; }
+  .s-fit-yes { background: var(--olive); color: var(--cream); }
+  .s-fit-yes h3 { color: var(--gold-light); }
+  .s-fit-yes li .icon { color: var(--gold-light); }
+  .s-fit-no { background: var(--sand); border: 1px solid var(--line); }
+  .s-fit-no li { color: var(--ink-soft); }
+  .s-fit-no li .icon { color: var(--rust); }
+  .s-fit-no p { margin-top: 1.4rem; font-family: var(--f-serif); font-style: italic; color: var(--gold-deep); line-height: 1.55; }
+
+  .s-parents { margin-top: 1.25rem; display: grid; gap: 1.75rem; padding: clamp(1.75rem, 1.2rem + 2vw, 3rem); border-radius: 1.75rem; background: var(--sage-deep); color: var(--cream); }
+  @media (min-width: 900px) { .s-parents { grid-template-columns: 0.9fr 1.1fr; align-items: center; gap: 3rem; } }
+  .s-parents h3 { margin-top: 0.7rem; font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem); line-height: 1.2; font-weight: 750; letter-spacing: -0.02em; color: var(--cream); text-wrap: balance; }
+  .s-parents ul { list-style: none; padding: 0; display: grid; gap: 1rem; }
+  .s-parents li { display: grid; grid-template-columns: auto 1fr; gap: 0.85rem; line-height: 1.55; color: #e5e1cf; }
+  .s-parents li b { color: var(--cream); }
+  .s-parents li .icon { width: 1.4rem; height: 1.4rem; margin-top: 0.1rem; color: var(--gold-light); }
+
+  /* Biaya */
+  .s-price { position: relative; overflow: clip; isolation: isolate; }
+  .s-price-mark { position: absolute; z-index: -1; left: -10%; bottom: -18%; width: min(60vw, 40rem); height: auto; opacity: 0.05; pointer-events: none; }
+  .s-price-grid { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 980px) { .s-price-grid { grid-template-columns: 1fr 0.95fr; gap: 5rem; } }
+  .s-price-copy .s-seats { margin-top: 2rem; }
+  .s-legend { list-style: none; padding: 0; margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.6rem 1.5rem; font-size: 0.9rem; color: #d3cdb4; }
+  .s-legend li { display: flex; align-items: center; gap: 0.5rem; }
+  .s-legend .s-seat { width: 0.85rem; flex: none; }
+  .s-hot { margin-top: 1.25rem; display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.5rem 1rem; border-radius: 999px; background: rgb(180 83 42 / 0.2); color: #f3c2ab; font-weight: 700; }
+  .s-hot .s-live { background: #f08a61; }
+  .s-bill { background: var(--cream); color: var(--ink); border-radius: 1.9rem; padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(224 196 138 / 0.4); }
+  .s-bill-head { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
+  .s-bill dl { margin-top: 1rem; }
+  .s-bill dl > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding-block: 1.05rem; border-bottom: 1px dashed var(--sand-2); }
+  .s-bill dt { font-weight: 650; line-height: 1.3; }
+  .s-bill dt small { display: block; margin-top: 0.2rem; font-weight: 500; font-size: 0.82rem; color: var(--ink-soft); }
+  .s-bill dd { font-weight: 800; font-size: 1.15rem; letter-spacing: -0.02em; text-align: right; white-space: nowrap; }
+  .s-bill-main dd { font-size: 1.7rem; color: var(--ink); }
+  .s-bill-main dd s { display: block; font-size: 0.95rem; font-weight: 500; color: var(--ink-soft); text-decoration-color: var(--rust); text-decoration-thickness: 2px; }
+  .s-save { margin-block: 1.1rem 1.25rem; padding: 0.75rem 1rem; border-radius: 0.9rem; background: #f4e1d8; color: #7c3318; font-size: 0.95rem; text-align: center; }
+  .s-rek { margin-top: 1.4rem; font-size: 0.85rem; color: var(--ink-soft); }
+  .s-copy { margin-top: 0.5rem; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.85rem 1rem; text-align: left; border-radius: 1rem; background: var(--sand); border: 1px dashed var(--gold); color: var(--ink); transition: background 200ms; }
+  .s-copy b { display: block; font-size: 1.05rem; letter-spacing: 0.02em; }
+  .s-copy small { color: var(--ink-soft); font-size: 0.8rem; }
+  .s-copy-l { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; color: var(--gold-deep); flex: none; }
+  .s-copy.is-copied { background: #e6efd9; border-color: #7a9b4a; }
+  @media (hover: hover) { .s-copy:hover { background: var(--sand-2); } }
+
+  /* Alur */
+  .s-steps { list-style: none; padding: 0; display: grid; gap: 1rem; counter-reset: s; }
+  @media (min-width: 720px) { .s-steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1080px) { .s-steps { grid-template-columns: repeat(5, 1fr); gap: 0.9rem; } }
+  .s-step { padding: 1.6rem 1.3rem; border-radius: 1.4rem; background: var(--cream); border: 1px solid var(--line); position: relative; }
+  .s-step-no { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--olive); color: var(--gold-light); font-weight: 800; font-size: 1.1rem; }
+  .s-step h3 { margin-top: 1rem; font-size: 1.1rem; font-weight: 700; line-height: 1.25; }
+  .s-step p { margin-top: 0.45rem; font-size: 0.93rem; line-height: 1.6; color: var(--ink-soft); }
+  .s-waves { margin-top: clamp(2.5rem, 2rem + 2vw, 4rem); padding: clamp(1.5rem, 1rem + 2vw, 2.5rem); border-radius: 1.75rem; background: #fff; border: 1px solid var(--line); }
+  .s-waves h3 { font-size: 1.3rem; font-weight: 750; }
+  .s-wave-list { margin-top: 1.1rem; display: grid; gap: 0.75rem; }
+  @media (min-width: 760px) { .s-wave-list { grid-template-columns: repeat(3, 1fr); } }
+  .s-wave { padding: 1.2rem 1.3rem; border-radius: 1.2rem; background: var(--sand); border: 1px solid var(--line); }
+  .s-wave-n { font-weight: 800; font-size: 1.1rem; }
+  .s-wave-d { color: var(--ink-soft); margin-top: 0.15rem; }
+  .s-wave-s { display: inline-block; margin-top: 0.7rem; padding: 0.2rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; background: var(--sand-2); color: var(--ink-soft); }
+  .s-wave.is-now { background: var(--olive); color: var(--cream); border-color: var(--olive); box-shadow: 0 20px 40px -24px rgb(35 37 27 / 0.7); }
+  .s-wave.is-now .s-wave-d { color: #d3cdb4; }
+  .s-wave.is-now .s-wave-s { background: var(--gold-light); color: var(--olive-deep); }
+  .s-wave.is-past { opacity: 0.55; }
+  .s-small { margin-top: 1.2rem; font-size: 0.9rem; color: var(--ink-soft); line-height: 1.6; }
+
+  /* Tim */
+  .s-person { padding: 1.5rem; border-radius: 1.4rem; background: #fff; border: 1px solid var(--line); display: grid; gap: 0.35rem; align-content: start; }
+  .s-avatar { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; border-radius: 50%; background: var(--sand); margin-bottom: 0.6rem; }
+  .s-avatar img { width: 1.9rem; height: auto; }
+  .s-person-r { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-deep); }
+  .s-person h3 { font-size: 1.1rem; font-weight: 700; line-height: 1.35; }
+  .s-support { margin-top: 2rem; text-align: center; color: var(--ink-soft); font-size: 0.95rem; }
+  .s-support b { color: var(--ink); }
+
+  /* FAQ */
+  .s-faq-wrap { display: grid; gap: 2.5rem; }
+  @media (min-width: 960px) { .s-faq-wrap { grid-template-columns: 0.8fr 1.2fr; gap: 4.5rem; align-items: start; } .s-faq-wrap .s-head { position: sticky; top: 6.5rem; margin-bottom: 0; } }
+  .s-head .s-btn { margin-top: 1.6rem; }
+  .s-q { border-bottom: 1px solid var(--line); }
+  .s-q:first-child { border-top: 1px solid var(--line); }
+  .s-q summary { list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 1.25rem; padding: 1.3rem 0; font-weight: 700; font-size: 1.08rem; line-height: 1.35; cursor: pointer; }
+  .s-q summary::-webkit-details-marker { display: none; }
+  .s-q summary .icon { flex: none; width: 1.4rem; height: 1.4rem; color: var(--gold-deep); transition: transform 300ms var(--ease-out); }
+  .s-q[open] summary .icon { transform: rotate(180deg); }
+  .s-a { padding: 0 0 1.4rem; color: var(--ink-soft); line-height: 1.75; max-width: 42rem; }
+  .s-a a { color: var(--gold-deep); text-decoration: underline; text-underline-offset: 3px; }
+  .s-a strong { color: var(--ink); }
+
+  /* Penutup */
+  .s-final { position: relative; overflow: clip; isolation: isolate; text-align: center; color: var(--cream); padding-block: clamp(4.5rem, 3rem + 7vw, 9rem); background:
+    radial-gradient(50rem 28rem at 50% 0%, rgb(188 156 97 / 0.28), transparent 65%),
+    linear-gradient(170deg, #2b2e22, #1a1c14); }
+  .s-final-mark { position: absolute; z-index: -1; left: 50%; top: 50%; width: min(90vw, 44rem); height: auto; transform: translate(-50%, -50%); opacity: 0.05; pointer-events: none; }
+  .s-final-in { max-width: 52rem; }
+  .s-ayat { font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.6rem); color: var(--gold-light); line-height: 2; }
+  .s-ayat-t { margin-top: 0.8rem; font-family: var(--f-serif); font-style: italic; color: #cfc9b0; line-height: 1.7; max-width: 40rem; margin-inline: auto; }
+  .s-ayat-t span { font-style: normal; font-size: 0.88em; color: var(--gold-light); }
+  .s-final-h { margin-top: clamp(2.25rem, 2rem + 1.5vw, 3.5rem); }
+  .s-final-lead { margin-inline: auto; }
+  .s-final-lead strong { color: var(--gold-light) !important; }
+  .s-cd-wide { max-width: 30rem; margin: 2rem auto 0; }
+  .s-final .s-cta-row { margin-top: 2rem; }
+  .s-final .s-cd > div { background: rgb(255 252 243 / 0.07); border: 1px solid rgb(224 196 138 / 0.35); }
+  .s-or { margin-top: 1.75rem; font-size: 0.92rem; color: #bdb8a1; }
+  .s-final .s-cta-wa { margin-top: 0.9rem; }
+
+  /* Footer */
+  .s-footer { background: #15170f; color: #bdb8a1; padding-block: 3rem; font-size: 0.92rem; }
+  .s-footer-in { display: grid; gap: 2rem; }
+  @media (min-width: 900px) { .s-footer-in { grid-template-columns: 1fr 1.3fr 1fr; align-items: start; } }
+  .s-footer img { height: 2.6rem; width: auto; }
+  .s-footer-t { margin-top: 1rem; max-width: 22rem; line-height: 1.6; }
+  .s-footer address { font-style: normal; display: grid; gap: 0.7rem; }
+  .s-footer address p { display: flex; gap: 0.6rem; align-items: flex-start; line-height: 1.5; }
+  .s-footer address .icon { margin-top: 0.2em; color: var(--gold-light); }
+  .s-footer a:hover { color: var(--gold-light); }
+  .s-footer-l nav { display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; }
+  .s-footer-l p { margin-top: 0.9rem; }
+  @media (min-width: 900px) { .s-footer-l nav { justify-content: flex-end; } .s-footer-l { text-align: right; } }
+
+  /* Bilah CTA seluler */
+  .s-mbar { position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; display: flex; gap: 0.6rem; padding: 0.7rem 1rem calc(0.7rem + env(safe-area-inset-bottom)); background: rgb(31 33 24 / 0.94); backdrop-filter: blur(10px); border-top: 1px solid rgb(224 196 138 / 0.25); transform: translateY(110%); transition: transform 450ms var(--ease-out); }
+  .s-mbar.is-on { transform: none; }
+  .s-mbar .s-btn { flex: 1; }
+  .s-mbar-wa { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: #25d366; color: #fff; flex: none; }
+  @media (min-width: 900px) { .s-mbar { display: none; } }
+  @media (max-width: 899px) { .s-footer { padding-bottom: 6rem; } }
+
+  /* data-reveal global memakai opacity; pastikan terlihat tanpa JS */
+</style>

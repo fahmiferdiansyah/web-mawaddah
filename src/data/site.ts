@@ -60,6 +60,30 @@ export const stamInfo = {
   atasNama: 'Yayasan Mawaddah Indonesia',
   adminWa: '6285710463077',
   adminTampil: '+62 857-1046-3077',
+  /** Kontak di brosur */
+  admin: [
+    { nama: 'Ust Ibrahim', wa: '6285710463077', tampil: '0857-1046-3077' },
+    { nama: 'Ust Bagus', wa: '6285890043041', tampil: '0858-9004-3041' },
+  ],
+  instagram: 'stam.mawaddah',
+  alamat: 'Jl. Swadaya I No. 59, RT 07 RW 01, Pondok Ranggon, Cipayung, Jakarta Timur 13860',
+  peta: 'https://maps.app.goo.gl/Ru62vWFYwBvFPDsVA',
+  /** Biaya (rupiah) — sumber: brosur STAM */
+  biaya: { pendaftaran: 500_000, uangMasukNormal: 14_000_000, uangMasukPromo: 7_000_000, syahriyah: 1_750_000 },
+  /** Kuota angkatan pertama dan jumlah kursi berdiskon (25 pendaftar pertama) */
+  kuota: 50,
+  kuotaPromo: 25,
+  /**
+   * Jumlah pendaftar yang sudah terdaftar. Isi angka (mis. 12) agar halaman /stam/ menampilkan
+   * meteran "kursi diskon terisi". Biarkan null bila belum ingin ditampilkan.
+   */
+  terisi: null as number | null,
+  /** Gelombang pendaftaran. `tutup` = hari terakhir (WIB). */
+  gelombang: [
+    { no: 1, tutup: '2026-11-30', label: '30 November 2026' },
+    { no: 2, tutup: '2027-02-02', label: '2 Februari 2027' },
+    { no: 3, tutup: '2027-07-02', label: '2 Juli 2027' },
+  ],
 } as const;
 
 /** Legalitas yayasan */
