@@ -63,7 +63,7 @@ export const stamInfo = {
   /** Kontak di brosur */
   admin: [
     { nama: 'Ust Ibrahim', wa: '6285710463077', tampil: '0857-1046-3077' },
-    { nama: 'Ust Bagus', wa: '6285890043041', tampil: '0858-9004-3041' },
+    { nama: 'Ust Abu Umar', wa: '6285890043041', tampil: '0858-9004-3041' },
   ],
   instagram: 'stam.mawaddah',
   alamat: 'Jl. Swadaya I No. 59, RT 07 RW 01, Pondok Ranggon, Cipayung, Jakarta Timur 13860',
