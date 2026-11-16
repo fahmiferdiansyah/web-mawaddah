@@ -173,7 +173,7 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
         </p>
         <div class="s-cta-row s-rise" style="--d:270ms">
           <a class="s-btn s-btn-gold s-btn-lg s-pulse" href="/daftar-stam/">Amankan Kursi Angkatan Pertama <Icon name="arrow-right" /></a>
-          <a class="s-btn s-btn-ghost s-btn-lg" href={wa('tanya')} target="_blank" rel="noopener"><Icon name="chat" /> Tanya Ustadz</a>
+          <a class="s-btn s-btn-ghost s-btn-lg" href={wa('tanya')} target="_blank" rel="noopener"><Icon name="chat" /> Chat Ustadz</a>
         </div>
         <ul class="s-hero-points s-rise" style="--d:360ms">
           <li><Icon name="check" /> Khusus ikhwan lulusan SMA/MA/sederajat</li>
@@ -370,7 +370,7 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
           <li><Icon name="shield" /><span><b>Berbadan hukum.</b> Yayasan Mawaddah Indonesia berdiri sejak {site.founded}, {legalitas[1].value}.</span></li>
           <li><Icon name="home" /><span><b>Lingkungan terbina.</b> Gedung, masjid, dan dapur milik sendiri, dengan asrama berpendingin ruangan.</span></li>
           <li><Icon name="file" /><span><b>Biaya jelas.</b> Pendaftaran, uang masuk, dan syahriyah tertulis terbuka di halaman ini.</span></li>
-          <li><Icon name="chat" /><span><b>Mudah dihubungi.</b> Dua ustadz admin siap menjawab langsung lewat WhatsApp.</span></li>
+          <li><Icon name="chat" /><span><b>Mudah dihubungi.</b> Para ustadz siap menjawab langsung lewat WhatsApp.</span></li>
         </ul>
       </div>
     </div>
@@ -479,8 +479,8 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
       <header class="s-head" data-reveal>
         <p class="s-kicker">Tanya jawab</p>
         <h2 class="s-h2">Yang paling sering <em>ditanyakan.</em></h2>
-        <p class="s-lead">Belum menemukan jawabannya? Tanyakan langsung kepada ustadz admin kami.</p>
-        <a class="s-btn s-btn-olive" href={wa('tanya', 1)} target="_blank" rel="noopener"><Icon name="chat" /> Chat {admin[1].nama}</a>
+        <p class="s-lead">Belum menemukan jawabannya? Tanyakan langsung kepada ustadz kami.</p>
+        <a class="s-btn s-btn-olive" href={wa('tanya')} target="_blank" rel="noopener"><Icon name="chat" /> Chat Ustadz</a>
       </header>
       <div class="s-faq" data-reveal style="--i:1">
         {faq.map((f, i) => (
@@ -510,7 +510,7 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
       <div class="s-cta-row s-cta-center">
         <a class="s-btn s-btn-gold s-btn-lg s-pulse" href="/daftar-stam/">Daftar STAM Sekarang <Icon name="arrow-right" /></a>
       </div>
-      <p class="s-or">Atau tanya langsung kepada ustadz admin:</p>
+      <p class="s-or">Atau tanya langsung kepada ustadz:</p>
       <div class="s-cta-row s-cta-center s-cta-wa">
         {admin.map((a, i) => (
           <a class="s-btn s-btn-ghost" href={wa('daftar', i)} target="_blank" rel="noopener"><Icon name="chat" /> {a.nama} · {a.tampil}</a>
