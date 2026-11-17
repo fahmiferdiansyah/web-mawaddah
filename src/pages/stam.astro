@@ -456,10 +456,9 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
         <h2 class="s-h2">Dikelola <em>Yayasan Mawaddah Indonesia</em>, lembaga dakwah, pendidikan, dan sosial sejak {site.founded}.</h2>
         <p class="s-lead">Yayasan yang juga mengelola Wesal TV, pesantren Taisiru Ar-Rahman Boarding School, wakaf mushaf Al-Qur’an, serta pembangunan masjid dan sumur. Berbadan hukum dengan {legalitas[1].value}.</p>
       </header>
-      <div class="s-grid3">
+      <div class="s-grid3 s-grid2">
         {[
           { n: 'M. Ibrahim Ar-Rayyan, Lc, S.Pd, M.Pd', r: 'Mudir STAM' },
-          { n: 'Sa’im Kurniawan, A.Md, S.Pd.I', r: 'Kepala Depdik' },
           { n: 'KH. Afifuddien, S.H.I., M.M.', r: 'Ketua Yayasan' },
         ].map((p, i) => (
           <article class="s-person" data-reveal style={`--i:${i}`}>
@@ -802,6 +801,7 @@ const waves = gelombang.map((g) => ({ no: g.no, label: g.label, end: `${g.tutup}
   .s-grid3 { display: grid; gap: 1.1rem; }
   @media (min-width: 680px) { .s-grid3 { grid-template-columns: repeat(2, 1fr); } }
   @media (min-width: 980px) { .s-grid3 { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 980px) { .s-grid3.s-grid2 { grid-template-columns: repeat(2, 1fr); } }
   .s-mini { padding: 1.6rem 1.5rem; border-radius: 1.3rem; background: #fff; border: 1px solid var(--line); }
   .s-mini h3 { margin-top: 0.9rem; font-size: 1.15rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
   .s-mini p { margin-top: 0.45rem; color: var(--ink-soft); line-height: 1.65; font-size: 0.97rem; }
