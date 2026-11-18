@@ -1,0 +1,14 @@
+{
+  "name": "Mawaddah.or.id",
+  "short_name": "Mawaddah.or.id",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "lang": "id",
+  "background_color": "#faf5f8",
+  "theme_color": "#faf5f8",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
